@@ -38,6 +38,7 @@ theme_set(theme_bw(base_size=20))
 ```{r}
 ggplot(data %>% filter(nhidden==2,rseed==0),aes(x=epoch,y=activity,color=condition)) +
   facet_grid(item ~ hidden_unit) + 
+  ggtitle('run 1') +
   geom_line()
 ```
 

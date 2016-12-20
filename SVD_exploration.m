@@ -14,6 +14,6 @@ ilz_IO_c = ideal_linearized_IO-ones(4,1)*mean(ideal_linearized_IO,1);
 [U_lz,S_lz,V_lz] = svd(lz_IO_c.')
 [U_ilz,S_ilz,V_ilz] = svd(ilz_IO_c.')
 
-actual_preoutputs = load('final_preoutputs_rseed_1.csv')
+actual_preoutputs = load('nonlinear_nhidden_2_rseed_0_pre_outputs.csv')
 ap_c = actual_preoutputs-ones(4,1)*mean(actual_preoutputs,1);
 [U_ap,S_ap,V_ap] = svd(ap_c.')
