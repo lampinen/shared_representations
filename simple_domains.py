@@ -8,11 +8,11 @@ init_eta = 0.05
 eta_decay = 1.0 #multiplicative per eta_decay_epoch epochs
 eta_decay_epoch = 10
 nepochs = 500
-nhidden = 2
+nhidden = 6
 
-rseed = 1 #reproducibility
+rseed = 0 #reproducibility
 filename_prefix = "linearized_nhidden_%i_rseed_%i_" %(nhidden,rseed)
-pre_output_filename_to_load = "nonlinear_nhidden_%i_rseed_%i_pre_outputs.csv" %(nhidden,rseed) #If running linearized version, where to load target pre-output values from
+pre_output_filename_to_load = "nonlinear_nhidden_2_rseed_%i_pre_outputs.csv" %(rseed) #If running linearized version, where to load target pre-output values from
 ###################################
 
 x_data = numpy.array([numpy.roll([1,0,0,0],i) for i in xrange(4)])
@@ -130,7 +130,7 @@ for epoch in xrange(nepochs):
 	print "epoch: %i, MSE: %f" %(epoch, test_accuracy())	
     if epoch % 100 == 0:
 	print_reps()	
-#	display_rep_similarity()
+	display_rep_similarity()
     if epoch % eta_decay_epoch == 0:
 	curr_eta *= eta_decay
 fout.close()
