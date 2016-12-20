@@ -10,8 +10,9 @@ eta_decay_epoch = 10
 nepochs = 500
 nhidden = 2
 
-rseed = 0 #reproducibility
-filename = "standard_rep_tracks_rseed_%i.csv" %rseed
+rseed = 1 #reproducibility
+filename_prefix = "linearized_nhidden_%i_rseed_%i_" %(nhidden,rseed)
+pre_output_filename_to_load = "nonlinear_nhidden_%i_rseed_%i_pre_outputs.csv" %(nhidden,rseed) #If running linearized version, where to load target pre-output values from
 ###################################
 
 x_data = numpy.array([numpy.roll([1,0,0,0],i) for i in xrange(4)])
@@ -80,7 +81,6 @@ def get_reps():
 
 def save_activations(tf_object,filename,remove_old=True):
     if remove_old and os.path.exists(filename):
-	print "removing..."
 	os.remove(filename)
     with open(filename,'ab') as fout:
 	for i in xrange(len(x_data)):
@@ -106,16 +106,26 @@ def train_with_standard_loss():
     for example_i in training_order:
 	sess.run(train,feed_dict={eta_ph: curr_eta,input_ph: x_data[example_i].reshape([4,1]),target_ph: y_data[example_i].reshape([6,1])})
 
+def train_with_linearized_loss(targets):
+    training_order = numpy.random.permutation(len(x_data))
+    for example_i in training_order:
+	sess.run(linearized_train,feed_dict={eta_ph: curr_eta,input_ph: x_data[example_i].reshape([4,1]),target_ph: targets[example_i].reshape([6,1])})
+
 print "Initial MSE: %f" %(test_accuracy())
+
+loaded_pre_outputs = numpy.loadtxt(pre_output_filename_to_load,delimiter=',')
 
 curr_eta = init_eta
 rep_track = []
+filename = filename_prefix + "rep_tracks.csv"
+if os.path.exists(filename):
+    os.remove(filename)
 fout = open(filename,'ab')
 for epoch in xrange(nepochs):
-    train_with_standard_loss()
-#    train_with_difference_penalty()
+#    train_with_standard_loss()
+    train_with_linearized_loss(loaded_pre_outputs)
     if epoch % 10 == 0:
-	numpy.savetxt(fout,numpy.array(get_reps()).flatten(),delimiter=',')
+	numpy.savetxt(fout,numpy.array(get_reps()),delimiter=',')
     if epoch % 10 == 0:
 	print "epoch: %i, MSE: %f" %(epoch, test_accuracy())	
     if epoch % 100 == 0:
@@ -129,4 +139,4 @@ fout.close()
 print "Final MSE: %f" %(test_accuracy())
 
 print_preoutputs()
-save_activations(pre_output,"final_preoutputs_rseed_%i.csv" %rseed)
+#save_activations(pre_output,filename_prefix+"pre_outputs.csv")

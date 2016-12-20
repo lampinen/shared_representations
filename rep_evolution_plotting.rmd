@@ -1,0 +1,43 @@
+---
+title: "rep_evolution_plotting.Rmd"
+author: "AndrewLampinen"
+date: "December 20, 2016"
+output: html_document
+---
+
+```{r}
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+```
+
+#load data
+```{r}
+data = data.frame()
+for (condition in c("nonlinear","linearized")) {
+  for (rseed in c(0,1)) {
+    for (nhidden in c(2,6)) {
+      if (!file.exists(sprintf("%s_nhidden_%i_rseed_%i_rep_tracks.csv",condition,nhidden,rseed)))
+      {
+        next
+      }
+      this_track = read.csv(sprintf("%s_nhidden_%i_rseed_%i_rep_tracks.csv",condition,nhidden,rseed),header=F)
+      data = rbind(data,data.frame(condition=rep(condition,200),nhidden=rep(nhidden,200),rseed=rep(rseed,200),epoch=rep(1:50*10,each=4),item=rep(1:4,50),n1=this_track$V1,n2=this_track$V2))
+    }
+  }
+}
+
+data = data %>% gather(hidden_unit,activity,n1,n2)
+```
+
+#plot
+```{r}
+theme_set(theme_bw(base_size=20))
+```
+
+```{r}
+ggplot(data %>% filter(nhidden==2,rseed==0),aes(x=epoch,y=activity,color=condition)) +
+  facet_grid(item ~ hidden_unit) + 
+  geom_line()
+```
+
