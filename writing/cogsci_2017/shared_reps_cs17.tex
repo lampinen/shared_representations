@@ -1,0 +1,71 @@
+%% Change "letterpaper" in the following line to "a4paper" if you must.
+
+\documentclass[10pt,letterpaper]{article}
+
+\usepackage{cogsci}
+\usepackage{pslatex}
+\usepackage{apacite}
+
+
+\title{Shared Structure Learning in Neural Networks}
+ 
+\author{{\large \bf Andrew Lampinen (lampinen@stanford.edu)} \\
+  Department of Psychology, Stanford University \\
+  Jordan Hall, 450 Serra Mall, Stanford CA 94305 
+  \AND {\large \bf Shaw Hsu (cshawhsu@stanford.edu)} \\
+  Department of BioPhysics, Stanford University \\
+  Varian Physics Building, 382 Via Pueblo Mall, Stanford CA 94305
+  \AND {\large \bf James L. McClelland (mcclelland@stanford.edu)} \\
+  Department of Psychology, Stanford University \\
+  Jordan Hall, 450 Serra Mall, Stanford CA 94305} 
+
+
+\begin{document}
+
+\maketitle
+
+
+\begin{abstract}
+The abstract should be one paragraph, indented 1/8~inch on both sides,
+in 9~point font with single spacing. The heading ``{\bf Abstract}''
+should be 10~point, bold, centered, with one line of space below
+it. This one-paragraph abstract section is required only for standard
+six page proceedings papers. Following the abstract should be a blank
+line, followed by the header ``{\bf Keywords:}'' and a list of
+descriptive keywords separated by semicolons, all in 9~point font, as
+shown below.
+
+\textbf{Keywords:} 
+add your choice of indexing terms or keywords; kindly use a
+semicolon; between each term
+\end{abstract}
+
+
+\section{Introduction}
+Neural networks are capable of extracting shared structure from knowledge domains without overlapping inputs \cite{Hinton1986}. This sets them apart from simple forms of statistical patter recognition \cite{Rogers2008}, and  \par
+However, we have little understanding of how, why, or when neural networks are able to extract ``hidden'' structure like this. Here, we describe a preliminary investigation into this question. 
+\section{A New Analysis}
+*Task: learn parallel structures in two separate domains
+    *Linear network needs 4 hidden units to solve, non-linear network needs only 2 because it can extract shared structure -- why?
+*Linear network cannot solve w/ fewer HUs since SVD of block diagonal is block diagonal, and this task I/O correlation matrix is full rank -- linear analyses cannot explain this
+*What if we allow ourselves a single non-linearity, thus changing the class of functions we can approximate?
+*Once the non-linear networks solves the problem, we can reduce to a linearized version whose targets are the pre-nonlinearity outputs of the non-linear network.
+*in this simple case, becomes rank 2
+    *components that emerge are 1) separation of domains and 2) shared structure 
+
+
+
+
+\section{Disussion}
+
+\section{Acknowledgments}
+
+\bibliographystyle{apacite}
+
+\setlength{\bibleftmargin}{.125in}
+\setlength{\bibindent}{-\bibleftmargin}
+
+\bibliography{shared_reps}
+
+
+\end{document}
