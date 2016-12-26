@@ -42,13 +42,18 @@ semicolon; between each term
 
 
 \section{Introduction}
-Neural networks are capable of extracting shared structure from knowledge domains without overlapping inputs \cite{Hinton1986}. This sets them apart from simple forms of statistical patter recognition \cite{Rogers2008}, and  \par
+Neural networks are capable of extracting shared structure from knowledge domains that are completely non-overlapping in their inputs and outputs \cite{Hinton1986}. This sets them apart from simple forms of statistical pattern recognition \cite{Rogers2008}, allows them to form representations that support analogy \cite{Pennington2014,Kollias2013}, and may underly their success on complex tasks like translation between languages \cite[e.g.]{Wu2016}. \par
 However, we have little understanding of how, why, or when neural networks are able to extract ``hidden'' structure like this. Here, we describe a preliminary investigation into this question. 
-\section{A New Analysis}
-*Task: learn parallel structures in two separate domains
-    *Linear network needs 4 hidden units to solve, non-linear network needs only 2 because it can extract shared structure -- why?
-*Linear network cannot solve w/ fewer HUs since SVD of block diagonal is block diagonal, and this task I/O correlation matrix is full rank -- linear analyses cannot explain this
-*What if we allow ourselves a single non-linearity, thus changing the class of functions we can approximate?
+\section{A New Analysis Approach}
+\subsection{Task}
+In the original work of Hinton \cite{Hinton1986}, a neural network was taught to answer queries about the structure of two perfectly analogous family trees (one English and one Italian), and was shown to generate representations that extract the analogy, in the sense that analogous people from different family trees are represented similarly. Here, we pare this task down to its barest essentials: two perfectly analogous domains with separate inputs and ouputs. (Figure here) How can a neural network extract the shared structure from these domains? \par
+\subsection{Linear Analysis?}
+There have been recent developments in the theory of linear neural networks which show that the process of learning is entirely driven by the Singular Value Decomposition (SVD) of the input-output correlation matrix \cite{Saxe2013}. These results have been shown to have implications for the learning of non-linear networks as well, so linear neural networks can be thought of as a relaxation of non-linear neural networks to make analysis more tractable. Thus one might ask whether our questions can be analyzed within this linear framework. \par
+Unfortunately, linear networks cannot extract shared structure from non-overlapping inputs and outputs. This can be seen because the input-output correlation matrix is block diagonal in this case, and the SVD of a block-diagonal matrix is also block-diagonal (see Fig. \ref{SVD_figure} for demonstration of this on our task). In other words, the representational components that a linear network learns will be separated by domain, there will not be any sharing of structure.\par 
+Furthermore, the rank $k$ approximation to a matrix which minimizes mean-squared output error for that matrix is to take the top $k$ components from the SVD. If the network's hidden layers are restricted to rank lower than that of the input-output correlation matrix, detail within the domains will be lost. This means that a linear neural network cannot solve the task perfectly if any of its hidden layers has a number of units smaller than the rank of the input-output correlation matrix. In the usual case when the input-output correlation matrix is full rank, a linear network requires at least one unit for every output or one for every input, whichever is smaller. By contrast, a non-linear network can exploit the shared structure of the domains to learn the task with substantially fewer hidden units, as shown below and in \cite{Hinton1986}. In the next section, we outline an intermediate, linearized relaxation for this task that both allows shared structure extraction and simple analysis. 
+\subsection{A Linearized Relaxation}
+Consider the fact that our task is solvable by logistic regression (i.e. it is linearly separable). Thus, while a linear network cannot solve the task if its hidden layer is smaller than the rank of the input-output correlation matrix, inserting a non-linearity after the output layer only may make the task solvable again (in the case that the non-linearity is a sigmoid, this essentially reduces the problem to logistic regression). \par
+When the network  
 *Once the non-linear networks solves the problem, we can reduce to a linearized version whose targets are the pre-nonlinearity outputs of the non-linear network.
 *in this simple case, becomes rank 2
     *components that emerge are 1) separation of domains and 2) shared structure 
