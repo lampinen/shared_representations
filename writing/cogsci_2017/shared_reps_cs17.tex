@@ -52,9 +52,9 @@ There have been recent developments in the theory of linear neural networks whic
 Unfortunately, linear networks cannot extract shared structure from non-overlapping inputs and outputs. This can be seen because the input-output correlation matrix is block diagonal in this case, and the SVD of a block-diagonal matrix is also block-diagonal (see Fig. \ref{SVD_figure} for demonstration of this on our task). In other words, the representational components that a linear network learns will be separated by domain, there will not be any sharing of structure.\par 
 Furthermore, the rank $k$ approximation to a matrix which minimizes mean-squared output error for that matrix is to take the top $k$ components from the SVD. If the network's hidden layers are restricted to rank lower than that of the input-output correlation matrix, detail within the domains will be lost. This means that a linear neural network cannot solve the task perfectly if any of its hidden layers has a number of units smaller than the rank of the input-output correlation matrix. In the usual case when the input-output correlation matrix is full rank, a linear network requires at least one unit for every output or one for every input, whichever is smaller. By contrast, a non-linear network can exploit the shared structure of the domains to learn the task with substantially fewer hidden units, as shown below and in \cite{Hinton1986}. In the next section, we outline an intermediate, linearized relaxation for this task that both allows shared structure extraction and simple analysis. 
 \subsection{A Linearized Relaxation}
-Consider the fact that our task is solvable by logistic regression (i.e. it is linearly separable). Thus, while a linear network cannot solve the task if its hidden layer is smaller than the rank of the input-output correlation matrix, inserting a non-linearity after the output layer only may make the task solvable again (in the case that the non-linearity is a sigmoid, this essentially reduces the problem to logistic regression). \par
-When the network  
-*Once the non-linear networks solves the problem, we can reduce to a linearized version whose targets are the pre-nonlinearity outputs of the non-linear network.
+Consider the fact that our task is solvable by logistic regression (i.e. it is linearly separable). Thus, while a linear network cannot solve the task if its hidden layer is smaller than the rank of the input-output correlation matrix, inserting a single non-linearity after the output layer may make the task solvable again. In the case that the non-linearity is a sigmoid, this essentially reduces the problem to logistic regression; here we will use rectified linear units in our analysis because the discontinuity makes the output patterns more intuitively interpretable. \par 
+Once this almost-linear network has solved the problem, consider its outputs prior to the non-linearity. These are produced by the linear part of the network, and together with the non-linearity suffice to produce the desired output pattern. We can use these to turn the problem into a linearly analyzable one -- simply use these outputs as targets for a linear network. Then the problem becomes susceptible to the types of linear analyses discussed above. \par 
+
 *in this simple case, becomes rank 2
     *components that emerge are 1) separation of domains and 2) shared structure 
 
@@ -62,7 +62,7 @@ When the network
 
 
 \section{Disussion}
-
+*Since every layer of any network is linear with a final non-linearity, can this technique give us a better grasp on what's actually going on overall?
 \section{Acknowledgments}
 
 \bibliographystyle{apacite}
