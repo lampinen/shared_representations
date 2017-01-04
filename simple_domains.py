@@ -84,7 +84,7 @@ def save_activations(tf_object,filename,remove_old=True):
 	os.remove(filename)
     with open(filename,'ab') as fout:
 	for i in xrange(len(x_data)):
-	    numpy.savetxt(fout,sess.run(tf_object,feed_dict={input_ph: x_data[i].reshape([4,1])}).reshape((1,6)),delimiter=',')
+	    numpy.savetxt(fout,sess.run(tf_object,feed_dict={input_ph: x_data[i].reshape([4,1])}).reshape((1,-1)),delimiter=',')
 
 
 def display_rep_similarity():
