@@ -253,7 +253,8 @@ for rseed in xrange(1):
     b1 = tf.Variable(tf.random_uniform([nhidden_shared,1],0,0.1))
     W2 = tf.Variable(tf.random_uniform([output_shape,nhidden_shared],0,0.1))
     b2 = tf.Variable(tf.random_uniform([output_shape,1],0,0.1))
-    middle_rep = tf.nn.relu(tf.matmul(W1,tf.concat(0,[people_input,relationship_input]))+b1)
+    pre_middle_rep = tf.matmul(W1,tf.concat(0,[people_input,relationship_input]))+b1
+    middle_rep = tf.nn.relu(pre_middle_rep)
 
     pre_output = tf.matmul(W2,middle_rep)+b2
 
@@ -371,5 +372,5 @@ for rseed in xrange(1):
     print "Final MSE: %f" %(test_accuracy())
 
 #    print_preoutputs()
-    save_activations(middle_rep,filename_prefix+"middle_reps.csv")
+    save_activations(pre_middle_rep,filename_prefix+"pre_middle_reps.csv")
     save_activations(pre_output,filename_prefix+"pre_outputs.csv")
