@@ -52,17 +52,28 @@ V_lz2_max_mag = max(max(abs(V_lz2(1:end,1:12))));
 imagesc(V_lz2(1:end,1:12),[-V_lz2_max_mag,V_lz2_max_mag])
 colormap(redbluecmap)
 
-%%
-
+%% non-parametric test of whether cross domain projections are significantly higher than shuffled projections
+display('V_lz')
 V_lz_top = V_lz(1:24,1:12);
 V_lz_bottom = V_lz(25:end,1:12);
-sum(V_lz_top.*V_lz_bottom,1)
-display('shuffled')
+V_lz_projections = sum(V_lz_top.*V_lz_bottom,1);
 
-shuffled_V_lz_bottom = reshape(V_lz_bottom(randperm(24*12)),[24 12]);
-sum(V_lz_top.*shuffled_V_lz_bottom,1)
+permuted_projections = zeros(1000,12);
+display('shuffled_V_lz')
+for i = 1:1000
+    
+    shuffled_V_lz= V_lz(randperm(48),1:12);
+    shuffled_V_lz_top = shuffled_V_lz(1:24,1:12);
+    shuffled_V_lz_bottom = shuffled_V_lz(25:end,1:12);
+    permuted_projections(i,:) = sum(shuffled_V_lz_top.*shuffled_V_lz_bottom,1);
+end
 
+significance_cutoffs = prctile(abs(permuted_projections),95,1);
 
+display(V_lz_projections);
+display(significance_cutoffs);
+
+display(abs(V_lz_projections) > significance_cutoffs);
 
 %%
 
@@ -85,9 +96,9 @@ for i = 1:1000
     maxBs(i) = max(abs(B));
 end
 
-highest_value = max(abs(A));
+highest_value = (abs(A(3)))
 first_component_value = abs(A(1))
-significance_threshold = prctile(maxBs,95);
+significance_threshold = prctile(maxBs,5)
 
 %% How do these project onto modes from offset version (even though it doesn't quite solve the problem)?
 
