@@ -4,10 +4,10 @@ import matplotlib.pyplot as plt
 import os
 
 ######Parameters###################
-init_eta = 0.005
+init_eta = 0.001
 eta_decay = 1.0 #multiplicative per eta_decay_epoch epochs
 eta_decay_epoch = 10
-nepochs = 1000
+nepochs = 5000
 nhidden_separate = 12
 nhidden_shared = 12
 npeople_per = 12
@@ -212,7 +212,7 @@ for rseed in xrange(1):
     numpy.random.seed(rseed)
     tf.set_random_seed(rseed)
 
-    input_ph = tf.placeholder(tf.float32, shape=[input_shape,1])
+    input_ph = tf.placeholder(tf.float32, shape=[input_shape,None])
     #handle some reshaping to get from block diagonal data matrix structure to desired input structure
     split_inputs = tf.split_v(input_ph,[(npeople_per if (i % 2 == 0) else nrelationships_per) for i in xrange(nfamilies*2)],0)
     people_inputs = [this_input for (i,this_input) in enumerate(split_inputs) if i % 2 == 0]
@@ -267,8 +267,8 @@ for rseed in xrange(1):
     output = tf.nn.relu(pre_output)
 
 
-    target_ph =  tf.placeholder(tf.float32, shape=[output_shape,1])
-    pre_output_target_ph =  tf.placeholder(tf.float32, shape=[output_shape,1])
+    target_ph =  tf.placeholder(tf.float32, shape=[output_shape,None])
+    pre_output_target_ph =  tf.placeholder(tf.float32, shape=[output_shape,None])
 
     loss = tf.reduce_sum(tf.square(output - target_ph))
     linearized_loss = tf.reduce_sum(tf.square(pre_output - pre_output_target_ph))
@@ -352,6 +352,9 @@ for rseed in xrange(1):
 	for example_i in training_order:
 	    sess.run(train,feed_dict={eta_ph: curr_eta,input_ph: x_data[example_i].reshape([input_shape,1]),target_ph: y_data[example_i].reshape([output_shape,1])})
 
+    def batch_train_with_standard_loss():
+	sess.run(train,feed_dict={eta_ph: curr_eta,input_ph: x_data.transpose(),target_ph: y_data.transpose()})
+
     def train_with_linearized_loss(targets):
 	training_order = numpy.random.permutation(len(x_data))
 	for example_i in training_order:
@@ -368,6 +371,7 @@ for rseed in xrange(1):
 	os.remove(filename)
     fout = open(filename,'ab')
     for epoch in xrange(nepochs):
+#        batch_train_with_standard_loss()
         train_with_standard_loss()
     #    train_with_linearized_loss(loaded_pre_outputs)
 #	train_with_linearized_loss(y_data)
@@ -390,5 +394,7 @@ for rseed in xrange(1):
     print "Final MSE: %f" %(test_accuracy())
 
 #    print_preoutputs()
+    display_rep_similarity()
+    display_po_similarity()
     save_activations(pre_middle_rep,filename_prefix+"pre_middle_reps.csv")
     save_activations(pre_output,filename_prefix+"pre_outputs.csv")
