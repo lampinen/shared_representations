@@ -5,7 +5,7 @@ import os
 
 ######Parameters###################
 init_eta = 0.005
-eta_decay = 0.99 #multiplicative per eta_decay_epoch epochs
+eta_decay = 1.0 #multiplicative per eta_decay_epoch epochs
 eta_decay_epoch = 10
 nepochs = 1000
 nhidden_separate = 12
@@ -150,7 +150,10 @@ def restructure_dict(x):
     return new_dict
 
 restructured_relationship_dict = restructure_dict(relationship_dict)
+print restructured_relationship_dict.keys()
 print restructured_relationship_dict
+print 
+print
 
 #Now build single family's data matrix
 restructured_relationship_dict_keys = restructured_relationship_dict.keys()
@@ -159,6 +162,9 @@ one_family_input_matrix = numpy.zeros((num_relations,npeople_per+nrelationships_
 one_family_output_matrix = numpy.zeros((num_relations,npeople_per)) 
 people = gender.keys()
 relationships = ["F","M","H","W","Son","D","U","A","B","Sis","Nep","Nie"]
+
+print people
+print relationships
 for i in xrange(len(restructured_relationship_dict_keys)):
     key = restructured_relationship_dict_keys[i]
     one_family_input_matrix[i,people.index(key[0])] = 1
@@ -319,7 +325,7 @@ for rseed in xrange(1):
 	reps = []
 	nsamples = len(x_data)
 	for i in xrange(nsamples):
-	    reps.append(sess.run(middle_rep,feed_dict={input_ph: x_data[i].reshape([input_shape,1])}).flatten())
+	    reps.append(sess.run(pre_middle_rep,feed_dict={input_ph: x_data[i].reshape([input_shape,1])}).flatten())
 	item_rep_similarity = numpy.zeros([nsamples,nsamples])
 	for i in xrange(nsamples):
 	    for j in xrange(i,nsamples):
@@ -328,6 +334,18 @@ for rseed in xrange(1):
 	plt.imshow(item_rep_similarity,cmap='Greys_r',interpolation='none') #cosine distance
 	plt.show()
 
+    def display_po_similarity():
+	reps = []
+	nsamples = len(x_data)
+	for i in xrange(nsamples):
+	    reps.append(sess.run(pre_output,feed_dict={input_ph: x_data[i].reshape([input_shape,1])}).flatten())
+	item_rep_similarity = numpy.zeros([nsamples,nsamples])
+	for i in xrange(nsamples):
+	    for j in xrange(i,nsamples):
+		item_rep_similarity[i,j] = numpy.linalg.norm(reps[i]-reps[j]) 
+		item_rep_similarity[j,i] = item_rep_similarity[i,j]
+	plt.imshow(item_rep_similarity,cmap='Greys_r',interpolation='none') #cosine distance
+	plt.show()
 
     def train_with_standard_loss():
 	training_order = numpy.random.permutation(len(x_data))
@@ -362,8 +380,8 @@ for rseed in xrange(1):
 	if epoch % 10 == 0:
 	    print "epoch: %i, MSE: %f" %(epoch, test_accuracy())	
 #	if epoch % 100 == 0:
-#	    print_reps()	
 #	    display_rep_similarity()
+#	    display_po_similarity()
 	if epoch % eta_decay_epoch == 0:
 	    curr_eta *= eta_decay
     fout.close()

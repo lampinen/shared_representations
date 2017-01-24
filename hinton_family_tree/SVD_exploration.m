@@ -8,18 +8,8 @@ nl_IO_c = nl_IO-ones(48,1)*mean(nl_IO,1);
 
 [U_nl,S_nl,V_nl] = svd(nl_IO_c.');
 
-% offset = nl_IO(1:24,1:12);
-% offset = offset-max(max(offset));
-%
-%
-% linearized_IO = nl_IO;
-% linearized_IO(1:24,13:end) = offset;
-% linearized_IO(25:end,1:12) = offset;
-% 
-% lz_IO_c = linearized_IO-ones(48,1)*mean(linearized_IO,1);
-% 
-% [U_lz,S_lz,V_lz] = svd(lz_IO_c.');
 
+%% Load
 actual_pre_middle_reps = load('results/hinton_nonlinear_nhidden_12_rseed_0_pre_middle_reps.csv');
 actual_middle_reps = max(actual_pre_middle_reps,0);
 actual_pre_outputs = load('results/hinton_nonlinear_nhidden_12_rseed_0_pre_outputs.csv');
@@ -27,13 +17,15 @@ actual_pre_outputs = load('results/hinton_nonlinear_nhidden_12_rseed_0_pre_outpu
 apmr_max_mag = max(max(abs(actual_pre_middle_reps)));
 apo_max_mag = max(max(abs(actual_pre_outputs)));
 
-imagesc(actual_pre_outputs,[-apo_max_mag,apo_max_mag])
-colormap(redbluecmap)
-
 imagesc(actual_pre_middle_reps,[-apmr_max_mag,apmr_max_mag])
 colormap(redbluecmap)
 
-%% Layer 1
+imagesc(actual_pre_outputs,[-apo_max_mag,apo_max_mag])
+colormap(redbluecmap)
+
+
+
+%% Layer 1 plot
 lz_IO = input.'*actual_pre_middle_reps;
 
 lz_IO_c = lz_IO-ones(48,1)*mean(lz_IO,1);
@@ -41,11 +33,11 @@ lz_IO_c = lz_IO-ones(48,1)*mean(lz_IO,1);
 [U_lz,S_lz,V_lz] = svd(lz_IO_c.');
 
 figure
-V_lz_max_mag = max(max(abs(V_lz(1:end,1:10))));
-imagesc(V_lz(1:end,1:10),[-V_lz_max_mag,V_lz_max_mag])
+V_lz_max_mag = max(max(abs(V_lz(1:end,1:12))));
+imagesc(V_lz(1:end,1:12),[-V_lz_max_mag,V_lz_max_mag])
 colormap(redbluecmap)
 
-%% Layer 2
+%% Layer 2 plot
 lz_IO_2 = actual_middle_reps.'*actual_pre_outputs;
 
 lz_IO_2_c = lz_IO_2-ones(12,1)*mean(lz_IO_2,1);
@@ -56,6 +48,74 @@ diag(S_lz2)
 
 figure 
 
-V_lz2_max_mag = max(max(abs(V_lz2(1:end,1:10))));
-imagesc(V_lz2(1:end,1:10),[-V_lz2_max_mag,V_lz2_max_mag])
+V_lz2_max_mag = max(max(abs(V_lz2(1:end,1:12))));
+imagesc(V_lz2(1:end,1:12),[-V_lz2_max_mag,V_lz2_max_mag])
 colormap(redbluecmap)
+
+%%
+
+V_lz_top = V_lz(1:24,1:12);
+V_lz_bottom = V_lz(25:end,1:12);
+sum(V_lz_top.*V_lz_bottom,1)
+display('shuffled')
+
+shuffled_V_lz_bottom = reshape(V_lz_bottom(randperm(24*12)),[24 12]);
+sum(V_lz_top.*shuffled_V_lz_bottom,1)
+
+
+
+%%
+
+figure
+
+U_lz2_max_mag = max(max(abs(U_lz2(1:end,1:12))));
+imagesc(U_lz2(1:end,1:12),[-U_lz2_max_mag,U_lz2_max_mag])
+colormap(redbluecmap)
+
+%% nonparametric test of projection of input modes onto the "domain" dimension
+q = ones(48,1);
+q(25:48) = -1;
+A = q.'*V_lz;
+
+
+maxBs = zeros(1000,1);
+
+for i = 1:1000
+    B = q(randperm(48)).'*V_lz; %lazy non-parametric estimate of how unusual the above projections are
+    maxBs(i) = max(abs(B));
+end
+
+highest_value = max(abs(A));
+first_component_value = abs(A(1))
+significance_threshold = prctile(maxBs,95);
+
+%% How do these project onto modes from offset version (even though it doesn't quite solve the problem)?
+
+offset = nl_IO(1:24,1:12);
+offset = offset-max(max(offset));
+
+
+ideal_linearized_IO = nl_IO;
+ideal_linearized_IO(1:24,13:end) = offset;
+ideal_linearized_IO(25:end,1:12) = offset;
+
+ilz_IO_c = ideal_linearized_IO-ones(48,1)*mean(ideal_linearized_IO,1);
+
+[U_ilz,S_ilz,V_ilz] = svd(ilz_IO_c.');
+
+%input
+figure 
+projection_strengths = abs(V_ilz(1:end,1:13).'*V_lz(1:end,1:12));
+max_ps = max(max(projection_strengths));
+imagesc(projection_strengths,[-max_ps,max_ps]);
+colormap(redbluecmap);
+
+%output
+figure 
+projection_strengths = abs(U_ilz(1:end,1:13).'*U_lz2(1:end,1:12));
+max_ps = max(max(projection_strengths));
+imagesc(projection_strengths,[-max_ps,max_ps]);
+colormap(redbluecmap);
+
+%% Looking at second layer?
+imagesc(lz_IO*V_lz2)
