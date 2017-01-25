@@ -64,9 +64,14 @@ In the original work of \citet{Hinton1986}, a neural network was taught to answe
  0 & 0 & 0 & 1 & 0 & 1\\
 \end{matrix}  \right] 
 \]
- We train a neural network with a single hidden layer (4 units) to solve this task. (No biases were used, weights were initialized randomly between 0 and 0.1, all training was done by SGD with \(\eta = 0.01\) for 500 epochs.) We include only a single non-linearity (a rectifier) at the output layer. When and how does this simple network extract the shared structure from the domains? \par
+We train a neural network with a single hidden layer (4 units) to solve this task. (No biases were used, weights were initialized randomly between 0 and 0.1, all training was done by SGD with \(\eta = 0.01\) for 500 epochs.) We include only a single non-linearity (a rectifier) at the output layer. When and how does this simple network extract the shared structure from the domains? \par
 \begin{figure*}
 \centering
+\begin{subfigure}{0.22\textwidth}
+\includegraphics[width=\textwidth]{figures/nonlinear_IO.png}
+\caption{$\Sigma_{IO,nl}$}
+\end{subfigure}
+\huge{$=$}
 \begin{subfigure}{0.22\textwidth}
 \includegraphics[width=\textwidth]{figures/U_nl.png}
 \caption{$U_{nl}$}
@@ -81,11 +86,6 @@ In the original work of \citet{Hinton1986}, a neural network was taught to answe
 \includegraphics[width=\textwidth]{figures/V_nl.png}
 \caption{$V_{nl}$}
 \end{subfigure}
-\huge{$=$}
-\begin{subfigure}{0.22\textwidth}
-\includegraphics[width=\textwidth]{figures/nonlinear_IO.png}
-\caption{$\Sigma_{IO,nl}$}
-\end{subfigure}
 \caption{SVD of regular input-output correlation matrix (components with singular value zero are omitted from this figure)}
 \label{regular_SVD_figure}
 \end{figure*}
@@ -95,6 +95,11 @@ Unfortunately, linear networks cannot extract shared structure from non-overlapp
 Furthermore, the optimal rank $k$ approximation to a matrix is to take the top $k$ components from the SVD \citep{Golub1987, Mirsky1960}. If a linear network's hidden layers are restricted to rank lower than that of the input-output correlation matrix, detail within the domains will be lost. This means that a linear neural network cannot solve the task perfectly if any of its hidden layers has a number of units smaller than the rank of the input-output correlation matrix. In the usual case when the input-output correlation matrix is full rank, a linear network requires at least one unit for every output or one for every input, whichever is smaller. By contrast, a non-linear network can exploit the shared structure of the domains to learn the task with fewer hidden units, as shown below and in \citep{Hinton1986}. In the next section, we outline an approach to analyzing this task based on reducing it to a linear problem.
 \begin{figure*}
 \centering
+\begin{subfigure}{0.22\textwidth}
+\includegraphics[width=\textwidth]{figures/linearized_IO.png}
+\caption{$\Sigma_{IO,lz}$}
+\end{subfigure}
+\huge{$=$}
 \begin{subfigure}{0.22\textwidth}
 \includegraphics[width=\textwidth]{figures/U_lz.png}
 \caption{$U_{lz}$}
@@ -109,17 +114,17 @@ Furthermore, the optimal rank $k$ approximation to a matrix is to take the top $
 \includegraphics[width=\textwidth]{figures/V_lz.png}
 \caption{$V_{lz}$}
 \end{subfigure}
-\huge{$=$}
-\begin{subfigure}{0.22\textwidth}
-\includegraphics[width=\textwidth]{figures/linearized_IO.png}
-\caption{$\Sigma_{IO,lz}$}
-\end{subfigure}
 \caption{SVD of linearized input-output correlation matrix (components with singular value zero are omitted from this figure)}
 \label{linearized_SVD_figure}
 \end{figure*}
 \subsection{A Linearized Approach}
+\begin{figure}
+\includegraphics[width=0.5\textwidth]{figures/network_diagram.png}
+\caption{Diagram of network for the simple task, showing a sample propagation of an input through the network with the single non-linearity at the output.}
+\label{network_diagram}
+\end{figure}
 Consider the fact that our task is solvable by logistic regression (i.e. it is linearly separable). Thus, while a linear network cannot extract shared structure from the task, inserting a single non-linearity after the output layer may cause it to do so again. In the case that the non-linearity is a sigmoid, this essentially reduces the problem to logistic regression; here we will use rectified linear units in our analysis because their structure makes the output patterns more intuitively interpretable. \par 
-Once this almost-linear network has solved the problem, consider its outputs immediately prior to the non-linearity. These are produced by the linear part of the network, and together with the non-linearity suffice to produce the desired output pattern. We can use these to turn the problem into a linearly analyzable one -- simply treat these pre-nonlinearity outputs as outputs of a linear network. Then the problem becomes susceptible to the types of linear analyses discussed above. We will refer to this as the ``linearized'' version of the task. \par 
+Once this almost-linear network has solved the problem, consider its outputs immediately prior to the non-linearity. These are produced by the linear part of the network, and together with the non-linearity suffice to produce the desired output pattern. We can use these to turn the problem into a linearly analyzable one -- simply treat these pre-nonlinearity outputs as outputs of a linear network. Then the problem becomes susceptible to the types of linear analyses discussed above. We will refer to this as the ``linearized'' version of the task. See fig. \ref{network_diagram} for a diagram of the network. \par 
 In the simple task described above, the solution that the nonlinear network discovers the majority of the time (about 75\%) is to output the same pattern on both sets of output units, but offset the ``incorrect'' domain sufficiently negative so that the output after the rectifier is zero, thus transforming the input-output mapping into the linearized input-output mapping as follows:
 \[
 \left[ \begin{matrix} 
@@ -145,7 +150,7 @@ Now that we have a linearized version of the task, we can perform a linear analy
 Furthermore, because this solution is rank 2, a non-linear network with two hidden units should be able to solve the task, whereas a linear network will require at least 3. We have verified these results empirically for this task. Thus the ability of a non-linear neural network to extract common structure from multiple tasks can allow it to find lower-rank solutions.
  
  
-\subsection{Evolution of input/output mappings in this task}
+\subsection{Evolution of I/O Mappings}
 \begin{figure}
 \centering
 \includegraphics[width=0.5\textwidth]{figures/regular_SVD_component_learning.png}
@@ -214,6 +219,39 @@ Why do both networks show shared structure extraction initially? At the stage wh
 \] 
 Using this shared structure enables the network to accelerate learning, even if it must eventually discard it in the linear case.  \par
 Why does this structure persist in the non-linear network but die out in the linear network? In the linear network, as mentioned above, the optimal solution the network must reach is to precisely learn the linear SVD. Since the components of the linear SVD do not have shared structure, the linear network cannot extract shared structure at convergence. By contrast, the non-linear network can simply offset the other domain's outputs further below zero, and thus maintain the shared structure, as we see in the solution with offsets. 
+\section{Reanalyzing Hinton's Family Tree Example}
+\begin{figure}
+\includegraphics[width=0.5\textwidth]{figures/hinton_family_tree_figure.png}
+\caption{Family trees from \citet{Hinton1986}, (permission pending).}
+\label{hinton_family_tree_figure}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[width=0.5\textwidth]{figures/family_tree_network_diagram.png}
+\caption{Diagram of the network we used for the family tree task}
+\label{family_tree_network_diagram}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[width=0.5\textwidth]{figures/ft_input_mode_example.png}
+\caption{Example layer 1 SVD input modes from the family tree task}
+\label{ft_input_mode_example}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[width=0.5\textwidth]{figures/ft_input_mode_significance_hist.png}
+\caption{How many of the input modes from the layer 1 SVD showed significantly more projection than would be expected between the domains regularly, if one family tree was completely flipped, or in either case (without double counting)}
+\label{ft_input_mode_sig_hist}
+\end{figure}
+Next, we briefly turn our attention to the example of \citet{Hinton1986} which inspired this work. Hinton described a task of learning the structure of two isomorphic family trees, one English and one Italian (see fig. \ref{hinton_family_tree_figure}). This structure is presented implicitly in the form of presenting a person (e.g. ``Jennifer'') and a relationship (e.g. ``Father''), and training the network to identify the correct person (``Andrew'' in this case). Unlike the simple problem above, this problem is not linearly separable, so we used a network with a non-linearity at the hidden layer as well (see fig. \ref{family_tree_network_diagram} for a diagram of our network). Hinton used the same relationship inputs for both families, but to highlight the shared structure extraction we separated these into distinct inputs (these could be thought of as corresponding to the English and Italian words for different relations e.g. ``mother'' vs. ``madre'' ). \par 
+Of course, the %%TODO \par
+The difficulty of analyzing the shared structure here is compounded by the complexity of the structure being learned in each family. In the simple problem above it was possible to ``eyeball'' the structure extraction, but here the structure is too rich. There are a variety of possible ways the families can be mapped onto one another (e.g. flipping the tree left to right and swapping all genders), and it's possible that the networks are extracting overlapping structure from several of these analogies (see fig. \ref{ft_input_mode_example} for an example of the first layer input mode structure one network learned). In this setting, how can we examine the shared structure extraction? \par
+As a first test of the shared structure, we tested how much each of the input modes of the SVD of the first layer showed greater than chance similarity between the inputs corresponding to the two families. To do this, we computed the dot product of the mode's weights for one family with that mode's weights for the other family, and then tested the significance of this projection by comparing it to the chance distribution generated by randomly permuting the columns of the input mode matrix 1000 times and computing the same dot product for each of these. We denoted a mode as showing significant shared structure extraction if it showed a stronger similarity between the weights for the two families' inputs than 95\% of the random permutations of that mode. \par
+We repeated this process across 100 network initilizations and found a great deal of shared structure was being extracted. The runs had a median of 4 modes showing significant shared structure extraction, and all the runs had at least one mode with significant shared structure extraction (for comparison, if 5\% of the modes showed significant results by chance, we would still expect 54\% of the runs to yield no significant results, and the median number of shared structure components would thus be zero). To account for the symmetry of the tree under flipping, we did the same analysis after permuting the second families input columns in such a way as to effectively flip the family tree and reverse all the genders. Since the network has no way to distinguish between the ``regular'' mapping and this ``flipped'' mapping during learning, we would expect to see similar representation of this shared structure, and indeed the distribution is similar. Furthermore, in 95\% of the runs the network has extracted 3 or more significant components for the regular mapping or 3 or more significant components for the flipped mapping, and in all of the runs it has extracted 3 or more components that are significant under one of the two mappings (if we assume 5\% false positives again, we would expect these results in only 4\% and 3\% of the runs, respectively). See fig. \ref{ft_input_mode_sig_hist} for a histogram of the number of significant input modes by run for the various types of similarity. Clearly a great deal of shared structure is being extracted in the layer 1 mapping. \par
+We performed an analogous analysis for the output modes of layer 2, and again found a great deal of shared structure extraction, though less than in the input modes of the first layer 
 \section{Disussion}
 We have explored how a simple neural network can extract shared structure from multiple analogous domains with non-overlapping inputs and outputs. We showed that a single non-linearity at the output layer of a neural network can allow this shared structure to emerge on a simple task, and that it emerges naturally (even in a linear network) once the base rates of the various domains have been learned, because incorporating it reduces MSE. A linear network must discard this structure to reach its optimal solution, but a non-linear network is able to retain it by simply offsetting the outputs to a sufficiently negative value for its nonlinearity, and does so the majority of the time (75\%). Here we used rectifiers as our non-linearity, but the same solution type is achievable with sigmoid, tanh, etc. \par 
 These results suggest that rather than an advanced cognitive ability requiring symbolic computations, analogy may be simply a natural feature of gradient based learning. It is particularly interesting to think about how shared structure between tasks can facilitate more rapid learning and better performance on these tasks, as with the multi-task machine learning examples cited above. More broadly, the power and generality of human cognition may result from the range of deeply related tasks we engage in, all of which we can extract shared structures from. 
@@ -221,10 +259,13 @@ These results suggest that rather than an advanced cognitive ability requiring s
 We think there are a variety of exciting future directions for this work. 
 \begin{enumerate}
 \item It would be useful to explore how learning trajectories might change with explicit cueing of the shared structure (e.g. presenting analogous exemplars together), or when one domain is learned before another. How does this change shared structure extraction?
-\item It would be useful to apply our theoretical analysis to more complex tasks, like that of \citet{Hinton1986}. 
+\item Similarly, how does structure extraction change when some inputs are shared between analogous items (as \citet{Hinton1986} did with the relationship inputs) and can thus act as cues to similarity?
+\item What happens when structures do not perfectly match, as is the case in most real world analogies?
+%%\item It would be useful to apply our theoretical analysis to more complex tasks, like that of \citet{Hinton1986}. 
+%%TODO \item something about figuring out inputs modes at l2 and output modes at l1
 \item It is interesting to think about the times when shared structure is not extracted -- what features of the initilization cause this, and how does it interact with task complexity?
-\item It would be interesting to think more broadly about the role that this structure extraction could play in analogical reasoning in human cognition, possibly serving in effect as a form of automatic amortized inference about relationships.
-\item Finally, in this paper we considered a network that was linear except for a single non-linearity at the end, and presented an approach to analyzing the structure it has extracted based on the SVD of the input to pre-nonlinearity output correlation matrix. Could our technique be applied more broadly? After all, any non-linear neural network is composed of layers which are linear except for a single non-linearity at the end. By repeatedly applying analyses like this, we may be able to explore the learned representations in any neural network.
+\item It would be interesting to think more broadly about the role that this structure extraction could play in analogical reasoning in human cognition, possibly serving in effect as a form of automatic amortized inference about potential analogical relationships.
+%%TODO: edit \item Finally, in this paper we considered a network that was linear except for a single non-linearity at the end, and presented an approach to analyzing the structure it has extracted based on the SVD of the input to pre-nonlinearity output correlation matrix. Could our technique be applied more broadly? After all, any non-linear neural network is composed of layers which are linear except for a single non-linearity at the end. By repeatedly applying analyses like this, we may be able to explore the learned representations in any neural network.
 \end{enumerate}
 \section{Acknowledgments}
 This material is based upon work supported by the National Science Foundation Graduate Research Fellowship under Grant No. DGE-114747.
