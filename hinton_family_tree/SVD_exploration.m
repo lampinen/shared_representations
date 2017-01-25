@@ -75,6 +75,56 @@ display(significance_cutoffs);
 
 display(abs(V_lz_projections) > significance_cutoffs);
 
+%% ditto for output modes
+display('U_lz2')
+U_lz2_top = U_lz2(1:12,1:12);
+U_lz2_bottom = U_lz2(13:end,1:12);
+U_lz2_projections = sum(U_lz2_top.*U_lz2_bottom,1);
+
+permuted_projections = zeros(1000,12);
+display('shuffled_U_lz2')
+for i = 1:1000
+    
+    shuffled_U_lz2= U_lz2(randperm(24),1:12);
+    shuffled_U_lz2_top = shuffled_U_lz2(1:12,1:12);
+    shuffled_U_lz2_bottom = shuffled_U_lz2(13:end,1:12);
+    permuted_projections(i,:) = sum(shuffled_U_lz2_top.*shuffled_U_lz2_bottom,1);
+end
+
+significance_cutoffs = prctile(abs(permuted_projections),95,1);
+
+display(U_lz2_projections);
+display(significance_cutoffs);
+
+display(abs(U_lz2_projections) > significance_cutoffs);
+
+
+%% now input modes again, but gender flipped
+V_lz_top = V_lz(1:24,1:12);
+V_lz_bottom = V_lz(25:end,1:12);
+
+%rearrange bottom according to switching gender
+V_lz_bottom = V_lz_bottom([12,4,8,2,11,10,9,3,7,6,5,1,14,13,16,15,18,17,20,19,22,21,24,23],:);
+
+V_lz_projections = sum(V_lz_top.*V_lz_bottom,1);
+
+permuted_projections = zeros(1000,12);
+
+for i = 1:1000
+    
+    shuffled_V_lz= V_lz(randperm(48),1:12);
+    shuffled_V_lz_top = shuffled_V_lz(1:24,1:12);
+    shuffled_V_lz_bottom = shuffled_V_lz(25:end,1:12);
+    permuted_projections(i,:) = sum(shuffled_V_lz_top.*shuffled_V_lz_bottom,1);
+end
+
+significance_cutoffs = prctile(abs(permuted_projections),95,1);
+
+display(V_lz_projections);
+display(significance_cutoffs);
+
+display(abs(V_lz_projections) > significance_cutoffs);
+
 %%
 
 figure
@@ -130,3 +180,8 @@ colormap(redbluecmap);
 
 %% Looking at second layer?
 imagesc(lz_IO*V_lz2)
+
+%% crude check of gender flip indices:
+
+sum(input(:,[12 4 8 2 11 10 9 3 7 6 5 1 14 13 16 15 18 17 20 19 22 21 24 23 25:48])) - sum(input)
+
