@@ -157,10 +157,19 @@ sum(sum(V_lz_gender_flipped_projection_tests_by_run,2) >= 3)
 sum(sum(U_lz2_gender_flipped_projection_tests_by_run,2) >= 2)
 
 %and both?
-sum(sum(V_lz_projection_tests_by_run,2)+sum(V_lz_gender_flipped_projection_tests_by_run,2) >= 5)
-sum(sum(U_lz2_projection_tests_by_run,2)+sum(U_lz2_gender_flipped_projection_tests_by_run,2) >= 3)
+sum(sum(V_lz_projection_tests_by_run + V_lz_gender_flipped_projection_tests_by_run - V_lz_projection_tests_by_run.*V_lz_gender_flipped_projection_tests_by_run ,2) >= 5)
+sum(sum(V_lz_projection_tests_by_run + V_lz_gender_flipped_projection_tests_by_run - V_lz_projection_tests_by_run.*V_lz_gender_flipped_projection_tests_by_run ,2) >= 3)
+
+sum(sum(U_lz2_projection_tests_by_run + U_lz2_gender_flipped_projection_tests_by_run - U_lz2_projection_tests_by_run.*U_lz2_gender_flipped_projection_tests_by_run ,2) >= 5)
+sum(sum(U_lz2_projection_tests_by_run + U_lz2_gender_flipped_projection_tests_by_run - U_lz2_projection_tests_by_run.*U_lz2_gender_flipped_projection_tests_by_run ,2) >= 3)
+
+
+
 
 sum((sum(V_lz_projection_tests_by_run,2) < 3) & (sum(V_lz_gender_flipped_projection_tests_by_run,2) < 3))
+sum((sum(U_lz2_projection_tests_by_run,2) < 3) & (sum(U_lz2_gender_flipped_projection_tests_by_run,2) < 3))
+sum((sum(U_lz2_projection_tests_by_run,2) < 2) & (sum(U_lz2_gender_flipped_projection_tests_by_run,2) < 2))
+
 
 %% Let's visualize this
 
@@ -177,9 +186,14 @@ bar(0:12,[N; gf_N; either_N].','stacked');
 set(gca,'fontsize',13)
 legend('Regular','Flipped','Either');
 ylim([0 80]);
-xlabel({'Number of layer 1 input modes showing'; 'significant shared structure representation'},'fontsize',15);
+l = xlabel({'Number of layer 1 input modes showing'; 'significant shared structure representation'},'fontsize',15);
 ylabel('Frequency out of 100 runs','fontsize',15)
 colormap('prism')
+%fuck matlab
+set(l,'units','normalized');
+axpos = get(gca,'pos');
+extent = get(l,'extent');
+set(gca,'pos',[axpos(1) axpos(2)-0.2*extent(2) axpos(3) axpos(4)])
 
 %% now output
 
