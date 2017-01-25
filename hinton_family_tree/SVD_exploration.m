@@ -34,7 +34,10 @@ lz_IO_c = lz_IO-ones(48,1)*mean(lz_IO,1);
 
 figure
 V_lz_max_mag = max(max(abs(V_lz(1:end,1:12))));
-imagesc(V_lz(1:end,1:12),[-V_lz_max_mag,V_lz_max_mag])
+imagesc(V_lz(1:end,1:12).',[-V_lz_max_mag,V_lz_max_mag])
+xlabel('inputs','fontsize',16)
+ylabel('modes','fontsize',16)
+set(gca,'ytick',1:12)
 colormap(redbluecmap)
 
 %% Layer 2 plot
