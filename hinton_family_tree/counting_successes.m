@@ -147,14 +147,14 @@ sum(U_lz2_projection_tests_by_run,1)
 
 %How many times did n or fewer modes come out significant?
 sum(sum(V_lz_projection_tests_by_run,2) >= 3)
-sum(sum(U_lz2_projection_tests_by_run,2) >= 2)
+sum(sum(U_lz2_projection_tests_by_run,2) >= 3)
 
 %Above, but for gender flipped
 sum(V_lz_gender_flipped_projection_tests_by_run,1)
 sum(U_lz2_gender_flipped_projection_tests_by_run,1)
 
 sum(sum(V_lz_gender_flipped_projection_tests_by_run,2) >= 3)
-sum(sum(U_lz2_gender_flipped_projection_tests_by_run,2) >= 2)
+sum(sum(U_lz2_gender_flipped_projection_tests_by_run,2) >= 3)
 
 %and both?
 sum(sum(V_lz_projection_tests_by_run + V_lz_gender_flipped_projection_tests_by_run - V_lz_projection_tests_by_run.*V_lz_gender_flipped_projection_tests_by_run ,2) >= 5)

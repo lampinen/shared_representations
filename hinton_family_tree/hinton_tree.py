@@ -4,10 +4,10 @@ import matplotlib.pyplot as plt
 import os
 
 ######Parameters###################
-init_eta = 0.001
+init_eta = 0.005
 eta_decay = 1.0 #multiplicative per eta_decay_epoch epochs
 eta_decay_epoch = 10
-nepochs = 5000
+nepochs = 1000
 nhidden_separate = 12
 nhidden_shared = 12
 npeople_per = 12
@@ -165,6 +165,7 @@ relationships = ["F","M","H","W","Son","D","U","A","B","Sis","Nep","Nie"]
 
 print people
 print relationships
+exit()
 for i in xrange(len(restructured_relationship_dict_keys)):
     key = restructured_relationship_dict_keys[i]
     one_family_input_matrix[i,people.index(key[0])] = 1
@@ -205,9 +206,9 @@ print y_data.shape
 print
 
 
-for rseed in xrange(1):
+for rseed in xrange(100):
     print "run %i" %rseed
-    filename_prefix = "results/hinton_nonlinear_nhidden_%i_rseed_%i_" %(nhidden_shared,rseed)
+    filename_prefix = "results/hinton_nonlinear_smallweights_nhidden_%i_rseed_%i_" %(nhidden_shared,rseed)
 
     numpy.random.seed(rseed)
     tf.set_random_seed(rseed)
@@ -255,10 +256,10 @@ for rseed in xrange(1):
 #    output = tf.nn.relu(pre_output)
 
      ############Working simpler network with eta = 0.005, nhidden = 13 
-    W1 = tf.Variable(tf.random_uniform([nhidden_shared,input_shape],0,0.1))
-    b1 = tf.Variable(tf.random_uniform([nhidden_shared,1],0,0.1))
-    W2 = tf.Variable(tf.random_uniform([output_shape,nhidden_shared],0,0.1))
-    b2 = tf.Variable(tf.random_uniform([output_shape,1],0,0.1))
+    W1 = tf.Variable(tf.random_uniform([nhidden_shared,input_shape],0,0.001))
+    b1 = tf.Variable(tf.random_uniform([nhidden_shared,1],0,0.001))
+    W2 = tf.Variable(tf.random_uniform([output_shape,nhidden_shared],0,0.001))
+    b2 = tf.Variable(tf.random_uniform([output_shape,1],0,0.001))
     pre_middle_rep = tf.matmul(W1,tf.concat(0,[people_input,relationship_input]))+b1
     middle_rep = tf.nn.relu(pre_middle_rep)
 
@@ -394,7 +395,7 @@ for rseed in xrange(1):
     print "Final MSE: %f" %(test_accuracy())
 
 #    print_preoutputs()
-    display_rep_similarity()
-    display_po_similarity()
+#    display_rep_similarity()
+#    display_po_similarity()
     save_activations(pre_middle_rep,filename_prefix+"pre_middle_reps.csv")
     save_activations(pre_output,filename_prefix+"pre_outputs.csv")

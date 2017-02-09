@@ -188,3 +188,83 @@ imagesc(lz_IO*V_lz2)
 
 sum(input(:,[12 4 8 2 11 10 9 3 7 6 5 1 14 13 16 15 18 17 20 19 22 21 24 23 25:48])) - sum(input)
 
+%% Input modes, but looking at only people inputs
+
+display('V_lz')
+V_lz_top = V_lz(1:12,1:12);
+V_lz_bottom = V_lz(25:36,1:12);
+V_lz_projections = sum(V_lz_top.*V_lz_bottom,1);
+
+permuted_projections = zeros(1000,12);
+display('shuffled_V_lz')
+for i = 1:1000
+    
+    shuffled_V_lz= V_lz(randperm(48),1:12);
+    shuffled_V_lz_top = shuffled_V_lz(1:12,1:12);
+    shuffled_V_lz_bottom = shuffled_V_lz(25:36,1:12);
+    permuted_projections(i,:) = sum(shuffled_V_lz_top.*shuffled_V_lz_bottom,1);
+end
+
+significance_cutoffs = prctile(abs(permuted_projections),95,1);
+
+
+display('People')
+display(V_lz_projections);
+display(significance_cutoffs);
+
+display(abs(V_lz_projections) > significance_cutoffs);
+
+%% "" Relations
+display('V_lz')
+V_lz_top = V_lz(13:24,1:12);
+V_lz_bottom = V_lz(37:end,1:12);
+V_lz_projections = sum(V_lz_top.*V_lz_bottom,1);
+
+permuted_projections = zeros(1000,12);
+display('shuffled_V_lz')
+for i = 1:1000
+    
+    shuffled_V_lz= V_lz(randperm(48),1:12);
+    shuffled_V_lz_top = shuffled_V_lz(13:24,1:12);
+    shuffled_V_lz_bottom = shuffled_V_lz(37:end,1:12);
+    permuted_projections(i,:) = sum(shuffled_V_lz_top.*shuffled_V_lz_bottom,1);
+end
+
+significance_cutoffs = prctile(abs(permuted_projections),95,1);
+
+
+display('Relations')
+display(V_lz_projections);
+display(significance_cutoffs);
+
+display(abs(V_lz_projections) > significance_cutoffs);
+
+%% relations gender flipped 
+
+
+display('V_lz')
+V_lz_top = V_lz(13:24,1:12);
+V_lz_bottom = V_lz(25:end,1:12);
+V_lz_bottom = V_lz_bottom([12,4,8,2,11,10,9,3,7,6,5,1,14,13,16,15,18,17,20,19,22,21,24,23],:);
+V_lz_bottom = V_lz_bottom(13:end,:)
+
+V_lz_projections = sum(V_lz_top.*V_lz_bottom,1);
+
+permuted_projections = zeros(1000,12);
+display('shuffled_V_lz')
+for i = 1:1000
+    
+    shuffled_V_lz= V_lz(randperm(48),1:12);
+    shuffled_V_lz_top = shuffled_V_lz(13:24,1:12);
+    shuffled_V_lz_bottom = shuffled_V_lz(37:end,1:12);
+    permuted_projections(i,:) = sum(shuffled_V_lz_top.*shuffled_V_lz_bottom,1);
+end
+
+significance_cutoffs = prctile(abs(permuted_projections),95,1);
+
+
+display('Relations')
+display(V_lz_projections);
+display(significance_cutoffs);
+
+display(abs(V_lz_projections) > significance_cutoffs);

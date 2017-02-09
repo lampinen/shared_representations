@@ -26,14 +26,14 @@ print
 
 for rseed in xrange(100):
     print "run %i" %rseed
-    filename_prefix = "results/onehundredruns/nonlinear_nhidden_%i_rseed_%i_" %(nhidden,rseed)
+    filename_prefix = "nonlinear_nhidden_%i_rseed_%i_" %(nhidden,rseed)
     pre_output_filename_to_load = "nonlinear_nhidden_2_rseed_%i_pre_outputs.csv" %(rseed) #If running linearized version, where to load target pre-output values from
 
     numpy.random.seed(rseed)
     tf.set_random_seed(rseed)
 
-    input_ph = tf.placeholder(tf.float32, shape=[4,1])
-    target_ph =  tf.placeholder(tf.float32, shape=[6,1])
+    input_ph = tf.placeholder(tf.float32, shape=[4,None])
+    target_ph =  tf.placeholder(tf.float32, shape=[6,None])
     W1 = tf.Variable(tf.random_uniform([nhidden,4],0,0.1))
     #b1 = tf.Variable(tf.random_normal([nhidden,1],1,0.1))
     W2 = tf.Variable(tf.random_uniform([6,nhidden],0,0.1))
@@ -46,6 +46,8 @@ for rseed in xrange(100):
 
     loss = tf.reduce_sum(tf.square(output - target_ph))# +0.05*(tf.nn.l2_loss(internal_rep))
     linearized_loss = tf.reduce_sum(tf.square(pre_output - target_ph))# +0.05*(tf.nn.l2_loss(internal_rep))
+    output_grad = tf.gradients(loss,[output])[0]
+    W1_grad = tf.gradients(loss,[W1])[0]
     eta_ph = tf.placeholder(tf.float32)
     optimizer = tf.train.GradientDescentOptimizer(eta_ph)
     train = optimizer.minimize(loss)
@@ -139,13 +141,20 @@ for rseed in xrange(100):
 #	    save_weights(W1,filename_prefix+"epoch_%i_W1.csv" %epoch)
 #	    save_weights(W2,filename_prefix+"epoch_%i_W2.csv" %epoch)
     #	numpy.savetxt(fout,numpy.array(get_reps()),delimiter=',')
-#	if epoch % 10 == 0:
-#	    print "epoch: %i, MSE: %f" %(epoch, test_accuracy())	
+	if epoch % 10 == 0:
+	    print "epoch: %i, MSE: %f" %(epoch, test_accuracy())	
+#	    print_preoutputs()
+	    print_reps()	
+	    print sess.run(W1)
+	    print "grad"
+	    print sess.run(W1_grad,feed_dict={eta_ph: curr_eta,input_ph: x_data.transpose(),target_ph: y_data.transpose()})
 #	if epoch % 100 == 0:
 #	    print_reps()	
     #	display_rep_similarity()
 	if epoch % eta_decay_epoch == 0:
 	    curr_eta *= eta_decay
+	if epoch == 140:
+	    exit()
     fout.close()
 	
 
