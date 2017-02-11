@@ -254,7 +254,7 @@ for rseed in xrange(100):
 	order = numpy.array(range(len(x_data)))
 	for i in order:
 	    if this_domain == 1:
-		MSE += sess.run(f1_loss,feed_dict={input_ph: x_data[i].reshape([input_shape,1]),target_ph: y_data[i].reshape([output_shape,1])})
+		MSE += sess.run(f1_loss,feed_dict={input_ph: x_data[i].reshape([input_shape,1]),target_ph: alt_y_data[i].reshape([output_shape,1])})
 	    else:
 		MSE += sess.run(f2_loss,feed_dict={input_ph: x_data[i].reshape([input_shape,1]),target_ph: y_data[i].reshape([output_shape,1])})
 	MSE /= len(x_data)
@@ -325,7 +325,7 @@ for rseed in xrange(100):
 	training_order = numpy.random.permutation(len(x_data))
 	for example_i in training_order:
 	    if this_domain == 1:
-		sess.run(f1_train,feed_dict={eta_ph: curr_eta,input_ph: x_data[example_i].reshape([input_shape,1]),target_ph: y_data[example_i].reshape([output_shape,1])})
+		sess.run(f1_train,feed_dict={eta_ph: curr_eta,input_ph: x_data[example_i].reshape([input_shape,1]),target_ph: alt_y_data[example_i].reshape([output_shape,1])})
 	    else:
 		sess.run(f2_train,feed_dict={eta_ph: curr_eta,input_ph: x_data[example_i].reshape([input_shape,1]),target_ph: y_data[example_i].reshape([output_shape,1])})
 
