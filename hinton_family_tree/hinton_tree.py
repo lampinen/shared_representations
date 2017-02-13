@@ -204,7 +204,7 @@ print
 
 for rseed in xrange(100):
     print "run %i" %rseed
-    filename_prefix = "results/pfl/hinton_nonlinear_smallweights_nhidden_%i_rseed_%i_" %(nhidden_shared,rseed)
+    filename_prefix = "results/pfl/hinton_nhidden_%i_rseed_%i_" %(nhidden_shared,rseed)
 
     numpy.random.seed(rseed)
     tf.set_random_seed(rseed)
