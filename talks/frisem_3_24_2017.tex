@@ -53,12 +53,14 @@ A variety of perspectives:
 \begin{frame}{Analogy, Transfer, and Neural Networks}
 If and when analogical reasoning is important for cognition, how can we solve the combinatorially explosive analogical mapping problem? Neural networks can extract analogies: 
 \begin{itemize}
-    \item<2-> Multi-task learning, zero-shot generalization \cite{Luong2016,Johnson2016}  
-    \item<3-> Verbal analogies \cite{Kollias2013}
+    \item<2-> Verbal analogies \cite{Kollias2013}
+    \item<3-> Multi-task learning, zero-shot generalization \cite{Luong2016,Johnson2016}  
     \item<4-> Hinton family tree task \cite{Hinton1986}
-    \begin{center}
-	\includegraphics[width = 0.5\textwidth]{../writing/cogsci_2017/figures/hinton_family_tree_figure.png}
-    \end{center}
+    \begin{columns}
+    \column{0.5\textwidth} Q: ``Who is Arthur's mother?'' \\ A: ``Penelope'' 
+    \column{0.5\textwidth}
+	\includegraphics[width = \textwidth]{../writing/cogsci_2017/figures/hinton_family_tree_figure.png}
+    \end{columns}
 \end{itemize}
 \uncover<5-> {Can neural networks perform amortized inference about analogies?}
 \end{frame}
@@ -83,38 +85,51 @@ L & 1 & 0 & 1 & 0 & 0 & 0 \\
 
 \section{(A Little) Theory}
 \begin{frame}{Linear Analyses?}
+Linear neural networks:
+\begin{columns}
+\column{0.5\textwidth}
 \begin{itemize}
-    \item<1-> In a linear network, learning is driven entirely by features of the SVD (Singular Value Decomposition) of the Input/Output (I/O) mapping \cite{Saxe2013}.
-    \item<2-> Can we use this analysis to study analogy learning?
-    \item<3-> \textbf{NO,} in the SVD of a block-diagonal matrix, the modes occur within the blocks, thus \textbf{a linear network cannot represent shared structure at convergence.}
-\uncover<4->{
-\begin{figure}
-\centering
-\begin{subfigure}{0.2\textwidth}
-\includegraphics[width=\textwidth]{../writing/cogsci_2017/figures/nonlinear_IO.png}
-%\caption{$\Sigma_{IO}$}
-\end{subfigure}
-{\!\!\huge{$=$}\!\!}
-\begin{subfigure}{0.2\textwidth}
-\includegraphics[width=\textwidth]{../writing/cogsci_2017/figures/U_nl.png}
-%\caption{$U$}
-\end{subfigure}
-{\!\!\LARGE{$\times$}\!\!}
-\begin{subfigure}{0.2\textwidth}
-\includegraphics[width=\textwidth]{../writing/cogsci_2017/figures/S_nl.png}
-%\caption{$S$}
-\end{subfigure}
-{\!\!\LARGE{$\times$}\!\!}
-\begin{subfigure}{0.2\textwidth}
-\includegraphics[width=\textwidth]{../writing/cogsci_2017/figures/V_nl.png}
-%\caption{$V^T$}
-\end{subfigure}
-\end{figure}
-}
-\item<5-> This also means that a linear network \textbf{cannot achieve as parsimonious a solution as a nonlinear network}, because it must solve each copy of a problem separately rather exploiting analogies between them.
+    \item<2-> Learning is driven entirely by features of the SVD (Singular Value Decomposition) of the Input/Output (I/O) mapping \cite{Saxe2013}.
+    \item<3-> Can we use this analysis to study analogy learning?
 \end{itemize}
+\column{0.5\textwidth}
+    \includegraphics[width=\textwidth]{figures/linear_network_diagram.png}
+\end{columns}
+\note{SVD is way of factorizing a matrix into ``modes'', you can think of these kind of like components in PCA, they're ordered in terms of ``how much variance they explain''}
 \end{frame}
 
+
+\begin{frame}{Linear Analyses?}
+\begin{itemize}
+    \item<1-> \textbf{NO,} in the SVD of a block-diagonal matrix, the modes occur within the blocks, thus \textbf{a linear network cannot represent shared structure at convergence.}
+    \uncover<2->{
+    \begin{figure}
+    \centering
+    \begin{subfigure}{0.2\textwidth}
+    \includegraphics[width=\textwidth]{../writing/cogsci_2017/figures/nonlinear_IO.png}
+    %\caption{$\Sigma_{IO}$}
+    \end{subfigure}
+    {\!\!\huge{$=$}\!\!}
+    \begin{subfigure}{0.2\textwidth}
+    \includegraphics[width=\textwidth]{../writing/cogsci_2017/figures/U_nl.png}
+    %\caption{$U$}
+    \end{subfigure}
+    {\!\!\LARGE{$\times$}\!\!}
+    \begin{subfigure}{0.2\textwidth}
+    \includegraphics[width=\textwidth]{../writing/cogsci_2017/figures/S_nl.png}
+    %\caption{$S$}
+    \end{subfigure}
+    {\!\!\LARGE{$\times$}\!\!}
+    \begin{subfigure}{0.2\textwidth}
+    \includegraphics[width=\textwidth]{../writing/cogsci_2017/figures/V_nl.png}
+    %\caption{$V^T$}
+    \end{subfigure}
+    \end{figure}
+    }
+    \item<3-> This also means that a linear network \textbf{cannot achieve as parsimonious a solution as a nonlinear network}, because it must solve each copy of a problem separately rather exploiting analogies between them.
+\end{itemize}
+\note{In plain english, what this means is the input output mappings for the two tasks are not really connected in any way. Really talk through SVD, first component gving strong separation between domains, and the letter that's ``always on'' in each language, second two components give within domain structure}
+\end{frame}
 
 \begin{frame}{Linearized analysis}
 \begin{columns}
@@ -125,9 +140,10 @@ L & 1 & 0 & 1 & 0 & 0 & 0 \\
 	    \item<3-> Perform a linearized analysis: SVD of I/O mapping of linear portion of network. 
 	\end{itemize}
     \column{0.5\textwidth}
+	\uncover<2->{
 	\begin{center}
 	    \includegraphics[width=0.8\textwidth]{../writing/cogsci_2017/figures/network_diagram.png}
-	\end{center}
+	\end{center}}
 \end{columns}
 \end{frame}
 
@@ -270,6 +286,7 @@ But why and how does this occur? The linearized SVD cannot tell us, but the prog
     }}
 \end{columns}
 \uncover<6->{For all but the last step, linear network learning dynamics are very similar! Do linear networks also start to extract some shared structure?}
+\note{base rates by domain = first component of SVD}
 \end{frame}
 
 \begin{frame}{Learning dynamics}
@@ -280,7 +297,7 @@ In fact, linear networks begin to extract the analogy as well, but must discard 
 \end{frame}
 
 \begin{frame}{Learning dynamics}
-Why do they extract the analogy? \\[11pt]
+Why? When gradually learning analogous tasks simultaneously, extracting the analogy reduces error. \\[11pt]
 \begin{columns}
     \column{0.45\textwidth}
     \only<1->{Base rates by domain:{\relsize{-1}
@@ -306,7 +323,7 @@ Why do they extract the analogy? \\[11pt]
     \] 
     }}
 \end{columns}
-\uncover<3->{More explicitly, any unit that has some any reflection of the analogy (from initialization) will naturally tend to highlight the analogy further under stochastic gradient descent 
+\uncover<3->{More explicitly: 
 { \relsize{-1}
 \[
 \begin{array}{cccccc||c||cccccc} 
@@ -350,6 +367,11 @@ A few problems:
 	\item<3-> The simple approach we took is just to perform the linearized analysis at each layer. 
     \end{itemize}
     \item<4-> Multiple analogies exist between family trees (for example flip left to right and reverse genders) 
+    \only<4> {
+    \begin{center}
+	\includegraphics[width = 0.5\textwidth]{../writing/cogsci_2017/figures/hinton_family_tree_figure.png}
+    \end{center}
+    }
     \begin{itemize}
 	\item<5-> Include both these analogies in our analysis. 
     \end{itemize}
@@ -358,12 +380,6 @@ A few problems:
 	\item<7-> Use a permutation test on each SVD mode to see whether the domains share more structure in this mode than would be expected by chance. 
     \end{itemize}
 \end{itemize}
-\only<4> {
-\vspace{-80pt}
-\begin{center}
-    \includegraphics[width = 0.4\textwidth]{../writing/cogsci_2017/figures/hinton_family_tree_figure.png}
-\end{center}
-}
 \note{Hinton shared relationship inputs, and had shared hidden layers, but we want to strip down to see if the analogies will emerge from the learning dynamics like in the above task.}
 \end{frame}
 
@@ -386,6 +402,16 @@ Significant amounts of shared structure extraction!\\[11pt]
     \end{center}
     }
 \end{columns}
+\end{frame}
+
+\begin{frame}{Shared structure highlights:}
+The input layers had:
+\begin{itemize}
+    \item<1-> A median of 6 modes showing significant extraction of the analogy to either the regular or flipped mapping (null: only 0.01\% of runs with 6 significant modes, median 0).
+    \item<2-> 3 or more significant components from at one of the mappings alone in 95\% of the runs (null: in 4\% of runs).
+    \item<3-> 3 or more significant components overall in all of the runs (null: in 3\% of runs).
+\end{itemize}
+\uncover<4->{Shared structure extraction appears \textbf{more consistent in a more complex task} than it was in the toy task}
 \end{frame}
 
 \begin{frame}{PFL Results}
@@ -427,15 +453,6 @@ Does this still result in extraction of analogies? Yes, but not as much as learn
 \end{columns}
 \end{frame}
 
-\begin{frame}{Shared structure highlights:}
-The input layers had:
-\begin{itemize}
-    \item<1-> A median of 6 modes showing significant extraction of the analogy to either the regular or flipped mapping (null: only 0.01\% of runs with 6 significant modes, median 0).
-    \item<2-> 3 or more significant components from at one of the mappings alone in 95\% of the runs (null: in 4\% of runs).
-    \item<3-> 3 or more significant components overall in all of the runs (null: in 3\% of runs).
-\end{itemize}
-\uncover<4->{Shared structure extraction appears \textbf{more consistent in a more complex task} than it was in the toy task}
-\end{frame}
 \section{Conclusions}
 
 \begin{frame}{Results summary}
