@@ -386,6 +386,27 @@ Significant amounts of shared structure extraction!\\[11pt]
 \end{columns}
 \end{frame}
 
+\begin{frame}{Results}
+Suppose we share some weights, can we see evidence of preparation for future learning?
+\begin{columns}
+\column{0.45\textwidth}
+    \uncover<2->{
+    Second layer output modes:
+    \begin{center}
+    \includegraphics[width=1.1\textwidth]{}
+    \end{center}
+    }
+\column{0.45\textwidth}
+    \uncover<3->{
+    First layer input modes:
+    \begin{center}
+    \includegraphics[width=1.1\textwidth]{figures/preparation_for_learning.png} 
+    \end{center}
+    }
+\end{columns}
+\end{frame}
+
+
 \begin{frame}{Shared structure highlights:}
 The input layers had:
 \begin{itemize}
@@ -405,9 +426,9 @@ The input layers had:
     \item<4-> This extraction of analogies does not even require shared weights, learning (or replaying) the tasks together suffices.
     \item<5-> This provides a good model for ``slow'' human analogical reasoning and transfer, including:
     \begin{itemize}
-	\item<6-> Benefits of multiple mutually supporting tasks.
-	\item<7-> Preparation for future learning.
-	\item<8-> Possible amortized inference about analogies.
+	\item<6-> Possible amortized inference about analogies.
+	\item<7-> Benefits of multiple mutually supporting tasks.
+	\item<8-> Preparation for future learning.
     \end{itemize}
 \end{itemize}
 \end{frame}
