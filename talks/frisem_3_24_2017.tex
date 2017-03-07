@@ -42,20 +42,22 @@
 \begin{frame}{Analogy, Transfer, and Cognition}
 \begin{itemize}
     \item<1-> ``What makes humans smart is (1) our exceptional ability to learn by analogy'' \cite{Gentner2003} 
-    \item<2-> Insert Detterman quote here
-    \item<3-> Insert Day \& Goldstone here? 
+    \item<2-> ``Significant transfer is probably rare and accounts for very little human behavior. ... We generally do what we have learned to do and no more.'' \cite{Detterman1993}
+    \item<3-> ``We found evidence for analogical transfer from a concrete, highly perceptual system to a very dissimilar domain and task ... participants transfer was independent of their explicit reports [of awareness of the analogy between the tasks].'' \cite{Day2011}
+    \item<4-> ``Our proposal is to view transfer from the perspective of preparation for future learning (PFL).'' \cite{Bransford1999} 
 \end{itemize}
+\note{Fortunately, there's a great deal of agreement in the field}
 \end{frame}
 
 \begin{frame}{Analogy, Transfer, and Neural Networks}
+If and when analogical reasoning is important for human cognition, how can we solve the combinatorially explosive analogical mapping problem? Perhaps using neural networks to do amortized inference. 
 \begin{itemize}
-    \item<1-> Insert Lake et al. here? 
-    \item<2-> Zero-Shot Machine Translation \cite{Johnson2016}
-    \item<3-> Hinton family tree task \cite{Hinton1986}
+    \item<2-> Zero-shot machine translation \cite{Johnson2016}
+    \item<3-> Training machine translation on image captioning tasks improves performance \cite{Luong2016} 
+    \item<4-> Hinton family tree task \cite{Hinton1986}
     \begin{center}
 	\includegraphics[width = 0.4\textwidth]{../writing/cogsci_2017/figures/hinton_family_tree_figure.png}
-   \end{center}
-    %%TODO: include network or task diagram
+    \end{center}
 \end{itemize}
 \end{frame}
 
@@ -400,19 +402,29 @@ The input layers had:
     \item<1-> We outlined a new analysis method for non-linear neural networks. 
     \item<2-> Used this in a toy task to show that analogies between non-overlapping tasks emerge naturally from learning dynamics. 
     \item<3-> Used in a more complicated task, and found that extraction of the analogies was even more consistent than on the toy task. 
-    \item<4-> This extraction of analogies does not even require shared weights, learning (or replaying) tasks together suffices.
+    \item<4-> This extraction of analogies does not even require shared weights, learning (or replaying) the tasks together suffices.
+    \item<5-> This provides a good model for ``slow'' human analogical reasoning and transfer, including:
+    \begin{itemize}
+	\item<6-> Benefits of multiple mutually supporting tasks.
+	\item<7-> Preparation for future learning.
+	\item<8-> Possible amortized inference about analogies.
+    \end{itemize}
 \end{itemize}
 \end{frame}
 
 \section{Thank you}
 \begin{frame}{Acknowledgements}
-
+Thanks to:
+\begin{itemize}
+    \item Co-authors: Shaw Hsu \& Jay McClelland
+    \item The rest of the lab for helpful conversations and feedback. 
+\end{itemize}
 \end{frame}
 
 \section{References}
 \begin{frame}[allowframebreaks]
 \frametitle{References}
 \bibliographystyle{apacite}
-\bibliography{../writing/cogsci_2017/shared_reps}
+\bibliography{shared_reps}
 \end{frame}
 \end{document}
