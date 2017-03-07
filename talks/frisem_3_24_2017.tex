@@ -1,6 +1,6 @@
 \documentclass{beamer}
 \usepackage{pgfpages}
-%%\setbeameroption{show notes on second screen=left} %enable for notes
+\setbeameroption{show notes on second screen=left} %enable for notes
 \usepackage{graphicx}
 \usepackage{xcolor}
 \usepackage{listings}
@@ -12,7 +12,7 @@
 \usepackage{amsmath}
 \usepackage{relsize}
 
-\usetheme{Madrid}
+\usetheme[numbering=fraction]{metropolis}
 %%\AtBeginSection[]
 %%{
 %%  \begin{frame}
@@ -40,23 +40,24 @@
 \end{frame}
 
 \begin{frame}{Analogy, Transfer, and Cognition}
+A variety of perspectives:
 \begin{itemize}
     \item<1-> ``What makes humans smart is (1) our exceptional ability to learn by analogy'' \cite{Gentner2003} 
     \item<2-> ``Significant transfer is probably rare and accounts for very little human behavior. ... We generally do what we have learned to do and no more.'' \cite{Detterman1993}
-    \item<3-> ``We found evidence for analogical transfer from a concrete, highly perceptual system to a very dissimilar domain and task ... participants transfer was independent of their explicit reports [of awareness of the analogy between the tasks].'' \cite{Day2011}
+    \item<3-> ``We found evidence for analogical transfer from a concrete, highly perceptual system to a very dissimilar domain and task ... participants' transfer was independent of their explicit reports [of awareness of the analogy between the tasks].'' \cite{Day2011}
     \item<4-> ``Our proposal is to view transfer from the perspective of preparation for future learning (PFL).'' \cite{Bransford1999} 
 \end{itemize}
 \note{Fortunately, there's a great deal of agreement in the field}
 \end{frame}
 
 \begin{frame}{Analogy, Transfer, and Neural Networks}
-If and when analogical reasoning is important for human cognition, how can we solve the combinatorially explosive analogical mapping problem? Perhaps using neural networks to do amortized inference. 
+If and when analogical reasoning is important for human cognition, how can we solve the combinatorially explosive analogical mapping problem? Perhaps neural network learning can serve as a form of amortized inference, since neural networks can extract analogies: 
 \begin{itemize}
     \item<2-> Zero-shot machine translation \cite{Johnson2016}
     \item<3-> Training machine translation on image captioning tasks improves performance \cite{Luong2016} 
     \item<4-> Hinton family tree task \cite{Hinton1986}
     \begin{center}
-	\includegraphics[width = 0.4\textwidth]{../writing/cogsci_2017/figures/hinton_family_tree_figure.png}
+	\includegraphics[width = 0.5\textwidth]{../writing/cogsci_2017/figures/hinton_family_tree_figure.png}
     \end{center}
 \end{itemize}
 \end{frame}
@@ -83,29 +84,29 @@ L & 1 & 0 & 1 & 0 & 0 & 0 \\
 \begin{frame}{Linear Analyses?}
 \begin{itemize}
     \item<1-> In a linear network, learning is driven entirely by features of the SVD (Singular Value Decomposition) of the Input/Output (I/O) mapping \cite{Saxe2013}.
-    \item<2-> Can we analyze learning of analogous structure in a linear framework?
+    \item<2-> Can we use this analysis to study analogy learning?
     \item<3-> \textbf{NO,} in the SVD of a block-diagonal matrix, the modes occur within the blocks, thus \textbf{a linear network cannot represent shared structure at convergence.}
-\only<4->{
+\uncover<4->{
 \begin{figure}
 \centering
 \begin{subfigure}{0.2\textwidth}
 \includegraphics[width=\textwidth]{../writing/cogsci_2017/figures/nonlinear_IO.png}
-\caption{$\Sigma_{IO}$}
+%\caption{$\Sigma_{IO}$}
 \end{subfigure}
-\raisebox{0.5em}{\!\!\huge{$=$}\!\!}
+{\!\!\huge{$=$}\!\!}
 \begin{subfigure}{0.2\textwidth}
 \includegraphics[width=\textwidth]{../writing/cogsci_2017/figures/U_nl.png}
-\caption{$U$}
+%\caption{$U$}
 \end{subfigure}
-\raisebox{0.5em}{\!\!\LARGE{$\times$}\!\!}
+{\!\!\LARGE{$\times$}\!\!}
 \begin{subfigure}{0.2\textwidth}
 \includegraphics[width=\textwidth]{../writing/cogsci_2017/figures/S_nl.png}
-\caption{$S$}
+%\caption{$S$}
 \end{subfigure}
-\raisebox{0.5em}{\!\!\LARGE{$\times$}\!\!}
+{\!\!\LARGE{$\times$}\!\!}
 \begin{subfigure}{0.2\textwidth}
 \includegraphics[width=\textwidth]{../writing/cogsci_2017/figures/V_nl.png}
-\caption{$V^T$}
+%\caption{$V^T$}
 \end{subfigure}
 \end{figure}
 }
@@ -119,7 +120,8 @@ L & 1 & 0 & 1 & 0 & 0 & 0 \\
     \column{0.5\textwidth}
 	However, we would still like to use linear analysis tools, so:
 	\begin{itemize}
-	    \item<2-> Linearized analysis: SVD of linear portion of network. 
+	    \item<2-> Train a network with a non-linearity at the output.
+	    \item<3-> Perform a linearized analysis: SVD of I/O mapping of linear portion of network. 
 	\end{itemize}
     \column{0.5\textwidth}
 	\begin{center}
@@ -128,7 +130,7 @@ L & 1 & 0 & 1 & 0 & 0 & 0 \\
 \end{columns}
 \end{frame}
 
-\section{The Return of the Toy Task}
+\section{That's enough theory -- back to the task}
 \begin{frame}{Toy task}
 What solutions does the network discover?
 \begin{columns}
@@ -152,7 +154,7 @@ What solutions does the network discover?
 \end{frame}
 
 \begin{frame}{Toy task solutions}
-Most commonly with ReLU, the network learns an offset structure, resulting in the following linearized I/O mapping (or a symmetric analog): 
+Most commonly, the network learns an offset structure, resulting in the following linearized I/O mapping (or a symmetric analog): 
 \[
 \left[ \begin{matrix} 
 1 & 1 & 0 & 0 & 0 & -1 \\
@@ -167,7 +169,7 @@ Most commonly with ReLU, the network learns an offset structure, resulting in th
 \begin{frame}{Comparing SVDs}
 \begin{itemize}
     \item<1-> Non-linear I/O Mapping
-    \only<1->{
+    \uncover<1->{
     \begin{figure}
     \centering
     \begin{subfigure}{0.2\textwidth}
@@ -192,7 +194,7 @@ Most commonly with ReLU, the network learns an offset structure, resulting in th
     \end{figure}
     }
     \item<2-> Linearized I/O Mapping
-    \only<2->{
+    \uncover<2->{
     \begin{figure}
     \centering
     \begin{subfigure}{0.2\textwidth}
@@ -218,7 +220,7 @@ Most commonly with ReLU, the network learns an offset structure, resulting in th
     }
     \item<3-> Linearized I/O shows network has captured the shared structure!
 \end{itemize}
-\note{Can interpret the top SVD in several ways, as the task that a linear network solves, or as the task that a non-linear netwokr begins solving when it is still in the linear regime. Note more parsimonious solutions available with linearized mapping.}
+\note{Can interpret the top SVD in several ways, as the task that a linear network solves, or as the task that a non-linear netwokr begins solving when it is still in the linear regime. Note more parsimonious solutions available with linearized mapping -- i.e. lower rank.}
 \end{frame}
 
 \begin{frame}{Learning dynamics}
@@ -266,19 +268,18 @@ But why and how does this occur? The linearized SVD cannot tell us, but the prog
     \]
     }}
 \end{columns}
-\uncover<6->{For all but the last step, linear network learning dynamics are very similar! Do they also start to extract some shared structure?}
+\uncover<6->{For all but the last step, linear network learning dynamics are very similar! Do linear networks also start to extract some shared structure?}
 \end{frame}
 
 \begin{frame}{Learning dynamics}
-In fact, linear networks begin to extract the shared structure as well, but must discard it to achieve their optimal solution.
+In fact, linear networks begin to extract the analogy as well, but must discard it to achieve their optimal solution.
 \begin{center}
 \includegraphics[width=0.7\textwidth]{../writing/cogsci_2017/figures/SVD_cross_projection_learning.png}
 \end{center}
-\note{What the fuck is up with this plot? What does it actually mean?}
 \end{frame}
 
 \begin{frame}{Learning dynamics}
-Why? \\[5pt]
+Why do they extract the analogy? \\[11pt]
 \begin{columns}
     \column{0.45\textwidth}
     \only<1->{Base rates by domain:{\relsize{-1}
@@ -304,7 +305,7 @@ Why? \\[5pt]
     \] 
     }}
 \end{columns}
-\uncover<3->{ More explicitly, this emerges naturally from SGD (weight updates for a unit on an example are proportional to the product of the output error and the unit's activation)  
+\uncover<3->{More explicitly, any unit that has some any reflection of the analogy (from initialization) will naturally tend to highlight the analogy further under stochastic gradient descent 
 { \relsize{-1}
 \[
 \begin{array}{cccccc||c||cccccc} 
@@ -386,26 +387,44 @@ Significant amounts of shared structure extraction!\\[11pt]
 \end{columns}
 \end{frame}
 
-\begin{frame}{Results}
-Suppose we share some weights, can we see evidence of preparation for future learning?
+\begin{frame}{PFL Results}
+Suppose we share some weights, can we see evidence of preparation for future learning?\\[11pt]
 \begin{columns}
 \column{0.45\textwidth}
     \uncover<2->{
-    Second layer output modes:
     \begin{center}
-    \includegraphics[width=1.1\textwidth]{}
+    \includegraphics[width=\textwidth]{figures/shared_weights_network_diagram.png}
     \end{center}
     }
 \column{0.45\textwidth}
-    \uncover<3->{
-    First layer input modes:
+    \uncover<3->{Yes, learning is faster after learning an analogous task than after learning a different one.
     \begin{center}
     \includegraphics[width=1.1\textwidth]{figures/preparation_for_learning.png} 
     \end{center}
     }
 \end{columns}
+\note{Would expect this effect to increase with increasing depth of the network}
 \end{frame}
 
+\begin{frame}{PFL Results}
+Does this still result in extraction of analogies? Yes, but not as much as learning simultaneously.\\[11pt]
+\begin{columns}
+\column{0.45\textwidth}
+    \uncover<2->{
+    Learn analogous task first:
+    \begin{center}
+    \includegraphics[width=1.1\textwidth]{figures/sequential_learning_analogous_tasks.png}
+    \end{center}
+    }
+\column{0.45\textwidth}
+    \uncover<3->{
+    Learn different task first (is there still some analogy):
+    \begin{center}
+    \includegraphics[width=1.1\textwidth]{figures/sequential_learning_different_tasks.png}
+    \end{center}
+    }
+\end{columns}
+\end{frame}
 
 \begin{frame}{Shared structure highlights:}
 The input layers had:
@@ -423,28 +442,30 @@ The input layers had:
     \item<1-> We outlined a new analysis method for non-linear neural networks. 
     \item<2-> Used this in a toy task to show that analogies between non-overlapping tasks emerge naturally from learning dynamics. 
     \item<3-> Used in a more complicated task, and found that extraction of the analogies was even more consistent than on the toy task. 
-    \item<4-> This extraction of analogies does not even require shared weights, learning (or replaying) the tasks together suffices.
-    \item<5-> This provides a good model for ``slow'' human analogical reasoning and transfer, including:
+    \item<4-> This extraction of analogies can emerge from:
     \begin{itemize}
-	\item<6-> Possible amortized inference about analogies.
-	\item<7-> Benefits of multiple mutually supporting tasks.
-	\item<8-> Preparation for future learning.
+	\item<5-> Simultaneous learning (or replay) without shared weights. 
+	\item<6-> Non-simultaneous learning with shared weights.
+    \end{itemize}
+    \item<7-> This provides a good model for ``slow'' human analogical reasoning and transfer, including:
+    \begin{itemize}
+	\item<8-> Possible amortized inference about analogies.
+	\item<9-> Benefits of multiple mutually supporting tasks.
+	\item<10-> Preparation for future learning.
     \end{itemize}
 \end{itemize}
 \end{frame}
 
-\section{Thank you}
 \begin{frame}{Acknowledgements}
 Thanks to:
 \begin{itemize}
     \item Co-authors: Shaw Hsu \& Jay McClelland
     \item The rest of the lab for helpful conversations and feedback. 
+    \item You, for listening.
 \end{itemize}
 \end{frame}
 
-\section{References}
 \begin{frame}[allowframebreaks]
-\frametitle{References}
 \bibliographystyle{apacite}
 \bibliography{shared_reps}
 \end{frame}
