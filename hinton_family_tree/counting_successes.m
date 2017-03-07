@@ -211,5 +211,5 @@ set(gca,'fontsize',13)
 legend('Regular','Flipped','Either');
 ylim([0 80]);
 xlabel({'Number of layer 2 output modes showing'; 'significant shared structure representation'},'fontsize',15);
-ylabel('Frequency out of 100 runs','fontsize',15)
+ylabel('Frequency out of 1000 runs','fontsize',15)
 colormap('prism')
