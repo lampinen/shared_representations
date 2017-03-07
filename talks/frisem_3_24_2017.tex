@@ -47,19 +47,20 @@ A variety of perspectives:
     \item<3-> ``We found evidence for analogical transfer from a concrete, highly perceptual system to a very dissimilar domain and task ... participants' transfer was independent of their explicit reports [of awareness of the analogy between the tasks].'' \cite{Day2011}
     \item<4-> ``Our proposal is to view transfer from the perspective of preparation for future learning (PFL).'' \cite{Bransford1999} 
 \end{itemize}
-\note{Fortunately, there's a great deal of agreement in the field}
+\note{Fortunately, there's a great deal of agreement in the field. What is the driving force? One possibility (which Bransford \& Schwartz among others acknowledged) is that there are different kinds of transfer. Failures to transfer most often occur in settings like Gick \& Holyoak's experiments with the Duncker radiation problem, where participants see one example and then have to do a symbolic mapping to another example. By contrast, successful analogical transfer often occurs in situations like Day \& Goldstone's, where participants actually interact with the system and learn about it over a period of time, or more generally in education as highlighted by Bransford \& Schwartz as the ability to learn faster in the future.}
 \end{frame}
 
 \begin{frame}{Analogy, Transfer, and Neural Networks}
-If and when analogical reasoning is important for human cognition, how can we solve the combinatorially explosive analogical mapping problem? Perhaps neural network learning can serve as a form of amortized inference, since neural networks can extract analogies: 
+If and when analogical reasoning is important for cognition, how can we solve the combinatorially explosive analogical mapping problem? Neural networks can extract analogies: 
 \begin{itemize}
-    \item<2-> Zero-shot machine translation \cite{Johnson2016}
-    \item<3-> Training machine translation on image captioning tasks improves performance \cite{Luong2016} 
+    \item<2-> Multi-task learning, zero-shot generalization \cite{Luong2016,Johnson2016}  
+    \item<3-> Verbal analogies \cite{Kollias2013}
     \item<4-> Hinton family tree task \cite{Hinton1986}
     \begin{center}
 	\includegraphics[width = 0.5\textwidth]{../writing/cogsci_2017/figures/hinton_family_tree_figure.png}
     \end{center}
 \end{itemize}
+\uncover<5-> {Can neural networks perform amortized inference about analogies?}
 \end{frame}
 
 \section{Modeling: A toy task}
