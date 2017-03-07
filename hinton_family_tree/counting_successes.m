@@ -195,7 +195,7 @@ axpos = get(gca,'pos');
 extent = get(l,'extent');
 set(gca,'pos',[axpos(1) axpos(2)-0.2*extent(2) axpos(3) axpos(4)])
 
-csvwrite('sl_input_mode_significance.csv',[sig_comp_counts;  gf_sig_comp_counts; either_sig_comp_counts].')
+csvwrite('sl_input_mode_significance.csv',[sig_comp_counts  gf_sig_comp_counts either_sig_comp_counts])
 
 %% now output
 
@@ -216,5 +216,5 @@ xlabel({'Number of layer 2 output modes showing'; 'significant shared structure 
 ylabel('Frequency out of 1000 runs','fontsize',15)
 colormap('prism')
 
-csvwrite('sl_output_mode_significance.csv',[sig_comp_counts;  gf_sig_comp_counts; either_sig_comp_counts].')
+csvwrite('sl_output_mode_significance.csv',[sig_comp_counts  gf_sig_comp_counts either_sig_comp_counts])
 
