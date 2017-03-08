@@ -1,0 +1,85 @@
+---
+title: "FriSem Plotting"
+output: html_notebook
+---
+
+
+```{r}
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+```
+
+```{r}
+sl_input = read.csv("sl_input_mode_significance.csv",header=F)
+sl_output = read.csv("sl_output_mode_significance.csv",header=F)
+pfl_alt_input = read.csv("pfl_different_task_input_mode_significance.csv",header=F)
+pfl_anal_input = read.csv("pfl_analogous_task_input_mode_significance.csv",header=F)
+```
+
+Add chance data
+```{r}
+chance_dist = rbinom(100,12,0.05)
+sl_input$Chance = chance_dist
+sl_output$Chance = chance_dist
+pfl_alt_input$Chance = chance_dist
+pfl_anal_input$Chance = chance_dist
+```
+
+```{r}
+names(sl_input) = c('Regular','Flipped','Either','Chance')
+names(sl_output) = c('Regular','Flipped','Either','Chance')
+names(pfl_alt_input) = c('Regular','Flipped','Either','Chance')
+names(pfl_anal_input) = c('Regular','Flipped','Either','Chance')
+```
+
+ggplot setup
+```{r}
+theme_set(theme_bw(base_size = 15))
+cbPalette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+
+```
+
+```{r}
+plotting_data = sl_input %>% gather(Analogy,num_projections,Regular,Flipped,Either,Chance)
+ggplot(plotting_data,aes(x=Analogy,y=num_projections,fill=Analogy)) +
+  geom_violin(adjust=2) +
+  scale_y_continuous(breaks=0:10) +
+  scale_x_discrete(limits=c('Regular','Flipped','Either','Chance')) +
+  scale_fill_manual(values=cbPalette)
+ggsave('results/input_mode_projections_violin.png')
+```
+
+
+```{r}
+plotting_data = sl_output %>% gather(Analogy,num_projections,Regular,Flipped,Either,Chance)
+ggplot(plotting_data,aes(x=Analogy,y=num_projections,fill=Analogy)) +
+  geom_violin(adjust=2) +
+  scale_y_continuous(breaks=0:10) +
+  scale_x_discrete(limits=c('Regular','Flipped','Either','Chance')) +
+  scale_fill_manual(values=cbPalette)
+ggsave('results/output_mode_projections_violin.png')
+```
+
+
+
+```{r}
+plotting_data = pfl_alt_input %>% gather(Analogy,num_projections,Regular,Flipped,Either,Chance)
+ggplot(plotting_data,aes(x=Analogy,y=num_projections,fill=Analogy)) +
+  geom_violin(adjust=2) +
+  scale_y_continuous(breaks=0:10) +
+  scale_x_discrete(limits=c('Regular','Flipped','Either','Chance')) +
+  scale_fill_manual(values=cbPalette)
+ggsave('results/pfl/alt_input_mode_projections_violin.png')
+```
+
+
+```{r}
+plotting_data = pfl_anal_input %>% gather(Analogy,num_projections,Regular,Flipped,Either,Chance)
+ggplot(plotting_data,aes(x=Analogy,y=num_projections,fill=Analogy)) +
+  geom_violin(adjust=2) +
+  scale_y_continuous(breaks=0:10) +
+  scale_x_discrete(limits=c('Regular','Flipped','Either','Chance')) +
+  scale_fill_manual(values=cbPalette)
+ggsave('results/pfl/anal_input_mode_projections_violin.png')
+```
