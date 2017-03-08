@@ -95,7 +95,7 @@ Linear neural networks:
 \column{0.5\textwidth}
     \includegraphics[width=\textwidth]{figures/linear_network_diagram.png}
 \end{columns}
-\note{SVD is way of factorizing a matrix into ``modes'', you can think of these kind of like components in PCA, they're ordered in terms of ``how much variance they explain''}
+\note{SVD is way of factorizing a matrix into ``modes'', you can think of these kind of like components in PCA, they're ordered in terms of ``how much variance they explain.'' }
 \end{frame}
 
 
@@ -145,6 +145,8 @@ Linear neural networks:
 	    \includegraphics[width=0.8\textwidth]{../writing/cogsci_2017/figures/network_diagram.png}
 	\end{center}}
 \end{columns}
+\note{Why use these tools? Analyzing the SVD is more principled than just looking at weights or hidden unit activations, because it is more invariant to rotations of representation space, etc.}
+
 \end{frame}
 
 \section{That's enough theory -- back to the task}
@@ -342,6 +344,14 @@ Why? When gradually learning analogous tasks simultaneously, extracting the anal
 \note{So network will exploit the analogy to reduce error, even though no weights are shared, and even if it must discard it in the linear case.}
 \end{frame}
 
+\begin{frame}{Interim Summary}
+ In this simple task:
+\begin{itemize}
+    \item<2-> Representation of the analogy emerges naturally from the learning dynamics (75\% of the time).
+    \item<3-> This does not depend on shared weights, gradually learning two analogous tasks simultaneously suffices.
+\end{itemize}
+\end{frame}
+
 \section{A more interesting example: Hinton's family tree task}
 \begin{frame}{Hinton family tree task}
 \begin{columns}
@@ -385,23 +395,18 @@ A few problems:
 
 \begin{frame}{Results}
 Significant amounts of shared structure extraction!\\[11pt]
-\begin{columns}
-\column{0.45\textwidth}
     \uncover<2->{
     First layer input modes:
     \begin{center}
-    \includegraphics[width=1.1\textwidth]{../writing/cogsci_2017/figures/ft_input_mode_significance_hist.png} 
+    \includegraphics[width=0.75\textwidth]{../hinton_family_tree/results/input_mode_projections_violin.png} 
     \end{center}
     }
-
-\column{0.45\textwidth}
-    \uncover<3->{
-    Second layer output modes:
-    \begin{center}
-    \includegraphics[width=1.1\textwidth]{../writing/cogsci_2017/figures/ft_output_mode_significance_hist.png} 
-    \end{center}
-    }
-\end{columns}
+\end{frame}
+\begin{frame}
+Also in second layer output modes (although slightly less):
+\begin{center}
+\includegraphics[width=0.75\textwidth]{../hinton_family_tree/results/output_mode_projections_violin.png} 
+\end{center}
 \end{frame}
 
 \begin{frame}{Shared structure highlights:}
@@ -434,20 +439,20 @@ Suppose we share some weights, can we see evidence of preparation for future lea
 \end{frame}
 
 \begin{frame}{PFL Results}
-Does this still result in extraction of analogies? Yes, but not as much as learning simultaneously.\\[11pt]
+Does this still result in extraction of analogies? Yes, but not quite as much as learning simultaneously.\\[11pt]
 \begin{columns}
 \column{0.45\textwidth}
     \uncover<2->{
     Learn analogous task first:
     \begin{center}
-    \includegraphics[width=1.1\textwidth]{figures/sequential_learning_analogous_tasks.png}
+    \includegraphics[width=1.2\textwidth]{../hinton_family_tree/results/pfl/anal_input_mode_projections_violin.png}
     \end{center}
     }
 \column{0.45\textwidth}
     \uncover<3->{
-    Learn different task first (is there still some analogy):
+    Learn different task first:
     \begin{center}
-    \includegraphics[width=1.1\textwidth]{figures/sequential_learning_different_tasks.png}
+    \includegraphics[width=1.2\textwidth]{../hinton_family_tree/results/pfl/alt_input_mode_projections_violin.png}
     \end{center}
     }
 \end{columns}
@@ -457,7 +462,7 @@ Does this still result in extraction of analogies? Yes, but not as much as learn
 
 \begin{frame}{Results summary}
 \begin{itemize}
-    \item<1-> We outlined a new analysis method for non-linear neural networks. 
+    \item<1-> We outlined a new linearized analysis method for non-linear neural networks. 
     \item<2-> Used this in a toy task to show that analogies between non-overlapping tasks emerge naturally from learning dynamics. 
     \item<3-> Used in a more complicated task, and found that extraction of the analogies was even more consistent than on the toy task. 
     \item<4-> This extraction of analogies can emerge from:
@@ -465,7 +470,7 @@ Does this still result in extraction of analogies? Yes, but not as much as learn
 	\item<5-> Simultaneous learning (or replay) without shared weights. 
 	\item<6-> Non-simultaneous learning with shared weights.
     \end{itemize}
-    \item<7-> This provides a good model for ``slow'' human analogical reasoning and transfer, including:
+    \item<7-> This may provide a good model for ``slow'' human analogical reasoning and transfer, including:
     \begin{itemize}
 	\item<8-> Possible amortized inference about analogies.
 	\item<9-> Benefits of multiple mutually supporting tasks.
