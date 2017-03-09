@@ -11,6 +11,7 @@
 \usepackage{subcaption}
 \usepackage{amsmath}
 \usepackage{relsize}
+\usepackage{appendixnumberbeamer}
 
 \usetheme[numbering=fraction]{metropolis}
 %%\AtBeginSection[]
@@ -57,7 +58,7 @@ If and when analogical reasoning is important for cognition, how can we solve th
     \item<3-> Multi-task learning, zero-shot generalization \cite{Luong2016,Johnson2016}  
     \item<4-> Hinton family tree task \cite{Hinton1986}
     \begin{columns}
-    \column{0.5\textwidth} Q: ``Who is Arthur's mother?'' \\ A: ``Penelope'' 
+    \column{0.5\textwidth} Q: ``Who is Arthur's mother?'' \\ A: ``Penelope'' %\\[11pt] Q: ``Who is Emilio's mother?'' \\ A: ``Maria'' 
     \column{0.5\textwidth}
 	\includegraphics[width = \textwidth]{../writing/cogsci_2017/figures/hinton_family_tree_figure.png}
     \end{columns}
@@ -80,7 +81,7 @@ L & 1 & 0 & 1 & 0 & 0 & 0 \\
 \end{array} 
 \]
 \end{center}
-\only<2->{How, when, and why will a neural network exploit the analogy between the Latin and Greek letters?}
+\uncover<2->{How, when, and why will a neural network exploit the analogy between the Latin and Greek letters?}
 \end{frame}
 
 \section{(A Little) Theory}
@@ -302,7 +303,7 @@ In fact, linear networks begin to extract the analogy as well, but must discard 
 Why? When gradually learning analogous tasks simultaneously, extracting the analogy reduces error. \\[11pt]
 \begin{columns}
     \column{0.45\textwidth}
-    \only<1->{Base rates by domain:{\relsize{-1}
+    \uncover<1->{Base rates by domain: \phantom{a little shared structure}{\relsize{-1}
     \[
     \left[ \begin{matrix} 
     1 & 0.5 & 0.5 & 0 & 0 & 0 \\
@@ -312,9 +313,9 @@ Why? When gradually learning analogous tasks simultaneously, extracting the anal
     \end{matrix}  \right] 
     \]
     }
-    }
+    \begin{center}\textbf{MSE = 0.5}\end{center}}
     \column{0.45\textwidth}
-    \only<2->{Base rates + a little shared structure{ \relsize{-1}
+    \uncover<2->{Base rates + a little shared structure{ \relsize{-1}
     \[
     \left[ \begin{matrix} 
     1 & 0.6 & 0.4 & 0 & 0.1 & -0.1 \\
@@ -323,32 +324,19 @@ Why? When gradually learning analogous tasks simultaneously, extracting the anal
     0 & -0.1 & 0.1 & 1 & 0.4 & 0.6  \\
     \end{matrix}  \right] 
     \] 
-    }}
-\end{columns}
-\uncover<3->{More explicitly: 
-{ \relsize{-1}
-\[
-\begin{array}{cccccc||c||cccccc} 
-\multicolumn{6}{c||}{\text{output error}}  & \text{unit}  & \multicolumn{6}{c}{\text{unit output weight updates}} \\
-\hline
- 0 & + & - & 0 & 0 & 0  &   +    &  0 & + & - & 0 & 0 & 0   \\
-0 & - & + & 0 & 0 & 0  &   -  & 0 & + & - & 0 & 0 & 0   \\
- 0 & 0 & 0 & 0 & + & - &   +   &  0 & 0 & 0 & 0 & + & - \\
- 0 & 0 & 0 & 0 & - & +  &  - &  0 & 0 & 0 & 0 & + & - \\
-\hline
-\multicolumn{7}{r}{\text{net output weight update:}} &   0 & + & - & 0 & + & - \\
-\end{array} 
-\]
-}
-} 
+    }
+    \begin{center}\textbf{MSE = 0.34}\end{center}}
+\end{columns} 
+
 \note{So network will exploit the analogy to reduce error, even though no weights are shared, and even if it must discard it in the linear case.}
 \end{frame}
 
 \begin{frame}{Interim Summary}
  In this simple task:
 \begin{itemize}
-    \item<2-> Representation of the analogy emerges naturally from the learning dynamics (75\% of the time).
-    \item<3-> This does not depend on shared weights, gradually learning two analogous tasks simultaneously suffices.
+    \item<2-> Representation of the analogy emerges naturally from the learning dynamics because it reduces error.
+    \item<3-> This occurs in about 75\% of random initializations.
+    \item<4-> This does not depend on shared weights, gradually learning two analogous tasks simultaneously suffices.
 \end{itemize}
 \end{frame}
 
@@ -492,4 +480,50 @@ Thanks to:
 \bibliographystyle{apacite}
 \bibliography{shared_reps}
 \end{frame}
+
+\appendix
+\begin{frame}{Analogy from gradients}
+In toy example, any unit that starts pointing slightly in direction of analogy (as some will due to random initialization) will extract it further when base rates have been learned.\\[11pt]
+\begin{columns}
+    \column{0.45\textwidth}
+    \uncover<1->{Base rates by domain: \phantom{a little shared structure}{\relsize{-1}
+    \[
+    \left[ \begin{matrix} 
+    1 & 0.5 & 0.5 & 0 & 0 & 0 \\
+    1 & 0.5 & 0.5 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 1 & 0.5 & 0.5  \\
+    0 & 0 & 0 & 1 & 0.5 & 0.5  \\
+    \end{matrix}  \right] 
+    \]
+    }
+    }
+    \column{0.45\textwidth}
+    \uncover<1->{Base rates + a little shared structure{ \relsize{-1}
+    \[
+    \left[ \begin{matrix} 
+    1 & 0.6 & 0.4 & 0 & 0.1 & -0.1 \\
+    1 & 0.4 & 0.6 & 0 & -0.1 & 0.1 \\
+    0 & 0.1 & -0.1 & 1 & 0.6 & 0.4  \\
+    0 & -0.1 & 0.1 & 1 & 0.4 & 0.6  \\
+    \end{matrix}  \right] 
+    \] 
+    }
+    }
+\end{columns} 
+{ \relsize{-1}
+\[
+\begin{array}{cccccc||c||cccccc} 
+\multicolumn{6}{c||}{\text{output error}}  & \text{unit}  & \multicolumn{6}{c}{\text{unit output weight updates}} \\
+\hline
+ 0 & + & - & 0 & 0 & 0  &   +    &  0 & + & - & 0 & 0 & 0   \\
+0 & - & + & 0 & 0 & 0  &   -  & 0 & + & - & 0 & 0 & 0   \\
+ 0 & 0 & 0 & 0 & + & - &   +   &  0 & 0 & 0 & 0 & + & - \\
+ 0 & 0 & 0 & 0 & - & +  &  - &  0 & 0 & 0 & 0 & + & - \\
+\hline
+\multicolumn{7}{r}{\text{net output weight update:}} &   0 & + & - & 0 & + & - \\
+\end{array} 
+\]
+}
+\end{frame}
+
 \end{document}
