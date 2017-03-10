@@ -29,7 +29,7 @@
 \title{Learning Parallels}
 \subtitle{Analogies emerge from learning dynamics in neural networks}
 \author{Andrew Lampinen}
-\date{3/7/2017}
+\date{FriSem, 3/24/2017}
 \frame{\titlepage}
 
 
@@ -51,8 +51,17 @@ A variety of perspectives:
 \note{Fortunately, there's a great deal of agreement in the field. What is the driving force? One possibility (which Bransford \& Schwartz among others acknowledged) is that there are different kinds of transfer. Failures to transfer most often occur in settings like Gick \& Holyoak's experiments with the Duncker radiation problem, where participants see one example and then have to do a symbolic mapping to another example. By contrast, successful analogical transfer often occurs in situations like Day \& Goldstone's, where participants actually interact with the system and learn about it over a period of time, or more generally in education as highlighted by Bransford \& Schwartz as the ability to learn faster in the future.}
 \end{frame}
 
+
+\begin{frame}{Analogy, Transfer, and Cognition}
+\begin{itemize}
+    \item<1-> Finding analogies is hard! (How many possible analogies are there?)
+    \item<2-> Seems like humans do it more ``slow'' than ``fast'' in many cases. 
+    \item<3-> How can we model this?    
+\end{itemize}
+\end{frame}
+
 \begin{frame}{Analogy, Transfer, and Neural Networks}
-If and when analogical reasoning is important for cognition, how can we solve the combinatorially explosive analogical mapping problem? Neural networks can extract analogies: 
+Neural networks can extract analogies: 
 \begin{itemize}
     \item<2-> Verbal analogies \cite{Kollias2013}
     \item<3-> Multi-task learning, zero-shot generalization \cite{Luong2016,Johnson2016}  
@@ -85,13 +94,14 @@ L & 1 & 0 & 1 & 0 & 0 & 0 \\
 \end{frame}
 
 \section{(A Little) Theory}
-\begin{frame}{Linear Analyses?}
+\begin{frame}{SVD Analyses?}
 Linear neural networks:
 \begin{columns}
 \column{0.5\textwidth}
 \begin{itemize}
     \item<2-> Learning is driven entirely by features of the SVD (Singular Value Decomposition) of the Input/Output (I/O) mapping \cite{Saxe2013}.
-    \item<3-> Can we use this analysis to study analogy learning?
+    \item<3-> SVD breaks the input/output correlation into independent ``patterns'' or ``modes'' that together explain the data (like components in PCA).
+    \item<4-> Can we use this analysis to study analogy learning?
 \end{itemize}
 \column{0.5\textwidth}
     \includegraphics[width=\textwidth]{figures/linear_network_diagram.png}
@@ -390,7 +400,7 @@ Significant amounts of shared structure extraction!\\[11pt]
     \end{center}
     }
 \end{frame}
-\begin{frame}
+\begin{frame}{Results}
 Also in second layer output modes (although slightly less):
 \begin{center}
 \includegraphics[width=0.75\textwidth]{../hinton_family_tree/results/output_mode_projections_violin.png} 
