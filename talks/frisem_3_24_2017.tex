@@ -12,6 +12,22 @@
 \usepackage{amsmath}
 \usepackage{relsize}
 \usepackage{appendixnumberbeamer}
+\usepackage{xparse}
+\usepackage{tikz}
+\usetikzlibrary{matrix,backgrounds}
+\pgfdeclarelayer{myback}
+\pgfsetlayers{myback,background,main}
+
+\tikzset{mycolor/.style = {line width=1bp,color=#1}}%
+\tikzset{myfillcolor/.style = {draw,fill=#1}}%
+
+\NewDocumentCommand{\highlight}{O{blue!40} m m}{%
+\draw[mycolor=#1,rounded corners] (#2.north west)rectangle (#3.south east);
+}
+
+\NewDocumentCommand{\fhighlight}{O{blue!40} m m}{%
+\draw[myfillcolor=#1,rounded corners] (#2.north west)rectangle (#3.south east);
+}
 
 \usetheme[numbering=fraction]{metropolis}
 %%\AtBeginSection[]
@@ -51,7 +67,6 @@ A variety of perspectives:
 \note{Fortunately, there's a great deal of agreement in the field. What is the driving force? One possibility (which Bransford \& Schwartz among others acknowledged) is that there are different kinds of transfer. Failures to transfer most often occur in settings like Gick \& Holyoak's experiments with the Duncker radiation problem, where participants see one example and then have to do a symbolic mapping to another example. By contrast, successful analogical transfer often occurs in situations like Day \& Goldstone's, where participants actually interact with the system and learn about it over a period of time, or more generally in education as highlighted by Bransford \& Schwartz as the ability to learn faster in the future.}
 \end{frame}
 
-
 \begin{frame}{Analogy, Transfer, and Cognition}
 \begin{itemize}
     \item<1-> Finding analogies is hard! (How many possible analogies are there?)
@@ -61,7 +76,7 @@ A variety of perspectives:
 \end{frame}
 
 \begin{frame}{Analogy, Transfer, and Neural Networks}
-Neural networks can extract analogies: 
+Neural networks can extract analogies and show cross-task transfer: 
 \begin{itemize}
     \item<2-> Verbal analogies \cite{Kollias2013}
     \item<3-> Multi-task learning, zero-shot generalization \cite{Luong2016,Johnson2016}  
@@ -72,7 +87,7 @@ Neural networks can extract analogies:
 	\includegraphics[width = \textwidth]{../writing/cogsci_2017/figures/hinton_family_tree_figure.png}
     \end{columns}
 \end{itemize}
-\uncover<5-> {Can neural networks perform amortized inference about analogies?}
+\uncover<5-> {Why does this occur?} %Can neural networks perform amortized inference about analogies?}
 \end{frame}
 
 \section{Modeling: A toy task}
@@ -100,8 +115,6 @@ Linear neural networks:
 \column{0.5\textwidth}
 \begin{itemize}
     \item<2-> Learning is driven entirely by features of the SVD (Singular Value Decomposition) of the Input/Output (I/O) mapping \cite{Saxe2013}.
-    \item<3-> SVD breaks the input/output correlation into independent ``patterns'' or ``modes'' that together explain the data (like components in PCA).
-    \item<4-> Can we use this analysis to study analogy learning?
 \end{itemize}
 \column{0.5\textwidth}
     \includegraphics[width=\textwidth]{figures/linear_network_diagram.png}
@@ -110,9 +123,37 @@ Linear neural networks:
 \end{frame}
 
 
-\begin{frame}{Linear Analyses?}
+\begin{frame}{SVD Analyses?}
+SVD breaks down the structure of the task into ``modes'' that together explain the data (like components in PCA).
+\begin{figure}
+\centering
+\begin{subfigure}{0.22\textwidth}
+\includegraphics[width=\textwidth]{../writing/cogsci_2017/figures/nonlinear_IO.png}
+%\caption{$\Sigma_{IO}$}
+\end{subfigure}
+{\!\!\huge{$=$}\!\!}
+\begin{subfigure}{0.22\textwidth}
+\includegraphics[width=\textwidth]{../writing/cogsci_2017/figures/U_nl.png}
+%\caption{$U$}
+\end{subfigure}
+{\!\!\LARGE{$\times$}\!\!}
+\begin{subfigure}{0.22\textwidth}
+\includegraphics[width=\textwidth]{../writing/cogsci_2017/figures/S_nl.png}
+%\caption{$S$}
+\end{subfigure}
+{\!\!\LARGE{$\times$}\!\!}
+\begin{subfigure}{0.22\textwidth}
+\includegraphics[width=\textwidth]{../writing/cogsci_2017/figures/V_nl.png}
+%\caption{$V^T$}
+\end{subfigure}
+\end{figure}
+\note{Really talk through SVD, first component gving strong separation between domains, and the letter that's ``always on'' in each language, second two components give within domain structure. Analyzing the SVD is more principled than just looking at weights or hidden unit activations, because it is more invariant to rotations of representation space, etc.}
+\end{frame}
+
+\begin{frame}{SVD Analyses?}
+Can we use SVD analyses of linear networks to study analogy learning?
 \begin{itemize}
-    \item<1-> \textbf{NO,} in the SVD of a block-diagonal matrix, the modes occur within the blocks, thus \textbf{a linear network cannot represent shared structure at convergence.}
+    \item<1-> \textbf{NO,} in the SVD of a block-diagonal matrix, the modes occur within the blocks, thus \textbf{a linear network cannot represent analogies at convergence.}
     \uncover<2->{
     \begin{figure}
     \centering
@@ -139,61 +180,47 @@ Linear neural networks:
     }
     \item<3-> This also means that a linear network \textbf{cannot achieve as parsimonious a solution as a nonlinear network}, because it must solve each copy of a problem separately rather exploiting analogies between them.
 \end{itemize}
-\note{In plain english, what this means is the input output mappings for the two tasks are not really connected in any way. Really talk through SVD, first component gving strong separation between domains, and the letter that's ``always on'' in each language, second two components give within domain structure}
+\note{In plain english, what this means is the input output mappings for the two tasks are not really connected in any way, the most naive way to solve the task where you solve each problem independently.}
 \end{frame}
 
 \begin{frame}{Linearized analysis}
-\begin{columns}
-    \column{0.5\textwidth}
-	However, we would still like to use linear analysis tools, so:
-	\begin{itemize}
-	    \item<2-> Train a network with a non-linearity at the output.
-	    \item<3-> Perform a linearized analysis: SVD of I/O mapping of linear portion of network. 
-	\end{itemize}
-    \column{0.5\textwidth}
-	\uncover<2->{
-	\begin{center}
-	    \includegraphics[width=0.8\textwidth]{../writing/cogsci_2017/figures/network_diagram.png}
-	\end{center}}
-\end{columns}
-\note{Why use these tools? Analyzing the SVD is more principled than just looking at weights or hidden unit activations, because it is more invariant to rotations of representation space, etc.}
-
+So we need non-linear networks. Is there a way we can still use SVD analyses? \uncover<2->{\textbf{Yes}, with a single non-linearity, just analyze linear portion.}\\[11pt]
+\only<1>{ \includegraphics[width=0.66\textwidth]{figures/network_with_IO.png}}
+\only<2>{ \includegraphics[width=0.83\textwidth]{figures/network_with_IO_and_QM.png}}
+\note{Yes, just put a non-linearity at the end and apply to the linear portion}
 \end{frame}
 
 \section{That's enough theory -- back to the task}
 \begin{frame}{Toy task}
-What solutions does the network discover?
-\begin{columns}
-    \column{0.5\textwidth}
-	    \[
-	    \begin{array}{c|cccccc} 
-	    & P & D & S & \pi & \delta & \sigma \\
-	    \hline
-	    R & 1 & 1 & 0 & 0 & 0 & 0 \\
-	    L & 1 & 0 & 1 & 0 & 0 & 0 \\
-	    \rho & 0 & 0 & 0 & 1 & 1 & 0\\
-	    \lambda & 0 & 0 & 0 & 1 & 0 & 1\\
-	    \end{array} 
-	    \]
-    \column{0.5\textwidth}
-	\begin{center}
-	    \includegraphics[width=0.8\textwidth]{../writing/cogsci_2017/figures/network_diagram.png}
-	\end{center}
-\end{columns}
+What solutions does the network discover? \\[11pt]
+ \includegraphics[width=0.83\textwidth]{figures/network_with_IO_and_QM.png}
 \note{note that no weights are shared between the two tasks!}
 \end{frame}
 
 \begin{frame}{Toy task solutions}
-Most commonly, the network learns an offset structure, resulting in the following linearized I/O mapping (or a symmetric analog): 
+Most commonly, the network learns an offset structure:\\[11pt] 
+\only<1>{\includegraphics[width=\textwidth]{figures/network_with_IOs.png}}
+\only<2->{
 \[
-\left[ \begin{matrix} 
-1 & 1 & 0 & 0 & 0 & -1 \\
-1 & 0 & 1 & 0 & -1 & 0 \\
- 0 & 0 & -1 & 1 & 1 & 0\\
- 0 & -1 & 0 & 1 & 0 & 1\\
-\end{matrix}  \right] 
+\begin{tikzpicture}[ampersand replacement=\&]
+\matrix(m)[matrix of math nodes,left delimiter={[},right delimiter={]}] 
+{ 
+1 \& 1 \& 0 \& 0 \& 0 \& -1 \\
+1 \& 0 \& 1 \& 0 \& -1 \& 0 \\
+ 0 \& 0 \& -1 \& 1 \& 1 \& 0\\
+ 0 \& -1 \& 0 \& 1 \& 0 \& 1\\
+};
+
+\begin{pgfonlayer}{myback}
+\fhighlight[red!30]{m-1-1}{m-2-3}
+\fhighlight[red!30]{m-3-4}{m-4-6}
+\fhighlight[blue!30]{m-3-1}{m-4-3}
+\fhighlight[blue!30]{m-1-4}{m-2-6}
+\end{pgfonlayer}
+\end{tikzpicture}
 \]
-\only<2->{(This is certainly not the only solution that can occur, but this happens about 75\% of the time. The remaining 25\% no analogy is discovered.)}
+}
+\uncover<3->{(This is certainly not the only solution that can occur, but this happens about 75\% of the time. The remaining 25\% no analogy is discovered.)}
 \end{frame}
 
 \begin{frame}{Comparing SVDs}
@@ -204,22 +231,22 @@ Most commonly, the network learns an offset structure, resulting in the followin
     \centering
     \begin{subfigure}{0.2\textwidth}
     \includegraphics[width=\textwidth]{../writing/cogsci_2017/figures/nonlinear_IO.png}
-    \caption{$\Sigma_{IO}$}
+%%    \caption{$\Sigma_{IO}$}
     \end{subfigure}
     \raisebox{0.5em}{\!\!\huge{$=$}\!\!}
     \begin{subfigure}{0.2\textwidth}
     \includegraphics[width=\textwidth]{../writing/cogsci_2017/figures/U_nl.png}
-    \caption{$U$}
+%%    \caption{$U$}
     \end{subfigure}
     \raisebox{0.5em}{\!\!\LARGE{$\times$}\!\!}
     \begin{subfigure}{0.2\textwidth}
     \includegraphics[width=\textwidth]{../writing/cogsci_2017/figures/S_nl.png}
-    \caption{$S$}
+%%    \caption{$S$}
     \end{subfigure}
     \raisebox{0.5em}{\!\!\LARGE{$\times$}\!\!}
     \begin{subfigure}{0.2\textwidth}
     \includegraphics[width=\textwidth]{../writing/cogsci_2017/figures/V_nl.png}
-    \caption{$V^T$}
+%%    \caption{$V^T$}
     \end{subfigure}
     \end{figure}
     }
@@ -229,32 +256,32 @@ Most commonly, the network learns an offset structure, resulting in the followin
     \centering
     \begin{subfigure}{0.2\textwidth}
     \includegraphics[width=\textwidth]{../writing/cogsci_2017/figures/linearized_IO.png}
-    \caption{$\Sigma_{IO}$}
+ %%   \caption{$\Sigma_{IO}$}
     \end{subfigure}
     \raisebox{0.5em}{\!\!\huge{$=$}\!\!}
     \begin{subfigure}{0.2\textwidth}
     \includegraphics[width=\textwidth]{../writing/cogsci_2017/figures/U_lz.png}
-    \caption{$U$}
+%%    \caption{$U$}
     \end{subfigure}
     \raisebox{0.5em}{\!\!\LARGE{$\times$}\!\!}
     \begin{subfigure}{0.2\textwidth}
     \includegraphics[width=\textwidth]{../writing/cogsci_2017/figures/S_lz.png}
-    \caption{$S$}
+%%    \caption{$S$}
     \end{subfigure}
     \raisebox{0.5em}{\!\!\LARGE{$\times$}\!\!}
     \begin{subfigure}{0.2\textwidth}
     \includegraphics[width=\textwidth]{../writing/cogsci_2017/figures/V_lz.png}
-    \caption{$V^T$}
+%%    \caption{$V^T$}
     \end{subfigure}
     \end{figure}
     }
-    \item<3-> Linearized I/O shows network has captured the shared structure!
+    \item<3-> Linearized I/O shows network has captured the analogy!
 \end{itemize}
 \note{Can interpret the top SVD in several ways, as the task that a linear network solves, or as the task that a non-linear netwokr begins solving when it is still in the linear regime. Note more parsimonious solutions available with linearized mapping -- i.e. lower rank.}
 \end{frame}
 
 \begin{frame}{Learning dynamics}
-But why and how does this occur? The linearized SVD cannot tell us, but the progression is fairly consistent: \\[11pt]
+But when and how does this occur? The linearized SVD cannot tell us about learning dynamics, but the progression is fairly consistent: \\[11pt]
 \begin{columns}
     \column{0.45\textwidth}
     \uncover<2->{Initial:{\relsize{-1}
@@ -298,7 +325,7 @@ But why and how does this occur? The linearized SVD cannot tell us, but the prog
     \]
     }}
 \end{columns}
-\uncover<6->{For all but the last step, linear network learning dynamics are very similar! Do linear networks also start to extract some shared structure?}
+\uncover<6->{For all but the last step, linear network learning dynamics are very similar! Do linear networks also show any signs of analogical learning?}
 \note{base rates by domain = first component of SVD}
 \end{frame}
 
@@ -407,14 +434,13 @@ Also in second layer output modes (although slightly less):
 \end{center}
 \end{frame}
 
-\begin{frame}{Shared structure highlights:}
+\begin{frame}{Highlights:}
 The input layers had:
 \begin{itemize}
-    \item<1-> A median of 6 modes showing significant extraction of the analogy to either the regular or flipped mapping (null: only 0.01\% of runs with 6 significant modes, median 0).
-    \item<2-> 3 or more significant components from at one of the mappings alone in 95\% of the runs (null: in 4\% of runs).
-    \item<3-> 3 or more significant components overall in all of the runs (null: in 3\% of runs).
+    \item<1-> A median of 6 modes showing significant extraction of the regular or flipped analogy (null: only 0.01\% of runs with 6 significant modes, median 0).
+    \item<2-> 3 or more significant components overall in all of the runs (null: in 3\% of runs).
 \end{itemize}
-\uncover<4->{Shared structure extraction appears \textbf{more consistent in a more complex task} than it was in the toy task}
+\uncover<3->{Analogy extraction appears \textbf{more consistent in a more complex task} than it was in the toy task}
 \end{frame}
 
 \begin{frame}{PFL Results}
@@ -427,7 +453,7 @@ Suppose we share some weights, can we see evidence of preparation for future lea
     \end{center}
     }
 \column{0.45\textwidth}
-    \uncover<3->{Yes, learning is faster after learning an analogous task than after learning a different one.
+    \uncover<3->{\textbf{Yes}, learning is faster after learning an analogous task than after learning a non-analogous one. \vspace{-10pt}
     \begin{center}
     \includegraphics[width=1.1\textwidth]{figures/preparation_for_learning.png} 
     \end{center}
@@ -437,7 +463,7 @@ Suppose we share some weights, can we see evidence of preparation for future lea
 \end{frame}
 
 \begin{frame}{PFL Results}
-Does this still result in extraction of analogies? Yes, but not quite as much as learning simultaneously.\\[11pt]
+Does this still result in representation of the analogy? Yes, but not quite as much as learning simultaneously.\\[11pt]
 \begin{columns}
 \column{0.45\textwidth}
     \uncover<2->{
@@ -481,7 +507,7 @@ Does this still result in extraction of analogies? Yes, but not quite as much as
 Thanks to:
 \begin{itemize}
     \item Co-authors: Shaw Hsu \& Jay McClelland
-    \item The rest of the lab for helpful conversations and feedback. 
+    \item The rest of the lab (especially Arianna) for helpful conversations and feedback. 
     \item You, for listening.
 \end{itemize}
 \end{frame}
