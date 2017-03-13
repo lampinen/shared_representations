@@ -45,6 +45,7 @@ plotting_data = sl_input %>% gather(Analogy,num_projections,Regular,Flipped,Eith
 ggplot(plotting_data,aes(x=Analogy,y=num_projections,fill=Analogy)) +
   geom_violin(adjust=2) +
   scale_y_continuous(breaks=0:12,limits=c(0,12)) +
+  ylab("# significant modes for that analogy")+
   scale_x_discrete(limits=c('Regular','Flipped','Either','Null'),labels=c('Regular','Flipped','Either','Null Dist.')) +
   scale_fill_manual(limits=c('Null','Regular','Flipped','Either'),values=cbPalette)
 ggsave('results/input_mode_projections_violin.png')
@@ -56,6 +57,7 @@ plotting_data = sl_output %>% gather(Analogy,num_projections,Regular,Flipped,Eit
 ggplot(plotting_data,aes(x=Analogy,y=num_projections,fill=Analogy)) +
   geom_violin(adjust=2) +
   scale_y_continuous(breaks=0:12,limits=c(0,12)) +
+  ylab("# significant modes for that analogy")+
   scale_x_discrete(limits=c('Regular','Flipped','Either','Null'),labels=c('Regular','Flipped','Either','Null Dist.')) +
   scale_fill_manual(limits=c('Null','Regular','Flipped','Either'),values=cbPalette)
 ggsave('results/output_mode_projections_violin.png')
@@ -68,6 +70,8 @@ plotting_data = pfl_alt_input %>% gather(Analogy,num_projections,Regular,Flipped
 ggplot(plotting_data,aes(x=Analogy,y=num_projections,fill=Analogy)) +
   geom_violin(adjust=2) +
   scale_y_continuous(breaks=0:12,limits=c(0,12)) +
+  ylab("# significant modes for that analogy")+
+  scale_x_discrete(limits=c('Regular','Flipped','Either','Null'),labels=c('Regular','Flipped','Either','Null Dist.')) +
   scale_x_discrete(limits=c('Regular','Flipped','Either','Null'),labels=c('Regular','Flipped','Either','Null Dist.')) +
   scale_fill_manual(limits=c('Null','Regular','Flipped','Either'),values=cbPalette)
 ggsave('results/pfl/alt_input_mode_projections_violin.png')
@@ -79,6 +83,7 @@ plotting_data = pfl_anal_input %>% gather(Analogy,num_projections,Regular,Flippe
 ggplot(plotting_data,aes(x=Analogy,y=num_projections,fill=Analogy)) +
   geom_violin(adjust=2) +
   scale_y_continuous(breaks=0:12,limits=c(0,12)) +
+  ylab("# significant modes for that analogy")+
   scale_x_discrete(limits=c('Regular','Flipped','Either','Null'),labels=c('Regular','Flipped','Either','Null Dist.')) +
   scale_fill_manual(limits=c('Null','Regular','Flipped','Either'),values=cbPalette)
 ggsave('results/pfl/anal_input_mode_projections_violin.png')
