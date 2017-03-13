@@ -68,15 +68,50 @@ A variety of perspectives:
 \end{frame}
 
 \begin{frame}{Analogy, Transfer, and Cognition}
+How can we reconcile these viewpoints?
 \begin{itemize}
-    \item<1-> Finding analogies is hard! (How many possible analogies are there?)
-    \item<2-> Seems like humans do it more ``slow'' than ``fast'' in many cases. 
-    \item<3-> How can we model this?    
+    \item<2-> Different kinds of transfer:
+\end{itemize}
+\uncover<3->{
+\begin{center}
+\begin{table}
+\begin{tabular}{|c|c|}
+\hline 
+Fast & Slow \\
+\hline
+\parbox{0.45\textwidth}{
+\begin{itemize}
+\item<4-> one (or a few) examples explicitly shown
+\item<5-> transfer requires explicit awareness of analogy 
+\end{itemize} 
+}
+&
+\parbox{0.45\textwidth}{
+\begin{itemize}
+\item<4-> learning through many interactions
+\item<5-> transfer need not be explicit 
+\end{itemize}
+}\\ \hline 
+\end{tabular}
+\end{table} 
+\end{center}
+}
+\end{frame}
+
+\begin{frame}{Analogy, Transfer, and Cognition}
+Why is fast transfer rare?
+\begin{itemize}
+    \item<1-> Finding analogies symbolically is hard! (How many possible analogies are there?)  
+\end{itemize}
+Why is slow transfer more common?
+\begin{itemize}
+    \item<1-> \textbf{Is finding analogies implicitly easy?}
 \end{itemize}
 \end{frame}
 
+
 \begin{frame}{Analogy, Transfer, and Neural Networks}
-Neural networks can extract analogies and show cross-task transfer: 
+Neural networks can show representation of analogies and demonstrate cross-task transfer in some cases: 
 \begin{itemize}
     \item<2-> Verbal analogies \cite{Kollias2013}
     \item<3-> Multi-task learning, zero-shot generalization \cite{Luong2016,Johnson2016}  
@@ -87,7 +122,16 @@ Neural networks can extract analogies and show cross-task transfer:
 	\includegraphics[width = \textwidth]{../writing/cogsci_2017/figures/hinton_family_tree_figure.png}
     \end{columns}
 \end{itemize}
-\uncover<5-> {Why does this occur?} %Can neural networks perform amortized inference about analogies?}
+\uncover<5->{Do neural networks naturally extract analogies?}
+\end{frame}
+
+\begin{frame}{Analogy, Transfer, and Neural Networks}
+Our claims:
+\begin{itemize}
+    \item<1-> Neural networks learning by gradient descent naturally extract analogies. 
+    \item<2-> This could act as a form of amortized inference about analogical mappings.
+    \item<3-> This in turn could support both implicit and explicit transfer in the long term. 
+\end{itemize}
 \end{frame}
 
 \section{Modeling: A toy task}
@@ -115,6 +159,7 @@ Linear neural networks:
 \column{0.5\textwidth}
 \begin{itemize}
     \item<2-> Learning is driven entirely by features of the SVD (Singular Value Decomposition) of the Input/Output (I/O) mapping \cite{Saxe2013}.
+    \item<3-> This analysis can tell us about the structure the network is actually learning. 
 \end{itemize}
 \column{0.5\textwidth}
     \includegraphics[width=\textwidth]{figures/linear_network_diagram.png}
@@ -184,9 +229,13 @@ Can we use SVD analyses of linear networks to study analogy learning?
 \end{frame}
 
 \begin{frame}{Linearized analysis}
-So we need non-linear networks. Is there a way we can still use SVD analyses? \uncover<2->{\textbf{Yes}, with a single non-linearity, just analyze linear portion.}\\[11pt]
-\only<1>{ \includegraphics[width=0.66\textwidth]{figures/network_with_IO.png}}
-\only<2>{ \includegraphics[width=0.83\textwidth]{figures/network_with_IO_and_QM.png}}
+So we need non-linear networks. \uncover<2->{Is there a way we can still use SVD analyses?} 
+\begin{itemize}
+\item<3-> \textbf{Yes}, with a single non-linearity, just analyze linear portion.
+\end{itemize}
+\only<1>{ \begin{center}\includegraphics[width=0.3\textwidth]{figures/network_diagram.png}\end{center}}
+\only<2>{ \includegraphics[width=0.83\textwidth]{figures/network_with_IO.png}}
+\only<3>{ \includegraphics[width=0.83\textwidth]{figures/network_with_IO_and_QM.png}}
 \note{Yes, just put a non-linearity at the end and apply to the linear portion}
 \end{frame}
 
@@ -280,55 +329,55 @@ Most commonly, the network learns an offset structure:\\[11pt]
 \note{Can interpret the top SVD in several ways, as the task that a linear network solves, or as the task that a non-linear netwokr begins solving when it is still in the linear regime. Note more parsimonious solutions available with linearized mapping -- i.e. lower rank.}
 \end{frame}
 
-\begin{frame}{Learning dynamics}
-But when and how does this occur? The linearized SVD cannot tell us about learning dynamics, but the progression is fairly consistent: \\[11pt]
-\begin{columns}
-    \column{0.45\textwidth}
-    \uncover<2->{Initial:{\relsize{-1}
-    \[ 
-    \left[ \begin{matrix} 
-    0 & 0 & 0 & 0 & 0 & 0 \\
-    \vdots & \vdots &\vdots &\vdots &\vdots &\vdots \\
-     0 & 0 & 0 & 0 & 0 & 0\\
-    \end{matrix}  \right] 
-    \] 
-    }}
-    \uncover<4->{Base rates by domain:{\relsize{-1}
-    \[
-    \left[ \begin{matrix} 
-    1 & 0.5 & 0.5 & 0 & 0 & 0 \\
-    1 & 0.5 & 0.5 & 0 & 0 & 0 \\
-    0 & 0 & 0 & 1 & 0.5 & 0.5  \\
-    0 & 0 & 0 & 1 & 0.5 & 0.5  \\
-    \end{matrix}  \right] 
-    \]
-    }
-    }
-    \column{0.45\textwidth}
-    \uncover<3->{Base rates:{\relsize{-1}
-    \[ 
-    \left[ \begin{matrix} 
-    0.5 & 0.25 & 0.25 & 0.5 & 0.25 & 0.25 \\
-    \vdots & \vdots &\vdots &\vdots &\vdots &\vdots \\
-     0.5 & 0.25 & 0.25 & 0.5 & 0.25 & 0.25\\
-    \end{matrix}  \right] 
-    \] 
-    }}
-    \uncover<5->{Solution with offsets:{\relsize{-1}
-    \[
-    \left[ \begin{matrix} 
-    1 & 1 & 0 & 0 & 0 & -1 \\
-    1 & 0 & 1 & 0 & -1 & 0 \\
-     0 & 0 & -1 & 1 & 1 & 0\\
-     0 & -1 & 0 & 1 & 0 & 1\\
-    \end{matrix}  \right] 
-    \]
-    }}
-\end{columns}
-\uncover<6->{For all but the last step, linear network learning dynamics are very similar! Do linear networks also show any signs of analogical learning?}
-\note{base rates by domain = first component of SVD}
-\end{frame}
-
+%%\begin{frame}{Learning dynamics}
+%%But when and how does this occur? The linearized SVD cannot tell us about learning dynamics, but the progression is fairly consistent: \\[11pt]
+%%\begin{columns}
+%%    \column{0.45\textwidth}
+%%    \uncover<2->{Initial:{\relsize{-1}
+%%    \[ 
+%%    \left[ \begin{matrix} 
+%%    0 & 0 & 0 & 0 & 0 & 0 \\
+%%    \vdots & \vdots &\vdots &\vdots &\vdots &\vdots \\
+%%     0 & 0 & 0 & 0 & 0 & 0\\
+%%    \end{matrix}  \right] 
+%%    \] 
+%%    }}
+%%    \uncover<4->{Base rates by domain:{\relsize{-1}
+%%    \[
+%%    \left[ \begin{matrix} 
+%%    1 & 0.5 & 0.5 & 0 & 0 & 0 \\
+%%    1 & 0.5 & 0.5 & 0 & 0 & 0 \\
+%%    0 & 0 & 0 & 1 & 0.5 & 0.5  \\
+%%    0 & 0 & 0 & 1 & 0.5 & 0.5  \\
+%%    \end{matrix}  \right] 
+%%    \]
+%%    }
+%%    }
+%%    \column{0.45\textwidth}
+%%    \uncover<3->{Base rates:{\relsize{-1}
+%%    \[ 
+%%    \left[ \begin{matrix} 
+%%    0.5 & 0.25 & 0.25 & 0.5 & 0.25 & 0.25 \\
+%%    \vdots & \vdots &\vdots &\vdots &\vdots &\vdots \\
+%%     0.5 & 0.25 & 0.25 & 0.5 & 0.25 & 0.25\\
+%%    \end{matrix}  \right] 
+%%    \] 
+%%    }}
+%%    \uncover<5->{Solution with offsets:{\relsize{-1}
+%%    \[
+%%    \left[ \begin{matrix} 
+%%    1 & 1 & 0 & 0 & 0 & -1 \\
+%%    1 & 0 & 1 & 0 & -1 & 0 \\
+%%     0 & 0 & -1 & 1 & 1 & 0\\
+%%     0 & -1 & 0 & 1 & 0 & 1\\
+%%    \end{matrix}  \right] 
+%%    \]
+%%    }}
+%%\end{columns}
+%%\uncover<6->{For all but the last step, linear network learning dynamics are very similar! Do linear networks also show any signs of analogical learning?}
+%%\note{base rates by domain = first component of SVD}
+%%\end{frame}
+\section{Learning dynamics}
 \begin{frame}{Learning dynamics}
 In fact, linear networks begin to extract the analogy as well, but must discard it to achieve their optimal solution.
 \begin{center}
@@ -368,13 +417,15 @@ Why? When gradually learning analogous tasks simultaneously, extracting the anal
 \note{So network will exploit the analogy to reduce error, even though no weights are shared, and even if it must discard it in the linear case.}
 \end{frame}
 
-\begin{frame}{Interim Summary}
+\section{Interim summary}
+\begin{frame}{Interim summary}
  In this simple task:
 \begin{itemize}
     \item<2-> Representation of the analogy emerges naturally from the learning dynamics because it reduces error.
     \item<3-> This occurs in about 75\% of random initializations.
     \item<4-> This does not depend on shared weights, gradually learning two analogous tasks simultaneously suffices.
 \end{itemize}
+\uncover<5->{Is this only because the task was simple?}
 \end{frame}
 
 \section{A more interesting example: Hinton's family tree task}
@@ -390,36 +441,59 @@ Why? When gradually learning analogous tasks simultaneously, extracting the anal
     \end{center}
 \end{columns}
 \begin{itemize}
-\item<2-> Our network is simplified from Hinton's, and tasks are completely separated.
+\item Our network is simplified from Hinton's, and tasks are completely separated.
 \end{itemize}
 \end{frame}
 
 \begin{frame}{Hinton family tree task: Problems}
 A few problems:
 \begin{itemize}
-    \item<2-> Task is not linearly separable, so we have multiple non-linearities, so how to perform analysis?
+    \item<1-> Task is not linearly separable, so we have multiple non-linearities, so how to perform analysis?
     \begin{itemize}
-	\item<3-> The simple approach we took is just to perform the linearized analysis at each layer. 
+	\item<2-> The simple approach we took is just to perform the linearized analysis at each layer. 
     \end{itemize}
-    \item<4-> Multiple analogies exist between family trees (for example flip left to right and reverse genders) 
-    \only<4> {
+    \uncover<2-> {
     \begin{center}
-	\includegraphics[width = 0.5\textwidth]{../writing/cogsci_2017/figures/hinton_family_tree_figure.png}
+	\includegraphics[width = 0.5\textwidth]{../writing/cogsci_2017/figures/family_tree_network_diagram.png}
+
     \end{center}
     }
-    \begin{itemize}
-	\item<5-> Include both these analogies in our analysis. 
-    \end{itemize}
-    \item<6-> Cannot simply ``eyeball'' structure extraction here, need a principled measure of shared structure extraction. 
-    \begin{itemize}
-	\item<7-> Use a permutation test on each SVD mode to see whether the domains share more structure in this mode than would be expected by chance. 
-    \end{itemize}
 \end{itemize}
 \note{Hinton shared relationship inputs, and had shared hidden layers, but we want to strip down to see if the analogies will emerge from the learning dynamics like in the above task.}
 \end{frame}
 
+\begin{frame}{Hinton family tree task: Problems}
+A few problems:
+\begin{itemize}
+    \item<1-> Multiple analogies exist between family trees (for example flip left to right and reverse genders) 
+    \begin{itemize}
+	\item<2-> Include both these analogies in our analysis. 
+    \end{itemize}
+    \uncover<1-> {
+    \begin{center}
+	\includegraphics[width = 0.5\textwidth]{../writing/cogsci_2017/figures/hinton_family_tree_figure.png}
+    \end{center}
+    }
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Hinton family tree task: Problems}
+A few problems:
+\begin{itemize}
+    \item<1-> Cannot simply ``eyeball'' analogy extraction here, need a principled measure.
+    \begin{itemize}
+	\item<2-> Use a non-parametric test on each SVD mode to see whether the domains share more analogous structure in this mode than would be expected by chance. 
+    \end{itemize}
+\end{itemize}
+\uncover<2-> {
+    \includegraphics[width = \textwidth]{figures/nonparametric_test.png}
+
+}
+\note{Hinton shared relationship inputs, and had shared hidden layers, but we want to strip down to see if the analogies will emerge from the learning dynamics like in the above task.}
+\end{frame}
+
 \begin{frame}{Results}
-Significant amounts of shared structure extraction!\\[11pt]
+Significant amounts of analogy extraction!\\[11pt]
     \uncover<2->{
     First layer input modes:
     \begin{center}
@@ -508,6 +582,7 @@ Thanks to:
 \begin{itemize}
     \item Co-authors: Shaw Hsu \& Jay McClelland
     \item The rest of the lab (especially Arianna) for helpful conversations and feedback. 
+    \item Mona, Yochai, Lester, and Pam, for feedback on this talk.
     \item You, for listening.
 \end{itemize}
 \end{frame}
