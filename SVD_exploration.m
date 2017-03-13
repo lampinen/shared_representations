@@ -14,6 +14,8 @@ ilz_IO_c = ideal_linearized_IO-ones(4,1)*mean(ideal_linearized_IO,1);
 [U_ilz,S_ilz,V_ilz] = svd(ilz_IO_c.')
 
 
+
+
 actual_preoutputs = load('nonlinear_nhidden_4_rseed_0_pre_outputs.csv')
 ap_c = actual_preoutputs-ones(4,1)*mean(actual_preoutputs,1);
 [U_ap,S_ap,V_ap] = svd(ap_c.')
@@ -127,7 +129,9 @@ ylabel('outputs','fontsize',16)
 set(gca,'xtick',1:4)
 colormap(redbluecmap)
 
-imagesc(V_nl(:,1:3).',[-1,1])
+temp = V_nl(:,1:3);
+temp(:,3) = -temp(:,3); %Flip mode input and outputs for visual consistency
+imagesc(temp.',[-1,1])
 xlabel('inputs','fontsize',16)
 ylabel('modes','fontsize',16)
 set(gca,'xtick',1:4)
@@ -140,8 +144,9 @@ set(gca,'xtick',1:3)
 set(gca,'ytick',1:3)
 colormap(redbluecmap)
 
-
-imagesc(U_nl(:,1:3),[-1,1])
+temp = U_nl(:,1:3);
+temp(:,3) = -temp(:,3); %Flip mode input and outputs for visual consistency
+imagesc(temp,[-1,1])
 xlabel('modes','fontsize',16)
 ylabel('outputs','fontsize',16)
 set(gca,'ytick',1:6)
