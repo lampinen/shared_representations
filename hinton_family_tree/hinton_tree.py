@@ -165,7 +165,6 @@ relationships = ["F","M","H","W","Son","D","U","A","B","Sis","Nep","Nie"]
 
 print people
 print relationships
-exit()
 for i in xrange(len(restructured_relationship_dict_keys)):
     key = restructured_relationship_dict_keys[i]
     one_family_input_matrix[i,people.index(key[0])] = 1
@@ -215,52 +214,18 @@ for rseed in xrange(100):
 
     input_ph = tf.placeholder(tf.float32, shape=[input_shape,None])
     #handle some reshaping to get from block diagonal data matrix structure to desired input structure
-    split_inputs = tf.split_v(input_ph,[(npeople_per if (i % 2 == 0) else nrelationships_per) for i in xrange(nfamilies*2)],0)
+    split_inputs = tf.split(input_ph,[(npeople_per if (i % 2 == 0) else nrelationships_per) for i in xrange(nfamilies*2)],0)
     people_inputs = [this_input for (i,this_input) in enumerate(split_inputs) if i % 2 == 0]
     relationship_inputs = [this_input for (i,this_input) in enumerate(split_inputs) if i % 2 == 1]
-    people_input = tf.concat(0,people_inputs)
-    relationship_input = tf.concat(0,relationship_inputs)
+    people_input = tf.concat(people_inputs,axis=0)
+    relationship_input = tf.concat(relationship_inputs,axis=0)
     #build the network
-    ############single nonlinearity -- won't work because this problem is not linearly separable
-#    W1p = tf.Variable(tf.random_uniform([nhidden_separate,nfamilies*npeople_per],0,0.1))
-#    W1r = tf.Variable(tf.random_uniform([nhidden_separate,nfamilies*npeople_per],0,0.1))
-#    W2 = tf.Variable(tf.random_uniform([nhidden_shared,2*nhidden_separate],0,0.1))
-#    W3 = tf.Variable(tf.random_uniform([nhidden_separate,nhidden_shared],0,0.1))
-#    W4 = tf.Variable(tf.random_uniform([output_shape,nhidden_separate],0,0.1))
-#    people_rep = tf.matmul(W1p,people_input)
-#    relationship_rep = tf.matmul(W1r,relationship_input)
-#    middle_rep = tf.matmul(W2,tf.concat(0,[people_rep,relationship_rep]))
-#
-#    pre_output = tf.matmul(W4,tf.matmul(W3,middle_rep))
-#
-#    output = tf.nn.relu(pre_output)
-
-
-    ###########more closely analogous to hintons--trouble with learning
-#    W1p = tf.Variable(tf.random_uniform([nhidden_separate,nfamilies*npeople_per],0,0.1))
-#    W1r = tf.Variable(tf.random_uniform([nhidden_separate,nfamilies*npeople_per],0,0.1))
-#    W2 = tf.Variable(tf.random_uniform([nhidden_shared,2*nhidden_separate],0,0.1))
-#    W3 = tf.Variable(tf.random_uniform([nhidden_separate,nhidden_shared],0,0.1))
-#    W4 = tf.Variable(tf.random_uniform([output_shape,nhidden_separate],0,0.1))
-#    b1p = tf.Variable(tf.random_uniform([nhidden_separate,1],0,0.1))
-#    b1r = tf.Variable(tf.random_uniform([nhidden_separate,1],0,0.1))
-#    b2 = tf.Variable(tf.random_uniform([nhidden_shared,1],0,0.1))
-#    b3 = tf.Variable(tf.random_uniform([nhidden_separate,1],0,0.1))
-#    b4 = tf.Variable(tf.random_uniform([output_shape,1],0,0.1))
-#    people_rep = tf.nn.relu(tf.matmul(W1p,people_input)+b1p)
-#    relationship_rep = tf.nn.relu(tf.matmul(W1r,relationship_input)+b1r)
-#    middle_rep = tf.nn.relu(tf.matmul(W2,tf.concat(0,[people_rep,relationship_rep]))+b2)
-#
-#    pre_output = tf.matmul(W4,tf.nn.relu(tf.matmul(W3,middle_rep)+b3))+b4
-#
-#    output = tf.nn.relu(pre_output)
-
      ############Working simpler network with eta = 0.005, nhidden = 13 
     W1 = tf.Variable(tf.random_uniform([nhidden_shared,input_shape],0,0.001))
     b1 = tf.Variable(tf.random_uniform([nhidden_shared,1],0,0.001))
     W2 = tf.Variable(tf.random_uniform([output_shape,nhidden_shared],0,0.001))
     b2 = tf.Variable(tf.random_uniform([output_shape,1],0,0.001))
-    pre_middle_rep = tf.matmul(W1,tf.concat(0,[people_input,relationship_input]))+b1
+    pre_middle_rep = tf.matmul(W1,tf.concat([people_input,relationship_input],0))+b1
     middle_rep = tf.nn.relu(pre_middle_rep)
 
     pre_output = tf.matmul(W2,middle_rep)+b2
@@ -383,7 +348,9 @@ for rseed in xrange(100):
 #	    save_weights(W2,filename_prefix+"epoch_%i_W2.csv" %epoch)
     #	numpy.savetxt(fout,numpy.array(get_reps()),delimiter=',')
 	if epoch % 10 == 0:
-	    print "epoch: %i, MSE: %f" %(epoch, test_accuracy())	
+	    temp = test_accuracy()
+	    print "epoch: %i, MSE: %f" %(epoch, temp)	
+	    numpy.savetxt(fout,[temp],delimiter=',')
 #	if epoch % 100 == 0:
 #	    display_rep_similarity()
 #	    display_po_similarity()
@@ -397,5 +364,5 @@ for rseed in xrange(100):
 #    print_preoutputs()
 #    display_rep_similarity()
 #    display_po_similarity()
-    save_activations(pre_middle_rep,filename_prefix+"pre_middle_reps.csv")
-    save_activations(pre_output,filename_prefix+"pre_outputs.csv")
+#    save_activations(pre_middle_rep,filename_prefix+"pre_middle_reps.csv")
+#    save_activations(pre_output,filename_prefix+"pre_outputs.csv")
