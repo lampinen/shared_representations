@@ -1,6 +1,6 @@
 \documentclass{beamer}
 \usepackage{pgfpages}
-\setbeameroption{show notes on second screen=left} %enable for notes
+%%\setbeameroption{show notes on second screen=left} %enable for notes
 \usepackage{graphicx}
 \usepackage{xcolor}
 \usepackage{listings}
@@ -101,11 +101,11 @@ Fast & Slow \\
 \begin{frame}{Analogy, Transfer, and Cognition}
 Why is fast transfer rare?
 \begin{itemize}
-    \item<1-> Finding analogies symbolically is hard! (How many possible analogies are there?)  
+    \item<2-> Finding analogies symbolically is hard! (How many possible analogies are there?)  
 \end{itemize}
-Why is slow transfer more common?
+\uncover<3->{Why is slow transfer more common?}
 \begin{itemize}
-    \item<1-> \textbf{Is finding analogies implicitly easy?}
+    \item<4-> \textbf{Is finding analogies implicitly ``easy''?}
 \end{itemize}
 \end{frame}
 
@@ -114,6 +114,7 @@ Why is slow transfer more common?
 Neural networks can show representation of analogies and demonstrate cross-task transfer in some cases: 
 \begin{itemize}
     \item<2-> Verbal analogies \cite{Kollias2013}
+    \item<3-> Transfer in artificial grammar learning \cite{Dienes1999}
     \item<3-> Multi-task learning, zero-shot generalization \cite{Luong2016,Johnson2016}  
     \item<4-> Hinton family tree task \cite{Hinton1986}
     \begin{columns}
@@ -129,8 +130,8 @@ Neural networks can show representation of analogies and demonstrate cross-task 
 Our claims:
 \begin{itemize}
     \item<1-> Neural networks learning by gradient descent naturally extract analogies. 
-    \item<2-> This could act as a form of amortized inference about analogical mappings.
-    \item<3-> This in turn could support both implicit and explicit transfer in the long term. 
+    \item<2-> This could act as a form of amortized inference about analogies.
+    \item<3-> This in turn could drive transfer (and could potentially support explicit analogical reasoning).
 \end{itemize}
 \end{frame}
 
@@ -223,7 +224,7 @@ Can we use SVD analyses of linear networks to study analogy learning?
     \end{subfigure}
     \end{figure}
     }
-    \item<3-> This also means that a linear network \textbf{cannot achieve as parsimonious a solution as a nonlinear network}, because it must solve each copy of a problem separately rather exploiting analogies between them.
+    \item<3-> This also means that a linear network \textbf{cannot achieve as parsimonious a solution as a nonlinear network}, because it must solve each copy of a problem separately rather than exploiting analogies between them.
 \end{itemize}
 \note{In plain english, what this means is the input output mappings for the two tasks are not really connected in any way, the most naive way to solve the task where you solve each problem independently.}
 \end{frame}
@@ -274,26 +275,26 @@ Most commonly, the network learns an offset structure:\\[11pt]
 
 \begin{frame}{Comparing SVDs}
 \begin{itemize}
-    \item<1-> Non-linear I/O Mapping
+    \item<1-> I/O Mapping
     \uncover<1->{
     \begin{figure}
     \centering
-    \begin{subfigure}{0.2\textwidth}
-    \includegraphics[width=\textwidth]{../writing/cogsci_2017/figures/nonlinear_IO.png}
-%%    \caption{$\Sigma_{IO}$}
-    \end{subfigure}
-    \raisebox{0.5em}{\!\!\huge{$=$}\!\!}
-    \begin{subfigure}{0.2\textwidth}
+%%    \begin{subfigure}{0.2\textwidth}
+%%    \includegraphics[width=\textwidth]{../writing/cogsci_2017/figures/nonlinear_IO.png}
+%%%%    \caption{$\Sigma_{IO}$}
+%%    \end{subfigure}
+%%    \raisebox{0.5em}{\!\!\huge{$=$}\!\!}
+    \begin{subfigure}{0.25\textwidth}
     \includegraphics[width=\textwidth]{../writing/cogsci_2017/figures/U_nl.png}
 %%    \caption{$U$}
     \end{subfigure}
     \raisebox{0.5em}{\!\!\LARGE{$\times$}\!\!}
-    \begin{subfigure}{0.2\textwidth}
+    \begin{subfigure}{0.25\textwidth}
     \includegraphics[width=\textwidth]{../writing/cogsci_2017/figures/S_nl.png}
 %%    \caption{$S$}
     \end{subfigure}
     \raisebox{0.5em}{\!\!\LARGE{$\times$}\!\!}
-    \begin{subfigure}{0.2\textwidth}
+    \begin{subfigure}{0.25\textwidth}
     \includegraphics[width=\textwidth]{../writing/cogsci_2017/figures/V_nl.png}
 %%    \caption{$V^T$}
     \end{subfigure}
@@ -303,30 +304,31 @@ Most commonly, the network learns an offset structure:\\[11pt]
     \uncover<2->{
     \begin{figure}
     \centering
-    \begin{subfigure}{0.2\textwidth}
-    \includegraphics[width=\textwidth]{../writing/cogsci_2017/figures/linearized_IO.png}
- %%   \caption{$\Sigma_{IO}$}
-    \end{subfigure}
-    \raisebox{0.5em}{\!\!\huge{$=$}\!\!}
-    \begin{subfigure}{0.2\textwidth}
+%%    \begin{subfigure}{0.25\textwidth}
+%%    \includegraphics[width=\textwidth]{../writing/cogsci_2017/figures/linearized_IO.png}
+%% %%   \caption{$\Sigma_{IO}$}
+%%    \end{subfigure}
+%%    \raisebox{0.5em}{\!\!\huge{$=$}\!\!}
+    \begin{subfigure}{0.25\textwidth}
     \includegraphics[width=\textwidth]{../writing/cogsci_2017/figures/U_lz.png}
 %%    \caption{$U$}
     \end{subfigure}
     \raisebox{0.5em}{\!\!\LARGE{$\times$}\!\!}
-    \begin{subfigure}{0.2\textwidth}
+    \begin{subfigure}{0.25\textwidth}
     \includegraphics[width=\textwidth]{../writing/cogsci_2017/figures/S_lz.png}
 %%    \caption{$S$}
     \end{subfigure}
     \raisebox{0.5em}{\!\!\LARGE{$\times$}\!\!}
-    \begin{subfigure}{0.2\textwidth}
+    \begin{subfigure}{0.25\textwidth}
     \includegraphics[width=\textwidth]{../writing/cogsci_2017/figures/V_lz.png}
 %%    \caption{$V^T$}
     \end{subfigure}
     \end{figure}
     }
     \item<3-> Linearized I/O shows network has captured the analogy!
+    \item<4-> Results in more parsimonious (lower-rank) solution.
 \end{itemize}
-\note{Can interpret the top SVD in several ways, as the task that a linear network solves, or as the task that a non-linear netwokr begins solving when it is still in the linear regime. Note more parsimonious solutions available with linearized mapping -- i.e. lower rank.}
+\note{Can interpret the top SVD in several ways, as the task that a linear network solves, or as the task that a non-linear network begins solving when it is still in the linear regime. Note more parsimonious solutions available with linearized mapping -- i.e. lower rank.}
 \end{frame}
 
 %%\begin{frame}{Learning dynamics}
@@ -424,8 +426,9 @@ Why? When gradually learning analogous tasks simultaneously, extracting the anal
     \item<2-> Representation of the analogy emerges naturally from the learning dynamics because it reduces error.
     \item<3-> This occurs in about 75\% of random initializations.
     \item<4-> This does not depend on shared weights, gradually learning two analogous tasks simultaneously suffices.
+    \item<5-> Thus it seems that neural networks could provide amortized inference about analogies. 
 \end{itemize}
-\uncover<5->{Is this only because the task was simple?}
+\uncover<6->{But is this only because the task was simple?}
 \end{frame}
 
 \section{A more interesting example: Hinton's family tree task}
@@ -517,7 +520,16 @@ The input layers had:
 \uncover<3->{Analogy extraction appears \textbf{more consistent in a more complex task} than it was in the toy task}
 \end{frame}
 
-\begin{frame}{PFL Results}
+\section{Preparation for Future Learning}
+\begin{frame}{PFL}
+The above required that the tasks are learned simultaneously, but humans need to find analogies beyond things that are simply learned at the same time. There are a few ways we could resolve this: 
+\begin{itemize}
+\item<2-> Experiences need not be simultaneous if the events can be interleaved on replay, c.f. complementary learning systems \cite{Kumaran2016}.
+\item<3-> If we allow some computations to be shared between the tasks, that may also suffice, and could also allow us to model Preparation for Future Learning (PFL).
+\end{itemize}
+\end{frame}
+
+\begin{frame}{PFL}
 Suppose we share some weights, can we see evidence of preparation for future learning?\\[11pt]
 \begin{columns}
 \column{0.45\textwidth}
@@ -568,12 +580,15 @@ Does this still result in representation of the analogy? Yes, but not quite as m
 	\item<5-> Simultaneous learning (or replay) without shared weights. 
 	\item<6-> Non-simultaneous learning with shared weights.
     \end{itemize}
-    \item<7-> This may provide a good model for ``slow'' human analogical reasoning and transfer, including:
-    \begin{itemize}
-	\item<8-> Possible amortized inference about analogies.
-	\item<9-> Benefits of multiple mutually supporting tasks.
-	\item<10-> Preparation for future learning.
-    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Results summary}
+This may provide a good model for ``slow'' human analogical reasoning and transfer, including:
+\begin{itemize}
+    \item<2-> Possible amortized inference about analogies which could potentially support later explicit analogical reasoning.
+    \item<3-> Benefits of multiple mutually supporting tasks.
+    \item<4-> Transfer as preparation for future learning.
 \end{itemize}
 \end{frame}
 
@@ -582,7 +597,7 @@ Thanks to:
 \begin{itemize}
     \item Co-authors: Shaw Hsu \& Jay McClelland
     \item The rest of the lab (especially Arianna) for helpful conversations and feedback. 
-    \item Mona, Yochai, Lester, and Pam, for feedback on this talk.
+    \item Lester, Mona, Pam, and Yochai, for feedback on this talk.
     \item You, for listening.
 \end{itemize}
 \end{frame}
