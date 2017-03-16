@@ -7,7 +7,7 @@ import os
 init_eta = 0.005
 eta_decay = 1.0 #multiplicative per eta_decay_epoch epochs
 eta_decay_epoch = 10
-nepochs = 2000
+nepochs = 1000
 nhidden_separate = 12
 nhidden_shared = 12
 npeople_per = 12
@@ -204,7 +204,7 @@ print
 
 for rseed in xrange(100):
     print "run %i" %rseed
-    filename_prefix = "results/pfl/hinton_nhidden_%i_rseed_%i_" %(nhidden_shared,rseed)
+    filename_prefix = "results/simul_learning_3layer/MOT_hinton_nhidden_%i_rseed_%i_" %(nhidden_shared,rseed)
 
     numpy.random.seed(rseed)
     tf.set_random_seed(rseed)
@@ -340,17 +340,28 @@ for rseed in xrange(100):
     if os.path.exists(filename):
 	os.remove(filename)
     fout = open(filename,'ab')
+    saved = False
     for epoch in xrange(nepochs):
-	if epoch < nepochs/2:  
-	    train_domain_with_standard_loss(1)
-	    if epoch % 10 == 0:
-		curr_error = test_domain_accuracy(1)
-		print "epoch: %i, family 1 MSE: %f" %(epoch, curr_error)	
-	else:
-	    train_domain_with_standard_loss(2)
-	    if epoch % 10 == 0:
-		curr_error = test_domain_accuracy(2)
-		print "epoch: %i, family 2 MSE: %f" %(epoch, curr_error)		    
+	train_domain_with_standard_loss(1)
+	train_domain_with_standard_loss(2)
+	if epoch % 10 == 0:
+	    curr_error = test_domain_accuracy(2)
+	    print "epoch: %i, family 2 MSE: %f" %(epoch, curr_error)	
+	    if (not saved) and curr_error <= 0.05:
+		save_activations(f1_pre_middle_rep,filename_prefix+"f1_pre_middle_reps.csv")
+		save_activations(f1_pre_output,filename_prefix+"f1_pre_outputs.csv")
+		save_activations(f2_pre_middle_rep,filename_prefix+"f2_pre_middle_reps.csv")
+		save_activations(f2_pre_output,filename_prefix+"f2_pre_outputs.csv")
+#	if epoch < nepochs/2:  
+#	    train_domain_with_standard_loss(1)
+#	    if epoch % 10 == 0:
+#		curr_error = test_domain_accuracy(1)
+#		print "epoch: %i, family 1 MSE: %f" %(epoch, curr_error)	
+#	else:
+#	    train_domain_with_standard_loss(2)
+#	    if epoch % 10 == 0:
+#		curr_error = test_domain_accuracy(2)
+#		print "epoch: %i, family 2 MSE: %f" %(epoch, curr_error)		    
 	fout.write(str(curr_error)+',')
 
 #	if epoch % 100 == 0:
@@ -368,7 +379,3 @@ for rseed in xrange(100):
 #    print_preoutputs()
 #    display_rep_similarity()
 #    display_po_similarity()
-    save_activations(f1_pre_middle_rep,filename_prefix+"f1_pre_middle_reps.csv")
-    save_activations(f1_pre_output,filename_prefix+"f1_pre_outputs.csv")
-    save_activations(f2_pre_middle_rep,filename_prefix+"f2_pre_middle_reps.csv")
-    save_activations(f2_pre_output,filename_prefix+"f2_pre_outputs.csv")
