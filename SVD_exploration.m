@@ -1,4 +1,4 @@
-
+ 
 nonlinear_IO = [[1 1 0 0 0 0]; [1 0 1 0 0 0]; [0 0 0 1 1 0]; [0 0 0 1 0 1]];
 
 linearized_IO = [[1 1 0 -1 0 -2]; [1 0 1 0 -1 0]; [-1 0 -2 1 1 0]; [0 -1 0 1 0 1]];
@@ -123,60 +123,134 @@ ylabel('Inner product (scaled) between current and target cross output mode')
 
 %% Generating Images
 
-imagesc(nl_IO_c.',[-1,1])
-xlabel('inputs','fontsize',16)
-ylabel('outputs','fontsize',16)
+imagesc(nonlinear_IO.',[-1,1])
+xlabel('inputs','fontsize',30)
+ylabel('outputs','fontsize',30)
 set(gca,'xtick',1:4)
 colormap(redbluecmap)
+pos = get(gca, 'Position');
+pos(2) = pos(2)+0.02;
+pos(4) = pos(4)+0.02;
+set(gca, 'Position', pos)
 
 temp = V_nl(:,1:3);
 temp(:,3) = -temp(:,3); %Flip mode input and outputs for visual consistency
 imagesc(temp.',[-1,1])
-xlabel('inputs','fontsize',16)
-ylabel('modes','fontsize',16)
+xlabel('inputs','fontsize',30)
+ylabel('modes','fontsize',30)
 set(gca,'xtick',1:4)
 set(gca,'ytick',1:3)
 colormap(redbluecmap)
+hold on;
+rectangle('Position',[0.53,0.53,3.96,0.98],...
+         'LineWidth',5)
+rectangle('Position',[0.53,1.5,3.96,1.0],...
+         'LineWidth',5)   
+rectangle('Position',[0.53,2.52,3.96,0.97],...
+         'LineWidth',5)  
+hold off;
+pos = get(gca, 'Position');
+pos(2) = pos(2)+0.02;
+pos(4) = pos(4)+0.02;
+set(gca, 'Position', pos)
 
 imagesc(S_nl(1:3,1:3),[-1.7321,1.7321])
-xlabel('modes','fontsize',16)
+xlabel('modes','fontsize',30)
 set(gca,'xtick',1:3)
 set(gca,'ytick',1:3)
 colormap(redbluecmap)
+hold on;
+rectangle('Position',[0.52,0.52,0.98,0.98],...
+         'LineWidth',5)
+rectangle('Position',[1.5,1.5,0.98,1.0],...
+         'LineWidth',5)   
+rectangle('Position',[2.5,2.52,0.98,0.98],...
+         'LineWidth',5)  
+hold off;
+pos = get(gca, 'Position');
+pos(2) = pos(2)+0.02;
+pos(4) = pos(4)+0.02;
+set(gca, 'Position', pos)
+
 
 temp = U_nl(:,1:3);
 temp(:,3) = -temp(:,3); %Flip mode input and outputs for visual consistency
 imagesc(temp,[-1,1])
-xlabel('modes','fontsize',16)
-ylabel('outputs','fontsize',16)
+xlabel('modes','fontsize',30)
+ylabel('outputs','fontsize',30)
 set(gca,'ytick',1:6)
 set(gca,'xtick',1:3)
 colormap(redbluecmap)
+hold on;
+rectangle('Position',[0.52,0.52,0.98,6.0],...
+         'LineWidth',5)
+rectangle('Position',[1.5,0.52,1.0,6.0],...
+         'LineWidth',5)   
+rectangle('Position',[2.5,0.52,0.99,6.0],...
+         'LineWidth',5)  
+hold off;
+pos = get(gca, 'Position');
+pos(2) = pos(2)+0.02;
+pos(4) = pos(4)+0.02;
+set(gca, 'Position', pos)
 
-imagesc(ilz_IO_c.',[-1,1])
-xlabel('inputs','fontsize',16)
-ylabel('outputs','fontsize',16)
+imagesc(ideal_linearized_IO.',[-1,1])
+xlabel('inputs','fontsize',30)
+ylabel('pre-outputs','fontsize',30)
 set(gca,'xtick',1:4)
 colormap(redbluecmap)
+pos = get(gca, 'Position');
+pos(2) = pos(2)+0.02;
+pos(4) = pos(4)+0.02;
+set(gca, 'Position', pos)
+
 
 imagesc(round(V_ilz(:,1:2).'*10)/10,[-1,1]) %round is to handle small floating point errors that are polluting plot
-xlabel('inputs','fontsize',16)
-ylabel('modes','fontsize',16)
+xlabel('inputs','fontsize',30)
+ylabel('modes','fontsize',30)
 set(gca,'xtick',1:4)
-set(gca,'ytick',1:2)
+set(gca,'ytick',1:3)
 colormap(redbluecmap)
+hold on;
+rectangle('Position',[0.53,0.52,3.96,0.98],...
+         'LineWidth',5)
+rectangle('Position',[0.53,1.5,3.96,0.99],...
+         'LineWidth',5)   
+hold off;
+pos = get(gca, 'Position');
+pos(2) = pos(2)+0.02;
+pos(4) = pos(4)+0.02;
+set(gca, 'Position', pos)
 
 imagesc(S_ilz(1:2,1:2),[-2.4495,2.4495])
-xlabel('modes','fontsize',16)
+xlabel('modes','fontsize',30)
 set(gca,'xtick',1:2)
 set(gca,'ytick',1:2)
 colormap(redbluecmap)
+hold on;
+rectangle('Position',[0.52,0.52,0.98,0.98],...
+         'LineWidth',5)
+rectangle('Position',[1.5,1.5,0.99,0.99],...
+         'LineWidth',5)   
+hold off;
+pos = get(gca, 'Position');
+pos(2) = pos(2)+0.02;
+pos(4) = pos(4)+0.02;
+set(gca, 'Position', pos)
 
 imagesc(U_ilz(:,1:2),[-1,1])
-xlabel('modes','fontsize',16)
-ylabel('outputs','fontsize',16)
+xlabel('modes','fontsize',30)
+ylabel('outputs','fontsize',30)
 set(gca,'ytick',1:6)
 set(gca,'xtick',1:2)
 colormap(redbluecmap)
-
-
+hold on;
+rectangle('Position',[0.52,0.52,0.98,6.0],...
+         'LineWidth',5)
+rectangle('Position',[1.5,0.52,0.99,6.0],...
+         'LineWidth',5)   
+hold off;
+pos = get(gca, 'Position');
+pos(2) = pos(2)+0.02;
+pos(4) = pos(4)+0.02;
+set(gca, 'Position', pos)
