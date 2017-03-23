@@ -34,13 +34,13 @@ for rseed in xrange(100):
 
     input_ph = tf.placeholder(tf.float32, shape=[4,None])
     target_ph =  tf.placeholder(tf.float32, shape=[6,None])
-    W1 = tf.Variable(tf.random_uniform([nhidden,4],0,0.1))
+    W1 = tf.Variable(tf.random_uniform([6,4],0,0.1))
     #b1 = tf.Variable(tf.random_normal([nhidden,1],1,0.1))
-    W2 = tf.Variable(tf.random_uniform([6,nhidden],0,0.1))
+#    W2 = tf.Variable(tf.random_uniform([6,nhidden],0,0.1))
     #b2 = tf.Variable(tf.random_normal([6,1],1,0.1))
-    internal_rep = tf.matmul(W1,input_ph)#+b1
-    output = tf.nn.relu(tf.matmul(W2,internal_rep))#+b2)
-    pre_output = (tf.matmul(W2,internal_rep))#+b2)
+#    internal_rep = tf.matmul(W1,input_ph)#+b1
+#    output = tf.nn.relu(tf.matmul(W2,internal_rep))#+b2)
+    pre_output = (tf.matmul(W1,input_ph))#+b2)
 
     rep_mean_ph =  tf.placeholder(tf.float32, shape=[nhidden,1])
 
