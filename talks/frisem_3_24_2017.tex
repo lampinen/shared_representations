@@ -61,26 +61,32 @@
 \note{Both transfer effects of presentation on later concepts, and effects of learning two analogous instantiations of the same concept. Today, we're going to take a step back and explore *MODELING* some of these more general phenomena}
 \end{frame}
 
-%%TODO Outline
+
 
 %%TODO: Plot?
 \begin{frame}{Analogy, Transfer, and Cognition}
 A variety of perspectives:
-\begin{itemize}
-    \item<1-> ``What makes humans smart is (1) our exceptional ability to learn by analogy'' \cite{Gentner2003} 
-    \item<2-> ``Significant transfer is probably rare and accounts for very little human behavior. ... We generally do what we have learned to do and no more.'' \cite{Detterman1993}
-    \item<3-> ``We found evidence for analogical transfer from a concrete, highly perceptual system to a very dissimilar domain and task ... participants' transfer was independent of their explicit reports [of awareness of the analogy between the tasks].'' \cite{Day2011}
-    \item<4-> ``Our proposal is to view transfer from the perspective of preparation for future learning (PFL).'' \cite{Bransford1999} 
-\end{itemize}
-\note{Fortunately, there's a great deal of agreement in the field. What is the driving force? One possibility (which Bransford \& Schwartz among others acknowledged) is that there are different kinds of transfer. Failures to transfer most often occur in settings like Gick \& Holyoak's experiments with the Duncker radiation problem, where participants see one example and then have to do a symbolic mapping to another example. By contrast, successful analogical transfer often occurs in situations like Day \& Goldstone's, where participants actually interact with the system and learn about it over a period of time, or more generally in education as highlighted by Bransford \& Schwartz as the ability to learn faster in the future.}
+\begin{center}
+\begin{overlayarea}{0.6\textwidth}{0.6\textheight}
+\only<1>{\includegraphics[width=\textwidth]{figures/perspectives_0.png}}
+\only<2>{\includegraphics[width=\textwidth]{figures/perspectives_1.png}}
+\only<3>{\includegraphics[width=\textwidth]{figures/perspectives_2.png}}
+\only<4>{\includegraphics[width=\textwidth]{figures/perspectives_3.png}}
+\only<5>{\includegraphics[width=\textwidth]{figures/perspectives_4.png}}
+\only<6>{\includegraphics[width=\textwidth]{figures/perspectives_final.png}}
+\end{overlayarea}
+\end{center}
+\note{
+    ``What makes humans smart is (1) our exceptional ability to learn by analogy'' \cite{Gentner2003} 
+    ``Significant transfer is probably rare and accounts for very little human behavior. ... We generally do what we have learned to do and no more.'' \cite{Detterman1993}
+     ``We found evidence for analogical transfer from a concrete, highly perceptual system to a very dissimilar domain and task ... participants' transfer was independent of their explicit reports [of awareness of the analogy between the tasks].'' \cite{Day2011}
+    ``Our proposal is to view transfer from the perspective of preparation for future learning (PFL).'' \cite{Bransford1999} 
+}
 \end{frame}
 
 \begin{frame}{Analogy, Transfer, and Cognition}
-Why the disagreement?
-\begin{itemize}
-    \item<2-> Different kinds of analogy/transfer:
-\end{itemize}
-\uncover<3->{
+Different kinds of analogy/transfer:
+\uncover<1->{
 \begin{center}
 \begin{table}
 \begin{tabular}{|c|c|}
@@ -89,22 +95,22 @@ Fast & Slow \\
 \hline
 \parbox{0.45\textwidth}{
 \begin{itemize}
-\item<4-> one (or a few) examples explicitly shown
-\item<5-> transfer requires explicit awareness of analogy 
+\item<2-> one (or a few) examples explicitly shown
+\item<3-> transfer requires explicit awareness of analogy 
 \end{itemize} 
 }
 &
 \parbox{0.45\textwidth}{
 \begin{itemize}
-\item<4-> learning through many interactions
-\item<5-> transfer need not be explicit 
+\item<2-> learning through many interactions
+\item<3-> transfer need not be explicit 
 \end{itemize}
 }\\ \hline 
 \end{tabular}
 \end{table} 
 \end{center}
 }
-\uncover<6->{In this talk we'll focus on the ``slow'' type, which we think could explain much of the analogical reasoning that supports everyday cognition (e.g. preparation for learning).}
+\uncover<6->{In this talk we'll focus on the ``slow'' type, which we think could explain much of the transfer that supports human intelligence (e.g. preparation for learning).}
 \end{frame}
 
 %%\begin{frame}{Analogy, Transfer, and Cognition}
@@ -155,6 +161,17 @@ Our claims:
 \end{itemize}
 \end{frame}
 
+\begin{frame}{Outline}
+\begin{itemize}[<+->]
+\item Modeling: a toy task 
+\begin{itemize}
+    \item A (little) theory interlude 
+\end{itemize}
+\item Modeling a more interesting task 
+\item Modeling preparation for future learning
+\item Conclusions
+\end{itemize}
+\end{frame}
 \section{Modeling: A toy task}
 \begin{frame}{A toy task}
 Learning which letters can follow other letters:\vspace{-2em}
@@ -214,7 +231,6 @@ Easier to interpret: linear neural networks!
 \end{frame}
 
 
-%%TODO: border around modes? Do not zero center
 \begin{frame}{SVD Analyses?}
 SVD breaks down the structure of the task into ``modes'' that together explain the data (like components in PCA).
 \begin{figure}
@@ -380,6 +396,14 @@ Most commonly, the network learns an (offset) analogy structure:\\[11pt]
     \item<4-> Results in more parsimonious solution (lower-rank, fewer hidden units neeeded).
 \end{itemize}
 \note{Can interpret the top SVD in several ways, as the task that a linear network solves, or as the task that a non-linear network begins solving when it is still in the linear regime. Note more parsimonious solutions available with linearized mapping -- i.e. lower rank.}
+\end{frame}
+
+\begin{frame}{No shared weights}
+This is somewhat surprising, since there are no weights shared between the two tasks!\vspace{10pt}
+\begin{overlayarea}{\textwidth}{0.35\textheight}
+\includegraphics[width=0.83\textwidth]{figures/network_with_nothing.png}
+\end{overlayarea}
+\uncover<2->{Why does this occur?}
 \end{frame}
 
 %%\begin{frame}{Learning dynamics}
@@ -591,11 +615,10 @@ The above required that the tasks are learned simultaneously, but humans need to
 \end{itemize}
 \end{frame}
 
-%%TODO Slide on training
 
-%%TODO: Path explanation
+
 \begin{frame}{PFL}
-Suppose we share some weights, can we see evidence of preparation for future learning?\\[11pt]
+Suppose we share some weights, can we model preparation for future learning?\\[11pt]
 \begin{columns}
 \column{0.45\textwidth}
     \uncover<1->{
@@ -604,12 +627,19 @@ Suppose we share some weights, can we see evidence of preparation for future lea
     \end{center}
     }
 \column{0.45\textwidth}
-    \uncover<2->{\textbf{Yes}, learning is faster after learning an analogous task than after learning a non-analogous one. \vspace{-10pt}
-    \begin{center}
-    \includegraphics[width=1.1\textwidth]{figures/preparation_for_learning.png} 
-    \end{center}
-    }
+    \begin{itemize}
+    \item<2-> First teach the network the Italian family, and then the English.
+    \item<3-> Compare to teaching non-analogous tasks in sequence. 
+    \item<4-> Is learning faster when the network has learned an analogous task previously?
+    \end{itemize}
 \end{columns}
+\end{frame}
+
+\begin{frame}{PFL Results}
+\textbf{Yes}, learning is faster after learning an analogous task than after learning a non-analogous one. \vspace{-10pt}
+\begin{center}
+\includegraphics[width=0.8\textwidth]{figures/preparation_for_learning.png} 
+\end{center}
 \note{Would expect this effect to increase with increasing depth of the network}
 \end{frame}
 
@@ -634,7 +664,6 @@ This still results in representation of the analogy (when the tasks are analogou
 \end{frame}
 
 \section{Conclusions}
-
 \begin{frame}{Results summary}
 \begin{itemize}
     \item<1-> We outlined a new linearized analysis method for non-linear neural networks. 
@@ -651,7 +680,7 @@ This still results in representation of the analogy (when the tasks are analogou
 \begin{frame}{Results summary}
 This may provide a good model for ``slow'' human analogical reasoning and transfer, including:
 \begin{itemize}
-    \item<2-> Possible amortized inference about analogies which could potentially support later explicit analogical reasoning.
+    \item<2-> Possible amortized inference about analogies which can support implicit transfer, and could potentially support later explicit analogical reasoning.
     \item<3-> Benefits of multiple mutually supporting tasks.
     \item<4-> Transfer as preparation for future learning.
 \end{itemize}
