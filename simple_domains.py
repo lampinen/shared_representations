@@ -26,8 +26,8 @@ print
 
 for rseed in xrange(100):
     print "run %i" %rseed
-    filename_prefix = "nonlinear_nhidden_%i_rseed_%i_" %(nhidden,rseed)
-    pre_output_filename_to_load = "nonlinear_nhidden_2_rseed_%i_pre_outputs.csv" %(rseed) #If running linearized version, where to load target pre-output values from
+    filename_prefix = "nonlinear_single_layer_nhidden_%i_rseed_%i_" %(nhidden,rseed)
+#    pre_output_filename_to_load = "nonlinear_nhidden_2_rseed_%i_pre_outputs.csv" %(rseed) #If running linearized version, where to load target pre-output values from
 
     numpy.random.seed(rseed)
     tf.set_random_seed(rseed)
@@ -41,7 +41,7 @@ for rseed in xrange(100):
 #    internal_rep = tf.matmul(W1,input_ph)#+b1
 #    output = tf.nn.relu(tf.matmul(W2,internal_rep))#+b2)
     pre_output = (tf.matmul(W1,input_ph))#+b2)
-
+    output = tf.nn.relu(pre_output)
     rep_mean_ph =  tf.placeholder(tf.float32, shape=[nhidden,1])
 
     loss = tf.reduce_sum(tf.square(output - target_ph))# +0.05*(tf.nn.l2_loss(internal_rep))
@@ -143,11 +143,11 @@ for rseed in xrange(100):
     #	numpy.savetxt(fout,numpy.array(get_reps()),delimiter=',')
 	if epoch % 10 == 0:
 	    print "epoch: %i, MSE: %f" %(epoch, test_accuracy())	
-#	    print_preoutputs()
-	    print_reps()	
-	    print sess.run(W1)
-	    print "grad"
-	    print sess.run(W1_grad,feed_dict={eta_ph: curr_eta,input_ph: x_data.transpose(),target_ph: y_data.transpose()})
+	    print_preoutputs()
+#	    print_reps()	
+#	    print sess.run(W1)
+#	    print "grad"
+#	    print sess.run(W1_grad,feed_dict={eta_ph: curr_eta,input_ph: x_data.transpose(),target_ph: y_data.transpose()})
 #	if epoch % 100 == 0:
 #	    print_reps()	
     #	display_rep_similarity()
