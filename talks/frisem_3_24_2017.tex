@@ -1,6 +1,6 @@
 \documentclass{beamer}
 \usepackage{pgfpages}
-%%\setbeameroption{show notes on second screen=left} %enable for notes
+\setbeameroption{show notes on second screen=left} %enable for notes
 \usepackage{graphicx}
 \usepackage{xcolor}
 \usepackage{listings}
@@ -52,12 +52,16 @@
 
 \section{Introduction}
 \begin{frame}{Last time...}
-\begin{center}
-\includegraphics[width = 0.66\textwidth]{../../../fyp/figures/fyp_1_polygon_text.png}
-\end{center}
-\begin{center}
-\includegraphics[width = 0.66\textwidth]{../../../fyp/figures/fyp_1_modular_text.png}
-\end{center}
+\begin{columns}
+\column{0.5\textwidth}
+    \begin{center}
+    \includegraphics[width = 0.5\textwidth]{../../../fyp/figures/hexagon_symbol.png}
+    \end{center}
+\column{0.5\textwidth}
+    \begin{center}
+    \resizebox{0.75\textwidth}{!}{$\textcolor{black}{+_6}$}
+    \end{center}
+\end{columns}
 \note{Both transfer effects of presentation on later concepts, and effects of learning two analogous instantiations of the same concept. Today, we're going to take a step back and explore *MODELING* some of these more general phenomena}
 \end{frame}
 
@@ -110,7 +114,7 @@ Fast & Slow \\
 \end{table} 
 \end{center}
 }
-\uncover<6->{In this talk we'll focus on the ``slow'' type, which we think could explain much of the transfer that supports human intelligence (e.g. preparation for learning).}
+\uncover<4->{In this talk I'll focus on the ``slow'' type.}
 \end{frame}
 
 %%\begin{frame}{Analogy, Transfer, and Cognition}
@@ -140,7 +144,7 @@ Neural networks:
     \end{itemize}
 \end{itemize}
 \only<1>{\vspace{-14pt}}
-\note{Cross-task transfer without building it in!}
+\note{Cross-task transfer as emergent, as opposed to building it in!}
 \end{frame}
 
 \begin{frame}{Hinton family-tree task}
@@ -149,7 +153,11 @@ Neural networks:
 \column{0.5\textwidth}
     \includegraphics[width = \textwidth]{../writing/cogsci_2017/figures/hinton_family_tree_figure.png}
 \end{columns}
-\uncover<2->{Do neural networks naturally extract analogies?}
+\begin{itemize}
+\item <2-> Network shows representation of analogy in the hidden units
+\item <3-> Shows ability to transfer knowledge based on the analogy
+\end{itemize}
+\uncover<4->{Do neural networks naturally extract analogies?}
 \end{frame}
 
 \begin{frame}{Analogy, Transfer, and Neural Networks}
@@ -157,18 +165,18 @@ Our claims:
 \begin{itemize}
     \item<1-> Neural networks learning by gradient descent naturally extract analogies. 
     \item<2-> This happens in more general circumstances than shown in previous work, in particular it does not rely on shared weights.
-    \item<3-> This could act as a form of amortized inference about analogies which could drive transfer (and could potentially serve as a search heuristic explicit analogical reasoning).
+    \item<3-> This could act as a form of amortized inference about analogies which could drive transfer (and could potentially serve as a search heuristic for explicit analogical reasoning).
 \end{itemize}
 \end{frame}
 
 \begin{frame}{Outline}
 \begin{itemize}[<+->]
-\item Modeling: a toy task 
+\item A toy task 
 \begin{itemize}
     \item A (little) theory interlude 
 \end{itemize}
-\item Modeling a more interesting task 
-\item Modeling preparation for future learning
+\item A more interesting task 
+\item Preparation for future learning
 \item Conclusions
 \end{itemize}
 \end{frame}
@@ -200,14 +208,9 @@ S & 0 & 1 & 0 & 0 \\
 \uncover<2->{How, when, and why will a neural network exploit the analogy between the Latin and Greek letters?}
 \end{frame}
 
-\section{(A Little) Theory}
-\begin{frame}
-Neural networks are difficult to interpret.
-\end{frame}
-
-
-\begin{frame}{SVD Analyses?}
-Easier to interpret: linear neural networks!
+\section{A (little) theory interlude}
+\begin{frame}{Linear neural networks}
+Neural networks are hard to interpret. Linear neural networks are easier!
 \only<1>{\vspace{-16pt}}
 \begin{columns}
 \column{0.5\textwidth}
@@ -231,7 +234,7 @@ Easier to interpret: linear neural networks!
 \end{frame}
 
 
-\begin{frame}{SVD Analyses?}
+\begin{frame}{SVD analyses?}
 SVD breaks down the structure of the task into ``modes'' that together explain the data (like components in PCA).
 \begin{figure}
 \centering
@@ -262,8 +265,8 @@ SVD breaks down the structure of the task into ``modes'' that together explain t
 \begin{frame}{SVD Analyses?}
 Can we use SVD analyses of linear networks to study analogy learning?
 \begin{itemize}
-    \item<1-> \textbf{NO,} in the SVD of a block-diagonal matrix, the modes occur within the blocks, thus \textbf{a linear network cannot represent analogies at convergence.}
-    \uncover<2->{
+    \item<2-> \textbf{NO,} in the SVD of a block-diagonal matrix, the modes occur within the blocks, thus \textbf{a linear network cannot represent analogies at convergence.}
+    \uncover<3->{
     \begin{figure}
     \centering
     \begin{subfigure}{0.2\textwidth}
@@ -287,7 +290,7 @@ Can we use SVD analyses of linear networks to study analogy learning?
     \end{subfigure}
     \end{figure}
     }
-    \item<3-> This also means that a linear network \textbf{cannot achieve as parsimonious a solution as a nonlinear network}, because it must solve each copy of a problem separately rather than exploiting analogies between them.
+    \item<4-> This also means that a linear network \textbf{cannot achieve as parsimonious a solution as a nonlinear network}, because it must solve each copy of a problem separately rather than exploiting analogies between them.
 \end{itemize}
 \note{In plain english, what this means is the input output mappings for the two tasks are not really connected in any way, the most naive way to solve the task where you solve each problem independently.}
 \end{frame}
@@ -297,8 +300,8 @@ So we need non-linear networks. \uncover<2->{Is there a way we can still use SVD
 \begin{itemize}
 \item<3-> \textbf{Yes}, with a single non-linearity, just analyze linear portion.
 \end{itemize}
-\only<1>{ \includegraphics[width=0.83\textwidth]{figures/network_with_nothing.png}}
-\only<2>{ \includegraphics[width=0.83\textwidth]{figures/network_with_QM.png}}
+\only<1-2>{ \includegraphics[width=0.83\textwidth]{figures/network_with_nothing.png}}
+\only<3>{ \includegraphics[width=0.83\textwidth]{figures/network_with_QM.png}}
 
 \note{Yes, just put a non-linearity at the end and apply to the linear portion}
 \end{frame}
@@ -597,13 +600,13 @@ Also in second layer output modes (although slightly less):
 \begin{frame}{Highlights:}
 The input layers had:
 \begin{itemize}
-    \item<1-> A median of 6 modes showing significant extraction of the regular or flipped analogy (null: only 0.01\% of runs with 6 significant modes, median 0).
+    \item<1-> A median of 6 modes showing significant extraction of the regular or flipped analogy (null: only 0.01\% of runs with 6 significant modes, median 1).
     \item<2-> 3 or more significant components overall in all of the runs (null: in 3\% of runs).
 \end{itemize}
 \uncover<3->{Analogy extraction appears \textbf{more consistent in a more complex task} than it was in the toy task.}
 \end{frame}
 
-\section{Preparation for Future Learning}
+\section{Preparation for future learning}
 \begin{frame}{PFL}
 The above required that the tasks are learned simultaneously, but humans need to find analogies beyond things that are simply learned at the same time. There are a few ways we could resolve this: 
 \begin{itemize}
@@ -629,7 +632,7 @@ Suppose we share some weights, can we model preparation for future learning?\\[1
 \column{0.45\textwidth}
     \begin{itemize}
     \item<2-> First teach the network the Italian family, and then the English.
-    \item<3-> Compare to teaching non-analogous tasks in sequence. 
+    \item<3-> Compare to teaching non-analogous Italian task first.
     \item<4-> Is learning faster when the network has learned an analogous task previously?
     \end{itemize}
 \end{columns}
@@ -680,7 +683,11 @@ This still results in representation of the analogy (when the tasks are analogou
 \begin{frame}{Results summary}
 This may provide a good model for ``slow'' human analogical reasoning and transfer, including:
 \begin{itemize}
-    \item<2-> Possible amortized inference about analogies which can support implicit transfer, and could potentially support later explicit analogical reasoning.
+    \item<2-> Possible amortized inference about analogies which can support:
+    \begin{itemize}
+	\item implicit transfer
+	\item explicit analogical reasoning.
+    \end{itemize}
     \item<3-> Benefits of multiple mutually supporting tasks.
     \item<4-> Transfer as preparation for future learning.
 \end{itemize}
@@ -703,7 +710,7 @@ Thanks to:
 
 \appendix
 \begin{frame}{Analogy from gradients}
-In toy example, any unit that starts pointing slightly in direction of analogy (as some will due to random initialization) will extract it further when base rates have been learned.\\[11pt]
+Any unit that starts pointing slightly in direction of analogy (due to random initialization) will extract it further when base rates have been learned.\\[11pt]
 \begin{columns}
     \column{0.45\textwidth}
     \uncover<1->{Base rates by domain: \phantom{a little shared structure}{\relsize{-1}
