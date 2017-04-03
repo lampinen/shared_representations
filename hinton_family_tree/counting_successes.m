@@ -23,8 +23,8 @@ rng(0) %Reproducibility
 for run = 1:100
 
     %Load
-    actual_pre_middle_reps = [load(sprintf('results/pfl/hinton_nhidden_12_rseed_%i_f1_pre_middle_reps.csv',run-1)); load(sprintf('results/pfl/hinton_nhidden_12_rseed_%i_f2_pre_middle_reps.csv',run-1)) ];    actual_middle_reps = max(actual_pre_middle_reps,0);
-    actual_pre_outputs = [load(sprintf('results/pfl/hinton_nhidden_12_rseed_%i_f1_pre_outputs.csv',run-1)); load(sprintf('results/pfl/hinton_nhidden_12_rseed_%i_f2_pre_outputs.csv',run-1)) ];    actual_outputs = max(actual_pre_outputs,0);
+    actual_pre_middle_reps = [load(sprintf('results/simul_learning_3layer/hinton_nhidden_12_rseed_%i_f1_pre_middle_reps.csv',run-1)); load(sprintf('results/simul_learning_3layer/hinton_nhidden_12_rseed_%i_f2_pre_middle_reps.csv',run-1)) ];    actual_middle_reps = max(actual_pre_middle_reps,0);
+    actual_pre_outputs = [load(sprintf('results/simul_learning_3layer/hinton_nhidden_12_rseed_%i_f1_pre_outputs.csv',run-1)); load(sprintf('results/simul_learning_3layer/hinton_nhidden_12_rseed_%i_f2_pre_outputs.csv',run-1)) ];    actual_outputs = max(actual_pre_outputs,0);
 
 
     lz_IO = input.'*actual_pre_middle_reps;
