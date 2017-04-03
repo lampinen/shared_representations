@@ -23,8 +23,8 @@ rng(0) %Reproducibility
 for run = 1:100
 
     %Load
-    actual_pre_middle_reps = [load(sprintf('results/simul_learning_3layer/MOT_hinton_nhidden_12_rseed_%i_f1_pre_middle_reps.csv',run-1)); load(sprintf('results/pfl/hinton_alt_nhidden_12_rseed_%i_f2_pre_middle_reps.csv',run-1)) ];    actual_middle_reps = max(actual_pre_middle_reps,0);
-    actual_pre_outputs = [load(sprintf('results/simul_learning_3layer/MOT_hinton_nhidden_12_rseed_%i_f1_pre_outputs.csv',run-1)); load(sprintf('results/pfl/hinton_alt_nhidden_12_rseed_%i_f2_pre_middle_reps.csv',run-1)) ];    actual_middle_reps = max(actual_pre_middle_reps,0);
+    actual_pre_middle_reps = [load(sprintf('results/sequential_noshared/SN_hinton_nhidden_12_rseed_%i_f1_pre_middle_reps.csv',run-1)); load(sprintf('results/sequential_noshared/SN_hinton_nhidden_12_rseed_%i_f2_pre_middle_reps.csv',run-1)) ];    actual_middle_reps = max(actual_pre_middle_reps,0);
+    actual_pre_outputs = [load(sprintf('results/sequential_noshared/SN_hinton_nhidden_12_rseed_%i_f1_pre_outputs.csv',run-1)); load(sprintf('results/sequential_noshared/SN_hinton_nhidden_12_rseed_%i_f2_pre_middle_reps.csv',run-1)) ];    actual_middle_reps = max(actual_pre_middle_reps,0);
 
 
     lz_IO = input.'*actual_pre_middle_reps;
@@ -135,4 +135,4 @@ axpos = get(gca,'pos');
 extent = get(l,'extent');
 set(gca,'pos',[axpos(1) axpos(2)-0.2*extent(2) axpos(3) axpos(4)])
 
-csvwrite('pfl_different_task_input_mode_significance.csv',[sig_comp_counts  gf_sig_comp_counts either_sig_comp_counts])
+%csvwrite('pfl_different_task_input_mode_significance.csv',[sig_comp_counts  gf_sig_comp_counts either_sig_comp_counts])

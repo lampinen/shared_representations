@@ -204,7 +204,7 @@ print
 
 for rseed in xrange(100):
     print "run %i" %rseed
-    filename_prefix = "results/simul_learning_3layer/MOT_hinton_nhidden_%i_rseed_%i_" %(nhidden_shared,rseed)
+    filename_prefix = "results/sequential_noshared/SN_hinton_nhidden_%i_rseed_%i_" %(nhidden_shared,rseed)
 
     numpy.random.seed(rseed)
     tf.set_random_seed(rseed)
@@ -228,8 +228,11 @@ for rseed in xrange(100):
     f1_middle_rep = tf.nn.relu(f1_pre_middle_rep)
     f2_middle_rep = tf.nn.relu(f2_pre_middle_rep)
 
-    f1_pre_output = tf.matmul(W3f1,tf.nn.relu(tf.matmul(W2,f1_middle_rep)+b2))+b3f1
-    f2_pre_output = tf.matmul(W3f2,tf.nn.relu(tf.matmul(W2,f2_middle_rep)+b2))+b3f2
+#    f1_pre_output = tf.matmul(W3f1,tf.nn.relu(tf.matmul(W2,f1_middle_rep)+b2))+b3f1
+#    f2_pre_output = tf.matmul(W3f2,tf.nn.relu(tf.matmul(W2,f2_middle_rep)+b2))+b3f2
+
+    f1_pre_output = tf.matmul(W3f1,f1_middle_rep)+b3f1
+    f2_pre_output = tf.matmul(W3f2,f2_middle_rep)+b3f2
 
     f1_output = tf.nn.relu(f1_pre_output)
     f2_output = tf.nn.relu(f2_pre_output)
@@ -342,26 +345,26 @@ for rseed in xrange(100):
     fout = open(filename,'ab')
     saved = False
     for epoch in xrange(nepochs):
-	train_domain_with_standard_loss(1)
-	train_domain_with_standard_loss(2)
-	if epoch % 10 == 0:
-	    curr_error = test_domain_accuracy(2)
-	    print "epoch: %i, family 2 MSE: %f" %(epoch, curr_error)	
-	    if (not saved) and curr_error <= 0.05:
-		save_activations(f1_pre_middle_rep,filename_prefix+"f1_pre_middle_reps.csv")
-		save_activations(f1_pre_output,filename_prefix+"f1_pre_outputs.csv")
-		save_activations(f2_pre_middle_rep,filename_prefix+"f2_pre_middle_reps.csv")
-		save_activations(f2_pre_output,filename_prefix+"f2_pre_outputs.csv")
-#	if epoch < nepochs/2:  
-#	    train_domain_with_standard_loss(1)
-#	    if epoch % 10 == 0:
-#		curr_error = test_domain_accuracy(1)
-#		print "epoch: %i, family 1 MSE: %f" %(epoch, curr_error)	
-#	else:
-#	    train_domain_with_standard_loss(2)
-#	    if epoch % 10 == 0:
-#		curr_error = test_domain_accuracy(2)
-#		print "epoch: %i, family 2 MSE: %f" %(epoch, curr_error)		    
+#	train_domain_with_standard_loss(1)
+#	train_domain_with_standard_loss(2)
+#	if epoch % 10 == 0:
+#	    curr_error = test_domain_accuracy(2)
+#	    print "epoch: %i, family 2 MSE: %f" %(epoch, curr_error)	
+#	    if (not saved) and curr_error <= 0.05:
+#		save_activations(f1_pre_middle_rep,filename_prefix+"f1_pre_middle_reps.csv")
+#		save_activations(f1_pre_output,filename_prefix+"f1_pre_outputs.csv")
+#		save_activations(f2_pre_middle_rep,filename_prefix+"f2_pre_middle_reps.csv")
+#		save_activations(f2_pre_output,filename_prefix+"f2_pre_outputs.csv")
+	if epoch < nepochs/2:  
+	    train_domain_with_standard_loss(1)
+	    if epoch % 10 == 0:
+		curr_error = test_domain_accuracy(1)
+		print "epoch: %i, family 1 MSE: %f" %(epoch, curr_error)	
+	else:
+	    train_domain_with_standard_loss(2)
+	    if epoch % 10 == 0:
+		curr_error = test_domain_accuracy(2)
+		print "epoch: %i, family 2 MSE: %f" %(epoch, curr_error)		    
 	fout.write(str(curr_error)+',')
 
 #	if epoch % 100 == 0:
@@ -379,3 +382,7 @@ for rseed in xrange(100):
 #    print_preoutputs()
 #    display_rep_similarity()
 #    display_po_similarity()
+    save_activations(f1_pre_output,filename_prefix +'f1_pre_outputs.csv',remove_old=True)
+    save_activations(f2_pre_output,filename_prefix +'f2_pre_outputs.csv',remove_old=True)
+    save_activations(f1_pre_middle_rep,filename_prefix +'f1_pre_middle_reps.csv',remove_old=True)
+    save_activations(f2_pre_middle_rep,filename_prefix +'f2_pre_middle_reps.csv',remove_old=True)
