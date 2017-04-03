@@ -27,7 +27,7 @@ print
 for rseed in xrange(100):
     print "run %i" %rseed
     filename_prefix = "nonlinear_nhidden_%i_rseed_%i_" %(nhidden,rseed)
-    pre_output_filename_to_load = "nonlinear_nhidden_2_rseed_%i_pre_outputs.csv" %(rseed) #If running linearized version, where to load target pre-output values from
+#    pre_output_filename_to_load = "nonlinear_nhidden_2_rseed_%i_pre_outputs.csv" %(rseed) #If running linearized version, where to load target pre-output values from
 
     numpy.random.seed(rseed)
     tf.set_random_seed(rseed)
@@ -130,6 +130,7 @@ for rseed in xrange(100):
     filename = filename_prefix + "rep_tracks.csv"
     if os.path.exists(filename):
 	os.remove(filename)
+    save_activations(pre_output,filename_prefix+"initial_pre_outputs.csv")
     fout = open(filename,'ab')
     for epoch in xrange(nepochs):
         train_with_standard_loss()
@@ -144,21 +145,19 @@ for rseed in xrange(100):
 	if epoch % 10 == 0:
 	    print "epoch: %i, MSE: %f" %(epoch, test_accuracy())	
 #	    print_preoutputs()
-	    print_reps()	
-	    print sess.run(W1)
-	    print "grad"
-	    print sess.run(W1_grad,feed_dict={eta_ph: curr_eta,input_ph: x_data.transpose(),target_ph: y_data.transpose()})
+#	    print_reps()	
+#	    print sess.run(W1)
+#	    print "grad"
+#	    print sess.run(W1_grad,feed_dict={eta_ph: curr_eta,input_ph: x_data.transpose(),target_ph: y_data.transpose()})
 #	if epoch % 100 == 0:
 #	    print_reps()	
     #	display_rep_similarity()
 	if epoch % eta_decay_epoch == 0:
 	    curr_eta *= eta_decay
-	if epoch == 140:
-	    exit()
     fout.close()
 	
 
     print "Final MSE: %f" %(test_accuracy())
 
     print_preoutputs()
-    save_activations(pre_output,filename_prefix+"pre_outputs.csv")
+    save_activations(pre_output,filename_prefix+"final_pre_outputs.csv")
