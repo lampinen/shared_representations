@@ -254,3 +254,24 @@ pos = get(gca, 'Position');
 pos(2) = pos(2)+0.02;
 pos(4) = pos(4)+0.02;
 set(gca, 'Position', pos)
+
+%% Pre and post
+
+initial_preoutputs = load('nonlinear_nhidden_4_rseed_0_initial_pre_outputs.csv')
+initial_c = initial_preoutputs-ones(4,1)*mean(initial_preoutputs,1);
+[U_in,S_in,V_in] = svd(initial_c.')
+
+imagesc(V_in.',[-1,1])
+xlabel('inputs','fontsize',16)
+ylabel('modes','fontsize',16)
+colormap(redbluecmap)
+
+
+final_preoutputs = load('nonlinear_nhidden_4_rseed_0_final_pre_outputs.csv')
+final_c = final_preoutputs-ones(4,1)*mean(final_preoutputs,1);
+[U_f,S_f,V_f] = svd(final_c.')
+
+imagesc(V_f.',[-1,1])
+xlabel('inputs','fontsize',16)
+ylabel('modes','fontsize',16)
+colormap(redbluecmap)

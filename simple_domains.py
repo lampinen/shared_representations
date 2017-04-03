@@ -26,7 +26,7 @@ print
 
 for rseed in xrange(100):
     print "run %i" %rseed
-    filename_prefix = "nonlinear_single_layer_nhidden_%i_rseed_%i_" %(nhidden,rseed)
+    filename_prefix = "nonlinear_nhidden_%i_rseed_%i_" %(nhidden,rseed)
 #    pre_output_filename_to_load = "nonlinear_nhidden_2_rseed_%i_pre_outputs.csv" %(rseed) #If running linearized version, where to load target pre-output values from
 
     numpy.random.seed(rseed)
@@ -34,14 +34,14 @@ for rseed in xrange(100):
 
     input_ph = tf.placeholder(tf.float32, shape=[4,None])
     target_ph =  tf.placeholder(tf.float32, shape=[6,None])
-    W1 = tf.Variable(tf.random_uniform([6,4],0,0.1))
+    W1 = tf.Variable(tf.random_uniform([nhidden,4],0,0.1))
     #b1 = tf.Variable(tf.random_normal([nhidden,1],1,0.1))
-#    W2 = tf.Variable(tf.random_uniform([6,nhidden],0,0.1))
+    W2 = tf.Variable(tf.random_uniform([6,nhidden],0,0.1))
     #b2 = tf.Variable(tf.random_normal([6,1],1,0.1))
-#    internal_rep = tf.matmul(W1,input_ph)#+b1
-#    output = tf.nn.relu(tf.matmul(W2,internal_rep))#+b2)
-    pre_output = (tf.matmul(W1,input_ph))#+b2)
-    output = tf.nn.relu(pre_output)
+    internal_rep = tf.matmul(W1,input_ph)#+b1
+    output = tf.nn.relu(tf.matmul(W2,internal_rep))#+b2)
+    pre_output = (tf.matmul(W2,internal_rep))#+b2)
+
     rep_mean_ph =  tf.placeholder(tf.float32, shape=[nhidden,1])
 
     loss = tf.reduce_sum(tf.square(output - target_ph))# +0.05*(tf.nn.l2_loss(internal_rep))
@@ -130,6 +130,7 @@ for rseed in xrange(100):
     filename = filename_prefix + "rep_tracks.csv"
     if os.path.exists(filename):
 	os.remove(filename)
+    save_activations(pre_output,filename_prefix+"initial_pre_outputs.csv")
     fout = open(filename,'ab')
     for epoch in xrange(nepochs):
         train_with_standard_loss()
@@ -143,7 +144,7 @@ for rseed in xrange(100):
     #	numpy.savetxt(fout,numpy.array(get_reps()),delimiter=',')
 	if epoch % 10 == 0:
 	    print "epoch: %i, MSE: %f" %(epoch, test_accuracy())	
-	    print_preoutputs()
+#	    print_preoutputs()
 #	    print_reps()	
 #	    print sess.run(W1)
 #	    print "grad"
@@ -153,12 +154,10 @@ for rseed in xrange(100):
     #	display_rep_similarity()
 	if epoch % eta_decay_epoch == 0:
 	    curr_eta *= eta_decay
-	if epoch == 140:
-	    exit()
     fout.close()
 	
 
     print "Final MSE: %f" %(test_accuracy())
 
     print_preoutputs()
-    save_activations(pre_output,filename_prefix+"pre_outputs.csv")
+    save_activations(pre_output,filename_prefix+"final_pre_outputs.csv")
