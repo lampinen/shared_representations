@@ -277,7 +277,7 @@ ylabel('modes','fontsize',16)
 colormap(redbluecmap)
 
 
-initial_preoutputs = load('nonlinear_nhidden_4_rseed_10_initial_pre_outputs.csv')
+initial_preoutputs = load('nonlinear_nhidden_4_rseed_25_initial_pre_outputs.csv')
 initial_c = initial_preoutputs-ones(4,1)*mean(initial_preoutputs,1);
 [U_in,S_in,V_in] = svd(initial_c.')
 
@@ -287,7 +287,7 @@ ylabel('modes','fontsize',16)
 colormap(redbluecmap)
 
 
-final_preoutputs = load('nonlinear_nhidden_4_rseed_10_final_pre_outputs.csv')
+final_preoutputs = load('nonlinear_nhidden_4_rseed_25_final_pre_outputs.csv')
 final_c = final_preoutputs-ones(4,1)*mean(final_preoutputs,1);
 [U_f,S_f,V_f] = svd(final_c.')
 
