@@ -24,9 +24,9 @@ print "y_data:"
 print x_data
 print
 
-for rseed in xrange(100):
+for rseed in [0,1,2,3,4,5,6,25]:
     print "run %i" %rseed
-    filename_prefix = "nonlinear_nhidden_%i_rseed_%i_" %(nhidden,rseed)
+    filename_prefix = "results/detailed_run/nonlinear_nhidden_%i_rseed_%i_" %(nhidden,rseed)
 #    pre_output_filename_to_load = "nonlinear_nhidden_2_rseed_%i_pre_outputs.csv" %(rseed) #If running linearized version, where to load target pre-output values from
 
     numpy.random.seed(rseed)
@@ -144,6 +144,7 @@ for rseed in xrange(100):
     #	numpy.savetxt(fout,numpy.array(get_reps()),delimiter=',')
 	if epoch % 10 == 0:
 	    print "epoch: %i, MSE: %f" %(epoch, test_accuracy())	
+	    save_activations(pre_output,filename_prefix+"epoch_%i_pre_outputs.csv" %epoch)
 #	    print_preoutputs()
 #	    print_reps()	
 #	    print sess.run(W1)

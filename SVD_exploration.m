@@ -16,7 +16,7 @@ ilz_IO_c = ideal_linearized_IO-ones(4,1)*mean(ideal_linearized_IO,1);
 
 
 
-actual_preoutputs = load('nonlinear_nhidden_4_rseed_0_pre_outputs.csv')
+actual_preoutputs = load('nonlinear_nhidden_4_rseed_0_final_pre_outputs.csv')
 ap_c = actual_preoutputs-ones(4,1)*mean(actual_preoutputs,1);
 [U_ap,S_ap,V_ap] = svd(ap_c.')
 
@@ -257,6 +257,7 @@ set(gca, 'Position', pos)
 
 %% Pre and post
 
+figure
 initial_preoutputs = load('nonlinear_nhidden_4_rseed_6_initial_pre_outputs.csv')
 initial_c = initial_preoutputs-ones(4,1)*mean(initial_preoutputs,1);
 [U_in,S_in,V_in] = svd(initial_c.')
@@ -266,7 +267,7 @@ xlabel('inputs','fontsize',16)
 ylabel('modes','fontsize',16)
 colormap(redbluecmap)
 
-
+figure
 final_preoutputs = load('nonlinear_nhidden_4_rseed_6_final_pre_outputs.csv')
 final_c = final_preoutputs-ones(4,1)*mean(final_preoutputs,1);
 [U_f,S_f,V_f] = svd(final_c.')
@@ -280,18 +281,74 @@ colormap(redbluecmap)
 initial_preoutputs = load('nonlinear_nhidden_4_rseed_25_initial_pre_outputs.csv')
 initial_c = initial_preoutputs-ones(4,1)*mean(initial_preoutputs,1);
 [U_in,S_in,V_in] = svd(initial_c.')
-
+figure
 imagesc(V_in.',[-1,1])
 xlabel('inputs','fontsize',16)
 ylabel('modes','fontsize',16)
 colormap(redbluecmap)
+figure
+imagesc(U_in,[-1,1])
+xlabel('modes','fontsize',16)
+ylabel('outputs','fontsize',16)
+colormap(redbluecmap)
+
 
 
 final_preoutputs = load('nonlinear_nhidden_4_rseed_25_final_pre_outputs.csv')
 final_c = final_preoutputs-ones(4,1)*mean(final_preoutputs,1);
 [U_f,S_f,V_f] = svd(final_c.')
-
+figure
 imagesc(V_f.',[-1,1])
 xlabel('inputs','fontsize',16)
 ylabel('modes','fontsize',16)
 colormap(redbluecmap)
+figure
+imagesc(U_f,[-1,1])
+xlabel('modes','fontsize',16)
+ylabel('outputs','fontsize',16)
+colormap(redbluecmap)
+
+%% Detailed run results
+prev_fv = figure();
+prev_fs = figure();
+prev_fu = figure();
+fv = figure();
+fs = figure();
+fu = figure();
+for epoch = 0:10:500
+    initial_preoutputs = load(sprintf('results/detailed_run/nonlinear_nhidden_4_rseed_1_epoch_%i_pre_outputs.csv',epoch))
+    initial_c = initial_preoutputs-ones(4,1)*mean(initial_preoutputs,1);
+    [U_in,S_in,V_in] = svd(initial_c.')
+    figure(fv)
+    imagesc(V_in.',[-1,1])
+    xlabel('inputs','fontsize',16)
+    ylabel('modes','fontsize',16)
+    colormap(redbluecmap)
+    figure(fs)
+    imagesc(S_in,[0,3])
+    xlabel('modes','fontsize',16)
+    colormap(redbluecmap)
+    figure(fu)
+    imagesc(U_in,[-1,1])
+    xlabel('modes','fontsize',16)
+    ylabel('outputs','fontsize',16)
+    colormap(redbluecmap)
+
+    
+    pause
+    figure(prev_fv)
+    imagesc(V_in.',[-1,1])
+    xlabel('inputs','fontsize',16)
+    ylabel('modes','fontsize',16)
+    colormap(redbluecmap)
+    figure(prev_fs)
+    imagesc(S_in,[0,3])
+    xlabel('modes','fontsize',16)
+    colormap(redbluecmap)
+    figure(prev_fu)
+    imagesc(U_in,[-1,1])
+    xlabel('modes','fontsize',16)
+    ylabel('outputs','fontsize',16)
+    colormap(redbluecmap)
+
+end
