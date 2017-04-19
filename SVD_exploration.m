@@ -258,7 +258,7 @@ set(gca, 'Position', pos)
 %% Pre and post
 
 figure
-initial_preoutputs = load('nonlinear_nhidden_4_rseed_6_initial_pre_outputs.csv')
+initial_preoutputs = load('nonlinear_nhidden_4_rseed_4_initial_pre_outputs.csv')
 initial_c = initial_preoutputs-ones(4,1)*mean(initial_preoutputs,1);
 [U_in,S_in,V_in] = svd(initial_c.')
 
@@ -316,7 +316,7 @@ fv = figure();
 fs = figure();
 fu = figure();
 for epoch = 0:10:500
-    initial_preoutputs = load(sprintf('results/detailed_run/nonlinear_nhidden_4_rseed_1_epoch_%i_pre_outputs.csv',epoch))
+    initial_preoutputs = load(sprintf('results/detailed_run/linear_nhidden_4_rseed_4_epoch_%i_pre_outputs.csv',epoch))
     initial_c = initial_preoutputs-ones(4,1)*mean(initial_preoutputs,1);
     [U_in,S_in,V_in] = svd(initial_c.')
     figure(fv)
@@ -352,3 +352,42 @@ for epoch = 0:10:500
     colormap(redbluecmap)
 
 end
+
+%% Do solutions SVD modes lie in subspace spanned by initial SVD modes
+
+%linear
+initial_preoutputs = load(sprintf('results/detailed_run/linear_nhidden_4_rseed_4_initial_pre_outputs.csv',epoch))
+initial_c = initial_preoutputs-ones(4,1)*mean(initial_preoutputs,1);
+[U_in,S_in,V_in] = svd(initial_c.')
+
+final_preoutputs = load(sprintf('results/detailed_run/linear_nhidden_4_rseed_4_final_pre_outputs.csv',epoch))
+final_c = final_preoutputs-ones(4,1)*mean(final_preoutputs,1);
+[U_f,S_f,V_f] = svd(final_c.')
+
+Q = [V_in(:,1:3) V_f(:,1)];
+det(Q)
+Q = [V_in(:,1:3) V_f(:,2)];
+det(Q)
+Q = [V_in(:,1:3) V_f(:,3)];
+det(Q)
+
+%nonlinear
+initial_preoutputs = load(sprintf('results/detailed_run/nonlinear_nhidden_4_rseed_4_initial_pre_outputs.csv',epoch))
+initial_c = initial_preoutputs-ones(4,1)*mean(initial_preoutputs,1);
+[U_in,S_in,V_in] = svd(initial_c.')
+
+final_preoutputs = load(sprintf('results/detailed_run/nonlinear_nhidden_4_rseed_4_final_pre_outputs.csv',epoch))
+final_c = final_preoutputs-ones(4,1)*mean(final_preoutputs,1);
+[U_f,S_f,V_f] = svd(final_c.')
+
+Q = [V_in(:,1:3) V_f(:,1)];
+det(Q)
+Q = [V_in(:,1:3) V_f(:,2)];
+det(Q)
+Q = [V_in(:,1:3) V_f(:,3)];
+det(Q)
+
+
+
+
+
