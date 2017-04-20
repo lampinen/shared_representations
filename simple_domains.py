@@ -24,9 +24,9 @@ print "y_data:"
 print x_data
 print
 
-for rseed in [0,1,2,3,4,5,6,25]:
+for rseed in xrange(100):
     print "run %i" %rseed
-    filename_prefix = "results/detailed_run/nonlinear_nhidden_%i_rseed_%i_" %(nhidden,rseed)
+    filename_prefix = "results/middle_rep_runs/nonlinear_nhidden_%i_rseed_%i_" %(nhidden,rseed)
 #    pre_output_filename_to_load = "nonlinear_nhidden_2_rseed_%i_pre_outputs.csv" %(rseed) #If running linearized version, where to load target pre-output values from
 
     numpy.random.seed(rseed)
@@ -131,6 +131,7 @@ for rseed in [0,1,2,3,4,5,6,25]:
     if os.path.exists(filename):
 	os.remove(filename)
     save_activations(pre_output,filename_prefix+"initial_pre_outputs.csv")
+    save_activations(internal_rep,filename_prefix+"initial_reps.csv")
     fout = open(filename,'ab')
     for epoch in xrange(nepochs):
         train_with_standard_loss()
@@ -144,7 +145,7 @@ for rseed in [0,1,2,3,4,5,6,25]:
     #	numpy.savetxt(fout,numpy.array(get_reps()),delimiter=',')
 	if epoch % 10 == 0:
 	    print "epoch: %i, MSE: %f" %(epoch, test_accuracy())	
-	    save_activations(pre_output,filename_prefix+"epoch_%i_pre_outputs.csv" %epoch)
+#	    save_activations(pre_output,filename_prefix+"epoch_%i_pre_outputs.csv" %epoch)
 #	    print_preoutputs()
 #	    print_reps()	
 #	    print sess.run(W1)
@@ -162,3 +163,4 @@ for rseed in [0,1,2,3,4,5,6,25]:
 
     print_preoutputs()
     save_activations(pre_output,filename_prefix+"final_pre_outputs.csv")
+    save_activations(internal_rep,filename_prefix+"final_reps.csv")
