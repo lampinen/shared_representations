@@ -4,13 +4,13 @@ import matplotlib.pyplot as plt
 import os
 
 ######Parameters###################
-init_eta = 0.0005
+init_eta = 0.005
 momentum = 0.5
 eta_decay = 1.0 #multiplicative per eta_decay_epoch epochs
 eta_decay_epoch = 200
-nepochs = 10000
-nhidden_separate = 12
-nhidden_shared = 12
+nepochs = 500
+nhidden_separate = 100
+nhidden_shared = 100
 npeople_per = 12
 nrelationships_per = 12
 nfamilies = 2
@@ -187,6 +187,7 @@ bin_data = [(bin(x)[2:]) for x in xrange(12)]
 bin_data = numpy.array(map(lambda x: [0]*(12-len(x))+(map(int,x)),bin_data))
 alt_y_data = map(lambda x: bin_data[numpy.argmax(x)], x_data)
 
+identity_data = numpy.eye(24) #For getting activations driven by each individual unit
 
 
 #numpy.savetxt("one_family_input.csv",one_family_input_matrix,delimiter=',')
@@ -203,9 +204,9 @@ print "y_data shape:"
 print y_data.shape
 print
 
-for rseed in xrange(10):
+for rseed in xrange(100):
     print "run %i" %rseed
-    filename_prefix = "results/simul_learning_5layer/hinton_nhidden_%i_rseed_%i_" %(nhidden_shared,rseed)
+    filename_prefix = "results/simul_learning_3layer_single_inputs/hinton_nhidden_%i_rseed_%i_" %(nhidden_shared,rseed)
 
     numpy.random.seed(rseed)
     tf.set_random_seed(rseed)
@@ -213,19 +214,19 @@ for rseed in xrange(10):
     input_ph = tf.placeholder(tf.float32, shape=[input_shape,None])
 
     ############build network#################### 
-    W1f1 = tf.Variable(tf.random_uniform([nhidden_shared,input_shape],0,0.2))
-    W1f2 = tf.Variable(tf.random_uniform([nhidden_shared,input_shape],0,0.2))
+    W1f1 = tf.Variable(tf.random_uniform([nhidden_shared,input_shape],0,0.02))
+    W1f2 = tf.Variable(tf.random_uniform([nhidden_shared,input_shape],0,0.02))
     b1 = tf.Variable(tf.random_uniform([nhidden_shared,1],0,0.001))
-    W2 = tf.Variable(tf.random_uniform([nhidden_shared,nhidden_shared],0,0.2)) 
+    W2 = tf.Variable(tf.random_uniform([nhidden_shared,nhidden_shared],0,0.02)) 
     b2 = tf.Variable(tf.random_uniform([nhidden_shared,1],0,0.001))
-    W3 = tf.Variable(tf.random_uniform([nhidden_shared,nhidden_shared],0,0.2)) 
-    b3 = tf.Variable(tf.random_uniform([nhidden_shared,1],0,0.001))
-    W4 = tf.Variable(tf.random_uniform([nhidden_shared,nhidden_shared],0,0.2)) 
-    b4 = tf.Variable(tf.random_uniform([nhidden_shared,1],0,0.001))
-    W5f1 = tf.Variable(tf.random_uniform([output_shape,nhidden_shared],0,0.2))
-    W5f2 = tf.Variable(tf.random_uniform([output_shape,nhidden_shared],0,0.2))
-    b5f1 = tf.Variable(tf.random_uniform([output_shape,1],0,0.001))
-    b5f2 = tf.Variable(tf.random_uniform([output_shape,1],0,0.001))
+#    W3 = tf.Variable(tf.random_uniform([nhidden_shared,nhidden_shared],0,0.1)) 
+#    b3 = tf.Variable(tf.random_uniform([nhidden_shared,1],0,0.001))
+#    W4 = tf.Variable(tf.random_uniform([nhidden_shared,nhidden_shared],0,0.1)) 
+#    b4 = tf.Variable(tf.random_uniform([nhidden_shared,1],0,0.001))
+    W3f1 = tf.Variable(tf.random_uniform([output_shape,nhidden_shared],0,0.02))
+    W3f2 = tf.Variable(tf.random_uniform([output_shape,nhidden_shared],0,0.02))
+    b3f1 = tf.Variable(tf.random_uniform([output_shape,1],0,0.001))
+    b3f2 = tf.Variable(tf.random_uniform([output_shape,1],0,0.001))
 
 
     f1_pre_middle_rep = tf.matmul(W1f1,input_ph)+b1
@@ -233,17 +234,21 @@ for rseed in xrange(10):
     f1_middle_rep = tf.nn.relu(f1_pre_middle_rep)
     f2_middle_rep = tf.nn.relu(f2_pre_middle_rep)
 
-#    f1_pre_output = tf.matmul(W3f1,tf.nn.relu(tf.matmul(W2,f1_middle_rep)+b2))+b3f1
-#    f2_pre_output = tf.matmul(W3f2,tf.nn.relu(tf.matmul(W2,f2_middle_rep)+b2))+b3f2
+    f1_pre_output = tf.matmul(W3f1,tf.nn.relu(tf.matmul(W2,f1_middle_rep)+b2))+b3f1
+    f2_pre_output = tf.matmul(W3f2,tf.nn.relu(tf.matmul(W2,f2_middle_rep)+b2))+b3f2
 
 #    f1_pre_output = tf.matmul(W3f1,f1_middle_rep)+b3f1
 #    f2_pre_output = tf.matmul(W3f2,f2_middle_rep)+b3f2
 
 
-    #5 layer
-    f1_pre_output = tf.matmul(W5f1,tf.nn.relu(tf.matmul(W4,tf.nn.relu(tf.matmul(W3,tf.nn.relu(tf.matmul(W2,f1_middle_rep)+b2))+b3))+b4))+b5f1
-    f2_pre_output = tf.matmul(W5f2,tf.nn.relu(tf.matmul(W4,tf.nn.relu(tf.matmul(W3,tf.nn.relu(tf.matmul(W2,f2_middle_rep)+b2))+b3))+b4))+b5f2
-
+#    #4 layer
+#    f1_l2_rep = tf.nn.relu(tf.matmul(W2,f1_middle_rep)+b2)
+#    f1_l3_rep = tf.nn.relu(tf.matmul(W3,f1_l2_rep)+b3)
+#    f1_pre_output = tf.matmul(W4f1,f1_l3_rep)+b4f1
+#
+#    f2_l2_rep = tf.nn.relu(tf.matmul(W2,f2_middle_rep)+b2)
+#    f2_l3_rep = tf.nn.relu(tf.matmul(W3,f2_l2_rep)+b3)
+#    f2_pre_output = tf.matmul(W4f2,f2_l3_rep)+b4f2
 
     f1_output = tf.nn.relu(f1_pre_output)
     f2_output = tf.nn.relu(f2_pre_output)
@@ -303,6 +308,13 @@ for rseed in xrange(10):
 	    for i in xrange(len(x_data)):
 		numpy.savetxt(fout,sess.run(tf_object,feed_dict={input_ph: x_data[i].reshape([input_shape,1])}).reshape((1,-1)),delimiter=',')
 
+    def save_identity_activations(tf_object,filename,remove_old=True):
+	if remove_old and os.path.exists(filename):
+	    os.remove(filename)
+	with open(filename,'ab') as fout:
+	    for i in xrange(len(identity_data)):
+		numpy.savetxt(fout,sess.run(tf_object,feed_dict={input_ph: identity_data[i].reshape([input_shape,1])}).reshape((1,-1)),delimiter=',')
+
     def save_weights(tf_object,filename,remove_old=True):
 	if remove_old and os.path.exists(filename):
 	    os.remove(filename)
@@ -361,11 +373,12 @@ for rseed in xrange(10):
 	if epoch % 10 == 0:
 	    curr_error = test_domain_accuracy(2)
 	    print "epoch: %i, family 2 MSE: %f" %(epoch, curr_error)	
-	    if (not saved) and curr_error <= 0.05:
-		save_activations(f1_pre_middle_rep,filename_prefix+"f1_pre_middle_reps.csv")
-		save_activations(f1_pre_output,filename_prefix+"f1_pre_outputs.csv")
-		save_activations(f2_pre_middle_rep,filename_prefix+"f2_pre_middle_reps.csv")
-		save_activations(f2_pre_output,filename_prefix+"f2_pre_outputs.csv")
+#	    if (not saved) and curr_error <= 0.05:
+#		save_activations(f1_pre_middle_rep,filename_prefix+"f1_pre_middle_reps.csv")
+#		save_activations(f1_pre_output,filename_prefix+"f1_pre_outputs.csv")
+#		save_activations(f2_pre_middle_rep,filename_prefix+"f2_pre_middle_reps.csv")
+#		save_activations(f2_pre_output,filename_prefix+"f2_pre_outputs.csv")
+#		saved = True
 #	if epoch < nepochs/2:  
 #	    train_domain_with_standard_loss(1)
 #	    if epoch % 10 == 0:
@@ -395,5 +408,11 @@ for rseed in xrange(10):
 #    display_po_similarity()
     save_activations(f1_pre_output,filename_prefix +'f1_pre_outputs.csv',remove_old=True)
     save_activations(f2_pre_output,filename_prefix +'f2_pre_outputs.csv',remove_old=True)
+#    save_activations(f1_l2_rep,filename_prefix +'f1_l2_reps.csv',remove_old=True)
+#    save_activations(f2_l2_rep,filename_prefix +'f2_l2_reps.csv',remove_old=True)
+#    save_activations(f1_l3_rep,filename_prefix +'f1_l3_reps.csv',remove_old=True)
+#    save_activations(f2_l3_rep,filename_prefix +'f2_l3_reps.csv',remove_old=True)
     save_activations(f1_pre_middle_rep,filename_prefix +'f1_pre_middle_reps.csv',remove_old=True)
     save_activations(f2_pre_middle_rep,filename_prefix +'f2_pre_middle_reps.csv',remove_old=True)
+    save_identity_activations(f1_pre_middle_rep,filename_prefix +'f1_single_input_pre_middle_reps.csv',remove_old=True)
+    save_identity_activations(f2_pre_middle_rep,filename_prefix +'f2_single_input_pre_middle_reps.csv',remove_old=True)
