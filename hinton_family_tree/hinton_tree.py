@@ -4,10 +4,11 @@ import matplotlib.pyplot as plt
 import os
 
 ######Parameters###################
-init_eta = 0.005
+init_eta = 0.0005
+momentum = 0.5
 eta_decay = 1.0 #multiplicative per eta_decay_epoch epochs
-eta_decay_epoch = 10
-nepochs = 1000
+eta_decay_epoch = 200
+nepochs = 10000
 nhidden_separate = 12
 nhidden_shared = 12
 npeople_per = 12
@@ -202,9 +203,9 @@ print "y_data shape:"
 print y_data.shape
 print
 
-for rseed in xrange(100):
+for rseed in xrange(10):
     print "run %i" %rseed
-    filename_prefix = "results/sequential_noshared/SN_hinton_nhidden_%i_rseed_%i_" %(nhidden_shared,rseed)
+    filename_prefix = "results/simul_learning_5layer/hinton_nhidden_%i_rseed_%i_" %(nhidden_shared,rseed)
 
     numpy.random.seed(rseed)
     tf.set_random_seed(rseed)
@@ -212,15 +213,19 @@ for rseed in xrange(100):
     input_ph = tf.placeholder(tf.float32, shape=[input_shape,None])
 
     ############build network#################### 
-    W1f1 = tf.Variable(tf.random_uniform([nhidden_shared,input_shape],0,0.1))
-    W1f2 = tf.Variable(tf.random_uniform([nhidden_shared,input_shape],0,0.1))
-    b1 = tf.Variable(tf.random_uniform([nhidden_shared,1],0,0.1))
-    W2 = tf.Variable(tf.random_uniform([nhidden_shared,nhidden_shared],0,0.1)) 
-    b2 = tf.Variable(tf.random_uniform([nhidden_shared,1],0,0.1))
-    W3f1 = tf.Variable(tf.random_uniform([output_shape,nhidden_shared],0,0.1))
-    W3f2 = tf.Variable(tf.random_uniform([output_shape,nhidden_shared],0,0.1))
-    b3f1 = tf.Variable(tf.random_uniform([output_shape,1],0,0.1))
-    b3f2 = tf.Variable(tf.random_uniform([output_shape,1],0,0.1))
+    W1f1 = tf.Variable(tf.random_uniform([nhidden_shared,input_shape],0,0.2))
+    W1f2 = tf.Variable(tf.random_uniform([nhidden_shared,input_shape],0,0.2))
+    b1 = tf.Variable(tf.random_uniform([nhidden_shared,1],0,0.001))
+    W2 = tf.Variable(tf.random_uniform([nhidden_shared,nhidden_shared],0,0.2)) 
+    b2 = tf.Variable(tf.random_uniform([nhidden_shared,1],0,0.001))
+    W3 = tf.Variable(tf.random_uniform([nhidden_shared,nhidden_shared],0,0.2)) 
+    b3 = tf.Variable(tf.random_uniform([nhidden_shared,1],0,0.001))
+    W4 = tf.Variable(tf.random_uniform([nhidden_shared,nhidden_shared],0,0.2)) 
+    b4 = tf.Variable(tf.random_uniform([nhidden_shared,1],0,0.001))
+    W5f1 = tf.Variable(tf.random_uniform([output_shape,nhidden_shared],0,0.2))
+    W5f2 = tf.Variable(tf.random_uniform([output_shape,nhidden_shared],0,0.2))
+    b5f1 = tf.Variable(tf.random_uniform([output_shape,1],0,0.001))
+    b5f2 = tf.Variable(tf.random_uniform([output_shape,1],0,0.001))
 
 
     f1_pre_middle_rep = tf.matmul(W1f1,input_ph)+b1
@@ -231,8 +236,14 @@ for rseed in xrange(100):
 #    f1_pre_output = tf.matmul(W3f1,tf.nn.relu(tf.matmul(W2,f1_middle_rep)+b2))+b3f1
 #    f2_pre_output = tf.matmul(W3f2,tf.nn.relu(tf.matmul(W2,f2_middle_rep)+b2))+b3f2
 
-    f1_pre_output = tf.matmul(W3f1,f1_middle_rep)+b3f1
-    f2_pre_output = tf.matmul(W3f2,f2_middle_rep)+b3f2
+#    f1_pre_output = tf.matmul(W3f1,f1_middle_rep)+b3f1
+#    f2_pre_output = tf.matmul(W3f2,f2_middle_rep)+b3f2
+
+
+    #5 layer
+    f1_pre_output = tf.matmul(W5f1,tf.nn.relu(tf.matmul(W4,tf.nn.relu(tf.matmul(W3,tf.nn.relu(tf.matmul(W2,f1_middle_rep)+b2))+b3))+b4))+b5f1
+    f2_pre_output = tf.matmul(W5f2,tf.nn.relu(tf.matmul(W4,tf.nn.relu(tf.matmul(W3,tf.nn.relu(tf.matmul(W2,f2_middle_rep)+b2))+b3))+b4))+b5f2
+
 
     f1_output = tf.nn.relu(f1_pre_output)
     f2_output = tf.nn.relu(f2_pre_output)
@@ -243,7 +254,7 @@ for rseed in xrange(100):
     f2_loss = tf.reduce_sum(tf.square(f2_output - target_ph))
 #    linearized_loss = tf.reduce_sum(tf.square(pre_output - pre_output_target_ph))
     eta_ph = tf.placeholder(tf.float32)
-    optimizer = tf.train.GradientDescentOptimizer(eta_ph)
+    optimizer = tf.train.MomentumOptimizer(eta_ph,momentum)
     f1_train = optimizer.minimize(f1_loss)
     f2_train = optimizer.minimize(f2_loss)
 
@@ -345,35 +356,35 @@ for rseed in xrange(100):
     fout = open(filename,'ab')
     saved = False
     for epoch in xrange(nepochs):
-#	train_domain_with_standard_loss(1)
-#	train_domain_with_standard_loss(2)
-#	if epoch % 10 == 0:
-#	    curr_error = test_domain_accuracy(2)
-#	    print "epoch: %i, family 2 MSE: %f" %(epoch, curr_error)	
-#	    if (not saved) and curr_error <= 0.05:
-#		save_activations(f1_pre_middle_rep,filename_prefix+"f1_pre_middle_reps.csv")
-#		save_activations(f1_pre_output,filename_prefix+"f1_pre_outputs.csv")
-#		save_activations(f2_pre_middle_rep,filename_prefix+"f2_pre_middle_reps.csv")
-#		save_activations(f2_pre_output,filename_prefix+"f2_pre_outputs.csv")
-	if epoch < nepochs/2:  
-	    train_domain_with_standard_loss(1)
-	    if epoch % 10 == 0:
-		curr_error = test_domain_accuracy(1)
-		print "epoch: %i, family 1 MSE: %f" %(epoch, curr_error)	
-	else:
-	    train_domain_with_standard_loss(2)
-	    if epoch % 10 == 0:
-		curr_error = test_domain_accuracy(2)
-		print "epoch: %i, family 2 MSE: %f" %(epoch, curr_error)		    
+	train_domain_with_standard_loss(1)
+	train_domain_with_standard_loss(2)
+	if epoch % 10 == 0:
+	    curr_error = test_domain_accuracy(2)
+	    print "epoch: %i, family 2 MSE: %f" %(epoch, curr_error)	
+	    if (not saved) and curr_error <= 0.05:
+		save_activations(f1_pre_middle_rep,filename_prefix+"f1_pre_middle_reps.csv")
+		save_activations(f1_pre_output,filename_prefix+"f1_pre_outputs.csv")
+		save_activations(f2_pre_middle_rep,filename_prefix+"f2_pre_middle_reps.csv")
+		save_activations(f2_pre_output,filename_prefix+"f2_pre_outputs.csv")
+#	if epoch < nepochs/2:  
+#	    train_domain_with_standard_loss(1)
+#	    if epoch % 10 == 0:
+#		curr_error = test_domain_accuracy(1)
+#		print "epoch: %i, family 1 MSE: %f" %(epoch, curr_error)	
+#	else:
+#	    train_domain_with_standard_loss(2)
+#	    if epoch % 10 == 0:
+#		curr_error = test_domain_accuracy(2)
+#		print "epoch: %i, family 2 MSE: %f" %(epoch, curr_error)		    
 	fout.write(str(curr_error)+',')
 
 #	if epoch % 100 == 0:
 #	    display_rep_similarity()
 #	    display_po_similarity()
-	if epoch % eta_decay_epoch == 0:
+	if epoch % eta_decay_epoch == 0 and epoch > 0:
 	    curr_eta *= eta_decay
-	if epoch == nepochs/2:
-	    curr_eta = init_eta
+#	if epoch == nepochs/2:
+#	    curr_eta = init_eta
     fout.close()
 	
 
