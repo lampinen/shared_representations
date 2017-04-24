@@ -23,8 +23,8 @@ rng(0) %Reproducibility
 for run = 1:100
 
     %Load
-    actual_pre_middle_reps = [load(sprintf('results/simul_learning_3layer/hinton_nhidden_12_rseed_%i_f1_pre_middle_reps.csv',run-1)); load(sprintf('results/simul_learning_3layer/hinton_nhidden_12_rseed_%i_f2_pre_middle_reps.csv',run-1)) ];    actual_middle_reps = max(actual_pre_middle_reps,0);
-    actual_pre_outputs = [load(sprintf('results/simul_learning_3layer/hinton_nhidden_12_rseed_%i_f1_pre_outputs.csv',run-1)); load(sprintf('results/simul_learning_3layer/hinton_nhidden_12_rseed_%i_f2_pre_outputs.csv',run-1)) ];    actual_outputs = max(actual_pre_outputs,0);
+    actual_pre_middle_reps = [load(sprintf('results/simul_learning_3layer_single_inputs/hinton_nhidden_100_rseed_%i_f1_pre_middle_reps.csv',run-1)); load(sprintf('results/simul_learning_3layer_single_inputs/hinton_nhidden_100_rseed_%i_f2_pre_middle_reps.csv',run-1)) ];    actual_middle_reps = max(actual_pre_middle_reps,0);
+    actual_pre_outputs = [load(sprintf('results/simul_learning_3layer_single_inputs/hinton_nhidden_100_rseed_%i_f1_pre_outputs.csv',run-1)); load(sprintf('results/simul_learning_3layer_single_inputs/hinton_nhidden_100_rseed_%i_f2_pre_outputs.csv',run-1)) ];    actual_outputs = max(actual_pre_outputs,0);
 
 
     lz_IO = input.'*actual_pre_middle_reps;
@@ -35,11 +35,11 @@ for run = 1:100
 
 
 
-    lz_IO_2 = actual_middle_reps.'*actual_pre_outputs;
+%    lz_IO_2 = actual_middle_reps.'*actual_pre_outputs;
 
-    lz_IO_2_c = lz_IO_2-ones(12,1)*mean(lz_IO_2,1);
+%    lz_IO_2_c = lz_IO_2-ones(12,1)*mean(lz_IO_2,1);
 
-    [U_lz2,S_lz2,V_lz2] = svd(lz_IO_2_c.');
+%    [U_lz2,S_lz2,V_lz2] = svd(lz_IO_2_c.');
 
     %% non-parametric test of whether cross domain projections are significantly higher than shuffled projections
     %display('V_lz')
