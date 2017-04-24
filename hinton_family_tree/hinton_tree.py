@@ -4,18 +4,25 @@ import matplotlib.pyplot as plt
 import os
 
 ######Parameters###################
-init_eta = 0.005
+nhidden_shared = 200
+weight_size = 4.0 #weights will be initialized uniform [0,weight_size/nhidden], weight size of 2.0 results in an expectation of preserving representation vector length under each transformation
+dropout_prob = 1.0
+
+init_eta = 0.003
+momentum = 0.0
 eta_decay = 1.0 #multiplicative per eta_decay_epoch epochs
-eta_decay_epoch = 10
-nepochs = 1000
-nhidden_separate = 12
-nhidden_shared = 12
-npeople_per = 12
-nrelationships_per = 12
-nfamilies = 2
+eta_decay_epoch = 500
+nepochs = 2000
+early_stopping_MSE = 0.001 #MSE at which to stop training even if nepochs not reached
+
+training_type = "minibatch" #one of "single", "batch", "minibatch"
+minibatch_size = 5
 
 #rseed = 2  #reproducibility
 ###################################
+npeople_per = 12
+nrelationships_per = 12
+nfamilies = 2
 
 #build tree
 gender = {"Christopher":"M",
@@ -207,12 +214,13 @@ print
 
 for rseed in xrange(100):
     print "run %i" %rseed
-    filename_prefix = "results/hinton_nonlinear_smallweights_nhidden_%i_rseed_%i_" %(nhidden_shared,rseed)
+    filename_prefix = "results/regular_3layer/hinton_nhidden_%i_dropout_%f_rseed_%i_" %(nhidden_shared,dropout_prob,rseed)
 
     numpy.random.seed(rseed)
     tf.set_random_seed(rseed)
 
     input_ph = tf.placeholder(tf.float32, shape=[input_shape,None])
+    dropout_ph = tf.placeholder(tf.float32)
     #handle some reshaping to get from block diagonal data matrix structure to desired input structure
     split_inputs = tf.split(input_ph,[(npeople_per if (i % 2 == 0) else nrelationships_per) for i in xrange(nfamilies*2)],0)
     people_inputs = [this_input for (i,this_input) in enumerate(split_inputs) if i % 2 == 0]
@@ -221,14 +229,20 @@ for rseed in xrange(100):
     relationship_input = tf.concat(relationship_inputs,axis=0)
     #build the network
      ############Working simpler network with eta = 0.005, nhidden = 13 
-    W1 = tf.Variable(tf.random_uniform([nhidden_shared,input_shape],0,0.001))
+    W1 = tf.Variable(tf.random_uniform([nhidden_shared,input_shape],0,weight_size/nhidden_shared))
     b1 = tf.Variable(tf.random_uniform([nhidden_shared,1],0,0.001))
-    W2 = tf.Variable(tf.random_uniform([output_shape,nhidden_shared],0,0.001))
-    b2 = tf.Variable(tf.random_uniform([output_shape,1],0,0.001))
-    pre_middle_rep = tf.matmul(W1,tf.concat([people_input,relationship_input],0))+b1
-    middle_rep = tf.nn.relu(pre_middle_rep)
+    W2 = tf.Variable(tf.random_uniform([nhidden_shared,nhidden_shared],0,weight_size/nhidden_shared))
+    b2 = tf.Variable(tf.random_uniform([nhidden_shared,1],0,0.001))
+    W3 = tf.Variable(tf.random_uniform([output_shape,nhidden_shared],0,weight_size/nhidden_shared))
 
-    pre_output = tf.matmul(W2,middle_rep)+b2
+
+    b3 = tf.Variable(tf.random_uniform([output_shape,1],0,0.001))
+    pre_middle_rep = tf.matmul(W1,tf.concat([people_input,relationship_input],0))+b1
+    middle_rep = tf.nn.dropout(tf.nn.relu(pre_middle_rep),dropout_ph)
+
+    pre_l2_rep =  tf.matmul(W2,middle_rep)+b2 
+    l2_rep = tf.nn.dropout(tf.nn.relu(pre_l2_rep),dropout_ph)
+    pre_output = tf.matmul(W3,l2_rep)+b3
 
     output = tf.nn.relu(pre_output)
 
@@ -239,7 +253,7 @@ for rseed in xrange(100):
     loss = tf.reduce_sum(tf.square(output - target_ph))
     linearized_loss = tf.reduce_sum(tf.square(pre_output - pre_output_target_ph))
     eta_ph = tf.placeholder(tf.float32)
-    optimizer = tf.train.GradientDescentOptimizer(eta_ph)
+    optimizer = tf.train.MomentumOptimizer(eta_ph,momentum)
     train = optimizer.minimize(loss)
     linearized_train = optimizer.minimize(linearized_loss)
 
@@ -251,27 +265,27 @@ for rseed in xrange(100):
     def test_accuracy():
 	MSE = 0.0
 	for i in xrange(len(x_data)):
-	    MSE += sess.run(loss,feed_dict={input_ph: x_data[i].reshape([input_shape,1]),target_ph: y_data[i].reshape([output_shape,1])})
+	    MSE += sess.run(loss,feed_dict={input_ph: x_data[i].reshape([input_shape,1]),target_ph: y_data[i].reshape([output_shape,1]),dropout_ph: 1.0})
 	MSE /= len(x_data)
 	return MSE
 
     def print_outputs():
 	for i in xrange(len(x_data)):
-	    print x_data[i], y_data[i], sess.run(output,feed_dict={input_ph: x_data[i].reshape([input_shape,1])}).flatten()
+	    print x_data[i], y_data[i], sess.run(output,feed_dict={input_ph: x_data[i].reshape([input_shape,1]),dropout_ph: 1.0}).flatten()
 
     def print_preoutputs():
 	for i in xrange(len(x_data)):
-	    print x_data[i], y_data[i], sess.run(pre_output,feed_dict={input_ph: x_data[i].reshape([input_shape,1])}).flatten()
+	    print x_data[i], y_data[i], sess.run(pre_output,feed_dict={input_ph: x_data[i].reshape([input_shape,1]),dropout_ph: 1.0}).flatten()
 
     def print_reps():
 	for i in xrange(len(x_data)):
-	    print x_data[i], y_data[i], sess.run(middle_rep,feed_dict={input_ph: x_data[i].reshape([input_shape,1])}).flatten()
+	    print x_data[i], y_data[i], sess.run(middle_rep,feed_dict={input_ph: x_data[i].reshape([input_shape,1]),dropout_ph: 1.0}).flatten()
 
     def get_reps():
 	reps = []
 	nsamples = len(x_data)
 	for i in xrange(nsamples):
-	    reps.append(sess.run(middle_rep,feed_dict={input_ph: x_data[i].reshape([input_shape,1])}).flatten())
+	    reps.append(sess.run(middle_rep,feed_dict={input_ph: x_data[i].reshape([input_shape,1]),dropout_ph: 1.0}).flatten())
 	return reps
 
     def save_activations(tf_object,filename,remove_old=True):
@@ -279,7 +293,7 @@ for rseed in xrange(100):
 	    os.remove(filename)
 	with open(filename,'ab') as fout:
 	    for i in xrange(len(x_data)):
-		numpy.savetxt(fout,sess.run(tf_object,feed_dict={input_ph: x_data[i].reshape([input_shape,1])}).reshape((1,-1)),delimiter=',')
+		numpy.savetxt(fout,sess.run(tf_object,feed_dict={input_ph: x_data[i].reshape([input_shape,1]),dropout_ph: 1.0}).reshape((1,-1)),delimiter=',')
 
     def save_weights(tf_object,filename,remove_old=True):
 	if remove_old and os.path.exists(filename):
@@ -291,7 +305,7 @@ for rseed in xrange(100):
 	reps = []
 	nsamples = len(x_data)
 	for i in xrange(nsamples):
-	    reps.append(sess.run(pre_middle_rep,feed_dict={input_ph: x_data[i].reshape([input_shape,1])}).flatten())
+	    reps.append(sess.run(pre_middle_rep,feed_dict={input_ph: x_data[i].reshape([input_shape,1]),dropout_ph: 1.0}).flatten())
 	item_rep_similarity = numpy.zeros([nsamples,nsamples])
 	for i in xrange(nsamples):
 	    for j in xrange(i,nsamples):
@@ -304,7 +318,7 @@ for rseed in xrange(100):
 	reps = []
 	nsamples = len(x_data)
 	for i in xrange(nsamples):
-	    reps.append(sess.run(pre_output,feed_dict={input_ph: x_data[i].reshape([input_shape,1])}).flatten())
+	    reps.append(sess.run(pre_output,feed_dict={input_ph: x_data[i].reshape([input_shape,1]),dropout_ph: 1.0}).flatten())
 	item_rep_similarity = numpy.zeros([nsamples,nsamples])
 	for i in xrange(nsamples):
 	    for j in xrange(i,nsamples):
@@ -316,15 +330,16 @@ for rseed in xrange(100):
     def train_with_standard_loss():
 	training_order = numpy.random.permutation(len(x_data))
 	for example_i in training_order:
-	    sess.run(train,feed_dict={eta_ph: curr_eta,input_ph: x_data[example_i].reshape([input_shape,1]),target_ph: y_data[example_i].reshape([output_shape,1])})
+	    sess.run(train,feed_dict={eta_ph: curr_eta,input_ph: x_data[example_i].reshape([input_shape,1]),target_ph: y_data[example_i].reshape([output_shape,1]),dropout_ph: dropout_prob})
+
+
+    def minibatch_train_with_standard_loss():
+	training_order = numpy.random.permutation(len(x_data))
+	for batch_i in xrange(1+len(x_data)//minibatch_size):
+	    sess.run(train,feed_dict={eta_ph: curr_eta,input_ph: x_data[training_order[batch_i*minibatch_size:(batch_i+1)*minibatch_size]].transpose(),target_ph: y_data[training_order[batch_i*minibatch_size:(batch_i+1)*minibatch_size]].transpose(),dropout_ph: dropout_prob})
 
     def batch_train_with_standard_loss():
-	sess.run(train,feed_dict={eta_ph: curr_eta,input_ph: x_data.transpose(),target_ph: y_data.transpose()})
-
-    def train_with_linearized_loss(targets):
-	training_order = numpy.random.permutation(len(x_data))
-	for example_i in training_order:
-	    sess.run(linearized_train,feed_dict={eta_ph: curr_eta,input_ph: x_data[example_i].reshape([input_shape,1]),pre_output_target_ph: targets[example_i].reshape([output_shape,1])})
+	sess.run(train,feed_dict={eta_ph: curr_eta,input_ph: x_data.transpose(),target_ph: y_data.transpose(),dropout_ph: dropout_prob})
 
     print "Initial MSE: %f" %(test_accuracy())
 
@@ -335,12 +350,18 @@ for rseed in xrange(100):
     filename = filename_prefix + "rep_tracks.csv"
     if os.path.exists(filename):
 	os.remove(filename)
+    saved = False
     fout = open(filename,'ab')
     for epoch in xrange(nepochs):
-#        batch_train_with_standard_loss()
-        train_with_standard_loss()
-    #    train_with_linearized_loss(loaded_pre_outputs)
-#	train_with_linearized_loss(y_data)
+	if training_type == "single": 
+	    train_with_standard_loss()
+	elif training_type == "minibatch":
+	    minibatch_train_with_standard_loss()
+	elif training_type == "batch":
+	    batch_train_with_standard_loss()
+	else: 
+	    print "Unrecognized training type!"
+	    exit(1)
 #	if epoch % 10 == 0:
 #	    save_activations(pre_output,filename_prefix+"epoch_%i_pre_outputs.csv" %epoch)
 #	    save_activations(middle_rep,filename_prefix+"epoch_%i_middle_rep.csv" %epoch)
@@ -351,10 +372,17 @@ for rseed in xrange(100):
 	    temp = test_accuracy()
 	    print "epoch: %i, MSE: %f" %(epoch, temp)	
 	    numpy.savetxt(fout,[temp],delimiter=',')
+	    if temp < 0.05 and not saved:
+		save_activations(pre_middle_rep,filename_prefix+"pre_middle_reps_at_MSE=0.05.csv")
+		save_activations(l2_rep,filename_prefix+"l2_reps_at_MSE=0.05.csv")
+		save_activations(pre_output,filename_prefix+"pre_outputs_at_MSE=0.05.csv")
+		saved = True
+	    if temp < early_stopping_MSE:
+		break
 #	if epoch % 100 == 0:
 #	    display_rep_similarity()
 #	    display_po_similarity()
-	if epoch % eta_decay_epoch == 0:
+	if epoch % eta_decay_epoch == 0 and epoch > 0:
 	    curr_eta *= eta_decay
     fout.close()
 	
@@ -364,5 +392,6 @@ for rseed in xrange(100):
 #    print_preoutputs()
 #    display_rep_similarity()
 #    display_po_similarity()
-#    save_activations(pre_middle_rep,filename_prefix+"pre_middle_reps.csv")
-#    save_activations(pre_output,filename_prefix+"pre_outputs.csv")
+    save_activations(pre_middle_rep,filename_prefix+"pre_middle_reps.csv")
+    save_activations(l2_rep,filename_prefix+"l2_reps.csv")
+    save_activations(pre_output,filename_prefix+"pre_outputs.csv")
