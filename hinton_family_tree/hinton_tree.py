@@ -1,6 +1,6 @@
 import tensorflow as tf
 import numpy
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import os
 
 ######Parameters###################
@@ -8,7 +8,7 @@ momentum = 0.0
 eta_decay = 1.0 #multiplicative per eta_decay_epoch epochs
 eta_decay_epoch = 1000
 
-nepochs = 3000
+nepochs = 10000
 early_stopping_MSE = 0.001 #stop training if MSE reaches this threshold
 #nhidden_separate = 100
 nhidden_shared = 1000
@@ -17,7 +17,7 @@ npeople_per = 12
 nrelationships_per = 12
 nfamilies = 2
 
-init_eta = 0.05/numpy.sqrt(nhidden_shared)
+init_eta = 0.03/numpy.sqrt(nhidden_shared)
 #rseed = 2  #reproducibility
 ###################################
 
@@ -207,9 +207,9 @@ print "y_data shape:"
 print y_data.shape
 print
 
-for rseed in xrange(100):
+for rseed in xrange(10):
     print "run %i" %rseed
-    filename_prefix = "results/simul_learning_3layer_single_inputs/hinton_nhidden_%i_eta_%f_momentum_%f_weightsize_%f_rseed_%i_" %(nhidden_shared,init_eta,momentum,weight_size,rseed)
+    filename_prefix = "results/simul_learning_3layer_single_inputs/hinton_batch_nhidden_%i_eta_%f_momentum_%f_weightsize_%f_rseed_%i_" %(nhidden_shared,init_eta,momentum,weight_size,rseed)
 
     numpy.random.seed(rseed)
     tf.set_random_seed(rseed)
@@ -350,13 +350,20 @@ for rseed in xrange(100):
 #	plt.imshow(item_rep_similarity,cmap='Greys_r',interpolation='none') #cosine distance
 #	plt.show()
 
-    def train_domain_with_standard_loss(this_domain):
-	training_order = numpy.random.permutation(len(x_data))
-	for example_i in training_order:
+    def train_domain_with_standard_loss(this_domain,batch=False):
+	if batch:
 	    if this_domain == 1:
-		sess.run(f1_train,feed_dict={eta_ph: curr_eta,input_ph: x_data[example_i].reshape([input_shape,1]),target_ph: y_data[example_i].reshape([output_shape,1])})
+		sess.run(f1_train,feed_dict={eta_ph: curr_eta,input_ph: x_data.transpose(),target_ph: y_data.transpose()})
 	    else:
-		sess.run(f2_train,feed_dict={eta_ph: curr_eta,input_ph: x_data[example_i].reshape([input_shape,1]),target_ph: y_data[example_i].reshape([output_shape,1])})
+		sess.run(f2_train,feed_dict={eta_ph: curr_eta,input_ph: x_data.transpose(),target_ph: y_data.transpose()})
+
+	else:
+		training_order = numpy.random.permutation(len(x_data))
+		for example_i in training_order:
+		    if this_domain == 1:
+			sess.run(f1_train,feed_dict={eta_ph: curr_eta,input_ph: x_data[example_i].reshape([input_shape,1]),target_ph: y_data[example_i].reshape([output_shape,1])})
+		    else:
+			sess.run(f2_train,feed_dict={eta_ph: curr_eta,input_ph: x_data[example_i].reshape([input_shape,1]),target_ph: y_data[example_i].reshape([output_shape,1])})
 
 
     print "Initial MSEa: %f, %f" %(test_domain_accuracy(1),test_domain_accuracy(2))
@@ -371,8 +378,8 @@ for rseed in xrange(100):
     fout = open(filename,'ab')
     saved = False
     for epoch in xrange(nepochs):
-	train_domain_with_standard_loss(1)
-	train_domain_with_standard_loss(2)
+	train_domain_with_standard_loss(1,batch=True)
+	train_domain_with_standard_loss(2,batch=True)
 	if epoch % 10 == 0:
 	    curr_error = test_domain_accuracy(2)
 	    print "epoch: %i, family 2 MSE: %f" %(epoch, curr_error)	
