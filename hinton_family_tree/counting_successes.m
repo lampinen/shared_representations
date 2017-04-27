@@ -20,11 +20,17 @@ U_lz2_gender_flipped_projection_tests_by_run = zeros(100,12);
 
 rng(0) %Reproducibility
 
+%Which runs to get
+nhidden = 200;
+eta = 0.003536;
+weightsize = 2.0;
+
 for run = 1:100
 
+    
     %Load
-    actual_pre_middle_reps = [load(sprintf('results/simul_learning_3layer_single_inputs/hinton_nhidden_100_rseed_%i_f1_pre_middle_reps.csv',run-1)); load(sprintf('results/simul_learning_3layer_single_inputs/hinton_nhidden_100_rseed_%i_f2_pre_middle_reps.csv',run-1)) ];    actual_middle_reps = max(actual_pre_middle_reps,0);
-    actual_pre_outputs = [load(sprintf('results/simul_learning_3layer_single_inputs/hinton_nhidden_100_rseed_%i_f1_pre_outputs.csv',run-1)); load(sprintf('results/simul_learning_3layer_single_inputs/hinton_nhidden_100_rseed_%i_f2_pre_outputs.csv',run-1)) ];    actual_outputs = max(actual_pre_outputs,0);
+    actual_pre_middle_reps = [load(sprintf('results/simul_learning_3layer_single_inputs/hinton_nhidden_%i_eta_%f_momentum_0.000000_weightsize_%f_rseed_%i_f1_pre_middle_reps.csv',nhidden,eta,weightsize,run-1)); load(sprintf('results/simul_learning_3layer_single_inputs/hinton_nhidden_%i_eta_%f_momentum_0.000000_weightsize_%f_rseed_%i_f2_pre_middle_reps.csv',nhidden,eta,weightsize,run-1)) ];    actual_middle_reps = max(actual_pre_middle_reps,0);
+    actual_pre_outputs = [load(sprintf('results/simul_learning_3layer_single_inputs/hinton_nhidden_%i_eta_%f_momentum_0.000000_weightsize_%f_rseed_%i_f1_pre_outputs.csv',nhidden,eta,weightsize,run-1)); load(sprintf('results/simul_learning_3layer_single_inputs/hinton_nhidden_%i_eta_%f_momentum_0.000000_weightsize_%f_rseed_%i_f2_pre_outputs.csv',nhidden,eta,weightsize,run-1)) ];    actual_outputs = max(actual_pre_outputs,0);
 
 
     lz_IO = input.'*actual_pre_middle_reps;
