@@ -4,17 +4,20 @@ import matplotlib.pyplot as plt
 import os
 
 ######Parameters###################
-init_eta = 0.005
-momentum = 0.5
+momentum = 0.0
 eta_decay = 1.0 #multiplicative per eta_decay_epoch epochs
-eta_decay_epoch = 200
-nepochs = 500
-nhidden_separate = 100
-nhidden_shared = 100
+eta_decay_epoch = 1000
+
+nepochs = 3000
+early_stopping_MSE = 0.001 #stop training if MSE reaches this threshold
+#nhidden_separate = 100
+nhidden_shared = 1000
+weight_size = 2.0 #weights initialized uniform in [0, weight_size/nhidden_shared]
 npeople_per = 12
 nrelationships_per = 12
 nfamilies = 2
 
+init_eta = 0.05/numpy.sqrt(nhidden_shared)
 #rseed = 2  #reproducibility
 ###################################
 
@@ -206,7 +209,7 @@ print
 
 for rseed in xrange(100):
     print "run %i" %rseed
-    filename_prefix = "results/simul_learning_3layer_single_inputs/hinton_nhidden_%i_rseed_%i_" %(nhidden_shared,rseed)
+    filename_prefix = "results/simul_learning_3layer_single_inputs/hinton_nhidden_%i_eta_%f_momentum_%f_weightsize_%f_rseed_%i_" %(nhidden_shared,init_eta,momentum,weight_size,rseed)
 
     numpy.random.seed(rseed)
     tf.set_random_seed(rseed)
@@ -214,17 +217,17 @@ for rseed in xrange(100):
     input_ph = tf.placeholder(tf.float32, shape=[input_shape,None])
 
     ############build network#################### 
-    W1f1 = tf.Variable(tf.random_uniform([nhidden_shared,input_shape],0,0.02))
-    W1f2 = tf.Variable(tf.random_uniform([nhidden_shared,input_shape],0,0.02))
+    W1f1 = tf.Variable(tf.random_uniform([nhidden_shared,input_shape],0,weight_size/nhidden_shared))
+    W1f2 = tf.Variable(tf.random_uniform([nhidden_shared,input_shape],0,weight_size/nhidden_shared))
     b1 = tf.Variable(tf.random_uniform([nhidden_shared,1],0,0.001))
-    W2 = tf.Variable(tf.random_uniform([nhidden_shared,nhidden_shared],0,0.02)) 
+    W2 = tf.Variable(tf.random_uniform([nhidden_shared,nhidden_shared],0,weight_size/nhidden_shared)) 
     b2 = tf.Variable(tf.random_uniform([nhidden_shared,1],0,0.001))
 #    W3 = tf.Variable(tf.random_uniform([nhidden_shared,nhidden_shared],0,0.1)) 
 #    b3 = tf.Variable(tf.random_uniform([nhidden_shared,1],0,0.001))
 #    W4 = tf.Variable(tf.random_uniform([nhidden_shared,nhidden_shared],0,0.1)) 
 #    b4 = tf.Variable(tf.random_uniform([nhidden_shared,1],0,0.001))
-    W3f1 = tf.Variable(tf.random_uniform([output_shape,nhidden_shared],0,0.02))
-    W3f2 = tf.Variable(tf.random_uniform([output_shape,nhidden_shared],0,0.02))
+    W3f1 = tf.Variable(tf.random_uniform([output_shape,nhidden_shared],0,weight_size/nhidden_shared))
+    W3f2 = tf.Variable(tf.random_uniform([output_shape,nhidden_shared],0,weight_size/nhidden_shared))
     b3f1 = tf.Variable(tf.random_uniform([output_shape,1],0,0.001))
     b3f2 = tf.Variable(tf.random_uniform([output_shape,1],0,0.001))
 
@@ -373,12 +376,17 @@ for rseed in xrange(100):
 	if epoch % 10 == 0:
 	    curr_error = test_domain_accuracy(2)
 	    print "epoch: %i, family 2 MSE: %f" %(epoch, curr_error)	
-#	    if (not saved) and curr_error <= 0.05:
-#		save_activations(f1_pre_middle_rep,filename_prefix+"f1_pre_middle_reps.csv")
-#		save_activations(f1_pre_output,filename_prefix+"f1_pre_outputs.csv")
-#		save_activations(f2_pre_middle_rep,filename_prefix+"f2_pre_middle_reps.csv")
-#		save_activations(f2_pre_output,filename_prefix+"f2_pre_outputs.csv")
-#		saved = True
+	    fout.write(str(curr_error)+',')
+	    if (not saved) and curr_error <= 0.05:
+		save_activations(f1_pre_middle_rep,filename_prefix+"f1_pre_middle_reps_at_0.05MSE.csv",remove_old=True)
+		save_activations(f1_pre_output,filename_prefix+"f1_pre_outputs_at_0.05MSE.csv",remove_old=True)
+		save_activations(f2_pre_middle_rep,filename_prefix+"f2_pre_middle_reps_at_0.05MSE.csv",remove_old=True)
+		save_activations(f2_pre_output,filename_prefix+"f2_pre_outputs_at_0.05MSE.csv",remove_old=True)
+		save_identity_activations(f1_pre_middle_rep,filename_prefix +'f1_single_input_pre_middle_reps_at_0.05MSE.csv',remove_old=True)
+		save_identity_activations(f2_pre_middle_rep,filename_prefix +'f2_single_input_pre_middle_reps_at_0.05MSE.csv',remove_old=True)
+		saved = True
+	    if curr_error <= early_stopping_MSE:
+		break
 #	if epoch < nepochs/2:  
 #	    train_domain_with_standard_loss(1)
 #	    if epoch % 10 == 0:
@@ -389,7 +397,6 @@ for rseed in xrange(100):
 #	    if epoch % 10 == 0:
 #		curr_error = test_domain_accuracy(2)
 #		print "epoch: %i, family 2 MSE: %f" %(epoch, curr_error)		    
-	fout.write(str(curr_error)+',')
 
 #	if epoch % 100 == 0:
 #	    display_rep_similarity()
