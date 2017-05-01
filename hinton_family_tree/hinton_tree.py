@@ -8,16 +8,15 @@ momentum = 0.0
 eta_decay = 1.0 #multiplicative per eta_decay_epoch epochs
 eta_decay_epoch = 1000
 
-nepochs = 13000
+nepochs = 5000
 early_stopping_MSE = 0.001 #stop training if MSE reaches this threshold
-#nhidden_separate = 100
-nhidden_shared = 1000
-weight_size = 2.0 #weights initialized uniform in [0, weight_size/nhidden_shared]
+nhiddens = [12, 24, 48, 100, 1000]
+#nhidden_shared = 1000
+weight_initializations = ['unif','He']
 npeople_per = 12
 nrelationships_per = 12
 nfamilies = 2
 
-init_eta = 0.02/numpy.sqrt(nhidden_shared)
 #rseed = 2  #reproducibility
 ###################################
 
@@ -207,227 +206,231 @@ print "y_data shape:"
 print y_data.shape
 print
 
-for rseed in xrange(10,100):
-    print "run %i" %rseed
-    filename_prefix = "results/simul_learning_3layer_single_inputs/hinton_batch_nhidden_%i_eta_%f_momentum_%f_weightsize_%f_rseed_%i_" %(nhidden_shared,init_eta,momentum,weight_size,rseed)
-
-    numpy.random.seed(rseed)
-    tf.set_random_seed(rseed)
-
-    input_ph = tf.placeholder(tf.float32, shape=[input_shape,None])
-
-    ############build network#################### 
-    W1f1 = tf.Variable(tf.random_uniform([nhidden_shared,input_shape],0,weight_size/nhidden_shared))
-    W1f2 = tf.Variable(tf.random_uniform([nhidden_shared,input_shape],0,weight_size/nhidden_shared))
-    b1 = tf.Variable(tf.random_uniform([nhidden_shared,1],0,0.001))
-    W2 = tf.Variable(tf.random_uniform([nhidden_shared,nhidden_shared],0,weight_size/nhidden_shared)) 
-    b2 = tf.Variable(tf.random_uniform([nhidden_shared,1],0,0.001))
-#    W3 = tf.Variable(tf.random_uniform([nhidden_shared,nhidden_shared],0,0.1)) 
-#    b3 = tf.Variable(tf.random_uniform([nhidden_shared,1],0,0.001))
-#    W4 = tf.Variable(tf.random_uniform([nhidden_shared,nhidden_shared],0,0.1)) 
-#    b4 = tf.Variable(tf.random_uniform([nhidden_shared,1],0,0.001))
-    W3f1 = tf.Variable(tf.random_uniform([output_shape,nhidden_shared],0,weight_size/nhidden_shared))
-    W3f2 = tf.Variable(tf.random_uniform([output_shape,nhidden_shared],0,weight_size/nhidden_shared))
-    b3f1 = tf.Variable(tf.random_uniform([output_shape,1],0,0.001))
-    b3f2 = tf.Variable(tf.random_uniform([output_shape,1],0,0.001))
-
-
-    f1_pre_middle_rep = tf.matmul(W1f1,input_ph)+b1
-    f2_pre_middle_rep = tf.matmul(W1f2,input_ph)+b1
-    f1_middle_rep = tf.nn.relu(f1_pre_middle_rep)
-    f2_middle_rep = tf.nn.relu(f2_pre_middle_rep)
-
-    f1_pre_output = tf.matmul(W3f1,tf.nn.relu(tf.matmul(W2,f1_middle_rep)+b2))+b3f1
-    f2_pre_output = tf.matmul(W3f2,tf.nn.relu(tf.matmul(W2,f2_middle_rep)+b2))+b3f2
-
-#    f1_pre_output = tf.matmul(W3f1,f1_middle_rep)+b3f1
-#    f2_pre_output = tf.matmul(W3f2,f2_middle_rep)+b3f2
-
-
-#    #4 layer
-#    f1_l2_rep = tf.nn.relu(tf.matmul(W2,f1_middle_rep)+b2)
-#    f1_l3_rep = tf.nn.relu(tf.matmul(W3,f1_l2_rep)+b3)
-#    f1_pre_output = tf.matmul(W4f1,f1_l3_rep)+b4f1
-#
-#    f2_l2_rep = tf.nn.relu(tf.matmul(W2,f2_middle_rep)+b2)
-#    f2_l3_rep = tf.nn.relu(tf.matmul(W3,f2_l2_rep)+b3)
-#    f2_pre_output = tf.matmul(W4f2,f2_l3_rep)+b4f2
-
-    f1_output = tf.nn.relu(f1_pre_output)
-    f2_output = tf.nn.relu(f2_pre_output)
-
-    target_ph =  tf.placeholder(tf.float32, shape=[output_shape,None])
-
-    f1_loss = tf.reduce_sum(tf.square(f1_output - target_ph))
-    f2_loss = tf.reduce_sum(tf.square(f2_output - target_ph))
-#    linearized_loss = tf.reduce_sum(tf.square(pre_output - pre_output_target_ph))
-    eta_ph = tf.placeholder(tf.float32)
-    optimizer = tf.train.MomentumOptimizer(eta_ph,momentum)
-    f1_train = optimizer.minimize(f1_loss)
-    f2_train = optimizer.minimize(f2_loss)
-
-    init = tf.global_variables_initializer()
-
-    sess = tf.Session()
-    sess.run(init)
-
-    def test_domain_accuracy(this_domain):
-	MSE = 0.0
-	order = numpy.array(range(len(x_data)))
-	for i in order:
-	    if this_domain == 1:
-		MSE += sess.run(f1_loss,feed_dict={input_ph: x_data[i].reshape([input_shape,1]),target_ph: y_data[i].reshape([output_shape,1])})
+for weight_initialization in weight_initializations:
+    for nhidden_shared in nhiddens:
+	for rseed in xrange(0,100):
+	    if nhidden_shared < 20: #At very small hidden layer sizes, need lower learning rates than sqrt scaling would suggest 
+		init_eta = 0.001
 	    else:
-		MSE += sess.run(f2_loss,feed_dict={input_ph: x_data[i].reshape([input_shape,1]),target_ph: y_data[i].reshape([output_shape,1])})
-	MSE /= len(x_data)
-	return MSE
+		init_eta = 0.02/numpy.sqrt(nhidden_shared)
+	    if nhidden_shared >= 1000:
+		nepochs = 15000 #slower
+	    print "weight init: %s, nhidden: %i, run: %i" %(weight_initialization,nhidden_shared,rseed)
+	    filename_prefix = "results/exploring_network_size/hinton_batch_nhidden_%i_eta_%f_momentum_%f_rseed_%i_" %(nhidden_shared,init_eta,momentum,rseed)
 
-    def print_outputs(domain):
-	for i in xrange(1,2):
-	    if domain == 1:
-		print x_data[i], y_data[i], sess.run(f1_output,feed_dict={input_ph: x_data[i].reshape([input_shape,1])}).flatten()
+	    numpy.random.seed(rseed)
+	    tf.set_random_seed(rseed)
+
+	    input_ph = tf.placeholder(tf.float32, shape=[input_shape,None])
+
+	    ############build network#################### 
+	    if weight_initialization == 'He':
+		weight_size = numpy.sqrt(2.0/nhidden_shared)
+		W1f1 = tf.Variable(tf.random_normal([nhidden_shared,input_shape],0,weight_size))
+		W1f2 = tf.Variable(tf.random_normal([nhidden_shared,input_shape],0,weight_size))
+		W2 = tf.Variable(tf.random_normal([nhidden_shared,nhidden_shared],0,weight_size))
+		W3f1 = tf.Variable(tf.random_normal([output_shape,nhidden_shared],0,weight_size))
+		W3f2 = tf.Variable(tf.random_normal([output_shape,nhidden_shared],0,weight_size))
+		b1 = tf.Variable(tf.zeros([nhidden_shared,1]))
+		b2 = tf.Variable(tf.zeros([nhidden_shared,1]))
+		b3f1 = tf.Variable(tf.random_uniform([output_shape,1],0.09,0.11))
+		b3f2 = tf.Variable(tf.random_uniform([output_shape,1],0.09,0.11))
 	    else:
-		print x_data[i], y_data[i], sess.run(f2_output,feed_dict={input_ph: x_data[i].reshape([input_shape,1])}).flatten()
+		weight_size = 2.0/nhidden_shared
+		W1f1 = tf.Variable(tf.random_uniform([nhidden_shared,input_shape],0,weight_size))
+		W1f2 = tf.Variable(tf.random_uniform([nhidden_shared,input_shape],0,weight_size))
+		W2 = tf.Variable(tf.random_uniform([nhidden_shared,nhidden_shared],0,weight_size)) 
+		W3f1 = tf.Variable(tf.random_uniform([output_shape,nhidden_shared],0,weight_size))
+		W3f2 = tf.Variable(tf.random_uniform([output_shape,nhidden_shared],0,weight_size))
+		b1 = tf.Variable(tf.random_uniform([nhidden_shared,1],0,weight_size))
+		b2 = tf.Variable(tf.random_uniform([nhidden_shared,1],0,weight_size))
+		b3f1 = tf.Variable(tf.random_uniform([output_shape,1],0,weight_size))
+		b3f2 = tf.Variable(tf.random_uniform([output_shape,1],0,weight_size))
 
-    def print_preoutputs():
-	for i in xrange(len(x_data)):
-	    print x_data[i], y_data[i], sess.run(pre_output,feed_dict={input_ph: x_data[i].reshape([input_shape,1])}).flatten()
 
-    def print_reps():
-	for i in xrange(len(x_data)):
-	    print x_data[i], y_data[i], sess.run(middle_rep,feed_dict={input_ph: x_data[i].reshape([input_shape,1])}).flatten()
+	    f1_pre_middle_rep = tf.matmul(W1f1,input_ph)+b1
+	    f2_pre_middle_rep = tf.matmul(W1f2,input_ph)+b1
+	    f1_middle_rep = tf.nn.relu(f1_pre_middle_rep)
+	    f2_middle_rep = tf.nn.relu(f2_pre_middle_rep)
 
-    def get_reps():
-	reps = []
-	nsamples = len(x_data)
-	for i in xrange(nsamples):
-	    reps.append(sess.run(middle_rep,feed_dict={input_ph: x_data[i].reshape([input_shape,1])}).flatten())
-	return reps
+	    f1_pre_output = tf.matmul(W3f1,tf.nn.relu(tf.matmul(W2,f1_middle_rep)+b2))+b3f1
+	    f2_pre_output = tf.matmul(W3f2,tf.nn.relu(tf.matmul(W2,f2_middle_rep)+b2))+b3f2
 
-    def save_activations(tf_object,filename,remove_old=True):
-	if remove_old and os.path.exists(filename):
-	    os.remove(filename)
-	with open(filename,'ab') as fout:
-	    for i in xrange(len(x_data)):
-		numpy.savetxt(fout,sess.run(tf_object,feed_dict={input_ph: x_data[i].reshape([input_shape,1])}).reshape((1,-1)),delimiter=',')
+	    f1_output = tf.nn.relu(f1_pre_output)
+	    f2_output = tf.nn.relu(f2_pre_output)
 
-    def save_identity_activations(tf_object,filename,remove_old=True):
-	if remove_old and os.path.exists(filename):
-	    os.remove(filename)
-	with open(filename,'ab') as fout:
-	    for i in xrange(len(identity_data)):
-		numpy.savetxt(fout,sess.run(tf_object,feed_dict={input_ph: identity_data[i].reshape([input_shape,1])}).reshape((1,-1)),delimiter=',')
+	    target_ph =  tf.placeholder(tf.float32, shape=[output_shape,None])
 
-    def save_weights(tf_object,filename,remove_old=True):
-	if remove_old and os.path.exists(filename):
-	    os.remove(filename)
-	with open(filename,'ab') as fout:
-	    numpy.savetxt(fout,sess.run(tf_object),delimiter=',')
+	    f1_loss = tf.reduce_sum(tf.square(f1_output - target_ph))
+	    f2_loss = tf.reduce_sum(tf.square(f2_output - target_ph))
+	#    linearized_loss = tf.reduce_sum(tf.square(pre_output - pre_output_target_ph))
+	    eta_ph = tf.placeholder(tf.float32)
+	    optimizer = tf.train.MomentumOptimizer(eta_ph,momentum)
+	    f1_train = optimizer.minimize(f1_loss)
+	    f2_train = optimizer.minimize(f2_loss)
 
-#    def display_rep_similarity():
-#	reps = []
-#	nsamples = len(x_data)
-#	for i in xrange(nsamples):
-#	    reps.append(sess.run(pre_middle_rep,feed_dict={input_ph: x_data[i].reshape([input_shape,1])}).flatten())
-#	item_rep_similarity = numpy.zeros([nsamples,nsamples])
-#	for i in xrange(nsamples):
-#	    for j in xrange(i,nsamples):
-#		item_rep_similarity[i,j] = numpy.linalg.norm(reps[i]-reps[j]) 
-#		item_rep_similarity[j,i] = item_rep_similarity[i,j]
-#	plt.imshow(item_rep_similarity,cmap='Greys_r',interpolation='none') #cosine distance
-#	plt.show()
-#
-#    def display_po_similarity():
-#	reps = []
-#	nsamples = len(x_data)
-#	for i in xrange(nsamples):
-#	    reps.append(sess.run(pre_output,feed_dict={input_ph: x_data[i].reshape([input_shape,1])}).flatten())
-#	item_rep_similarity = numpy.zeros([nsamples,nsamples])
-#	for i in xrange(nsamples):
-#	    for j in xrange(i,nsamples):
-#		item_rep_similarity[i,j] = numpy.linalg.norm(reps[i]-reps[j]) 
-#		item_rep_similarity[j,i] = item_rep_similarity[i,j]
-#	plt.imshow(item_rep_similarity,cmap='Greys_r',interpolation='none') #cosine distance
-#	plt.show()
+	    init = tf.global_variables_initializer()
 
-    def train_domain_with_standard_loss(this_domain,batch=False):
-	if batch:
-	    if this_domain == 1:
-		sess.run(f1_train,feed_dict={eta_ph: curr_eta,input_ph: x_data.transpose(),target_ph: y_data.transpose()})
-	    else:
-		sess.run(f2_train,feed_dict={eta_ph: curr_eta,input_ph: x_data.transpose(),target_ph: y_data.transpose()})
+	    sess = tf.Session()
+	    sess.run(init)
 
-	else:
-		training_order = numpy.random.permutation(len(x_data))
-		for example_i in training_order:
+	    def test_domain_accuracy(this_domain):
+		MSE = 0.0
+		order = numpy.array(range(len(x_data)))
+		for i in order:
 		    if this_domain == 1:
-			sess.run(f1_train,feed_dict={eta_ph: curr_eta,input_ph: x_data[example_i].reshape([input_shape,1]),target_ph: y_data[example_i].reshape([output_shape,1])})
+			MSE += sess.run(f1_loss,feed_dict={input_ph: x_data[i].reshape([input_shape,1]),target_ph: y_data[i].reshape([output_shape,1])})
 		    else:
-			sess.run(f2_train,feed_dict={eta_ph: curr_eta,input_ph: x_data[example_i].reshape([input_shape,1]),target_ph: y_data[example_i].reshape([output_shape,1])})
+			MSE += sess.run(f2_loss,feed_dict={input_ph: x_data[i].reshape([input_shape,1]),target_ph: y_data[i].reshape([output_shape,1])})
+		MSE /= len(x_data)
+		return MSE
+
+	    def print_outputs(domain):
+		for i in xrange(1,2):
+		    if domain == 1:
+			print x_data[i], y_data[i], sess.run(f1_output,feed_dict={input_ph: x_data[i].reshape([input_shape,1])}).flatten()
+		    else:
+			print x_data[i], y_data[i], sess.run(f2_output,feed_dict={input_ph: x_data[i].reshape([input_shape,1])}).flatten()
+
+	    def print_preoutputs():
+		for i in xrange(len(x_data)):
+		    print x_data[i], y_data[i], sess.run(pre_output,feed_dict={input_ph: x_data[i].reshape([input_shape,1])}).flatten()
+
+	    def print_reps():
+		for i in xrange(len(x_data)):
+		    print x_data[i], y_data[i], sess.run(middle_rep,feed_dict={input_ph: x_data[i].reshape([input_shape,1])}).flatten()
+
+	    def get_reps():
+		reps = []
+		nsamples = len(x_data)
+		for i in xrange(nsamples):
+		    reps.append(sess.run(middle_rep,feed_dict={input_ph: x_data[i].reshape([input_shape,1])}).flatten())
+		return reps
+
+	    def save_activations(tf_object,filename,remove_old=True):
+		if remove_old and os.path.exists(filename):
+		    os.remove(filename)
+		with open(filename,'ab') as fout:
+		    for i in xrange(len(x_data)):
+			numpy.savetxt(fout,sess.run(tf_object,feed_dict={input_ph: x_data[i].reshape([input_shape,1])}).reshape((1,-1)),delimiter=',')
+
+	    def save_identity_activations(tf_object,filename,remove_old=True):
+		if remove_old and os.path.exists(filename):
+		    os.remove(filename)
+		with open(filename,'ab') as fout:
+		    for i in xrange(len(identity_data)):
+			numpy.savetxt(fout,sess.run(tf_object,feed_dict={input_ph: identity_data[i].reshape([input_shape,1])}).reshape((1,-1)),delimiter=',')
+
+	    def save_weights(tf_object,filename,remove_old=True):
+		if remove_old and os.path.exists(filename):
+		    os.remove(filename)
+		with open(filename,'ab') as fout:
+		    numpy.savetxt(fout,sess.run(tf_object),delimiter=',')
+
+	#    def display_rep_similarity():
+	#	reps = []
+	#	nsamples = len(x_data)
+	#	for i in xrange(nsamples):
+	#	    reps.append(sess.run(pre_middle_rep,feed_dict={input_ph: x_data[i].reshape([input_shape,1])}).flatten())
+	#	item_rep_similarity = numpy.zeros([nsamples,nsamples])
+	#	for i in xrange(nsamples):
+	#	    for j in xrange(i,nsamples):
+	#		item_rep_similarity[i,j] = numpy.linalg.norm(reps[i]-reps[j]) 
+	#		item_rep_similarity[j,i] = item_rep_similarity[i,j]
+	#	plt.imshow(item_rep_similarity,cmap='Greys_r',interpolation='none') #cosine distance
+	#	plt.show()
+	#
+	#    def display_po_similarity():
+	#	reps = []
+	#	nsamples = len(x_data)
+	#	for i in xrange(nsamples):
+	#	    reps.append(sess.run(pre_output,feed_dict={input_ph: x_data[i].reshape([input_shape,1])}).flatten())
+	#	item_rep_similarity = numpy.zeros([nsamples,nsamples])
+	#	for i in xrange(nsamples):
+	#	    for j in xrange(i,nsamples):
+	#		item_rep_similarity[i,j] = numpy.linalg.norm(reps[i]-reps[j]) 
+	#		item_rep_similarity[j,i] = item_rep_similarity[i,j]
+	#	plt.imshow(item_rep_similarity,cmap='Greys_r',interpolation='none') #cosine distance
+	#	plt.show()
+
+	    def train_domain_with_standard_loss(this_domain,batch=False):
+		if batch:
+		    if this_domain == 1:
+			sess.run(f1_train,feed_dict={eta_ph: curr_eta,input_ph: x_data.transpose(),target_ph: y_data.transpose()})
+		    else:
+			sess.run(f2_train,feed_dict={eta_ph: curr_eta,input_ph: x_data.transpose(),target_ph: y_data.transpose()})
+
+		else:
+			training_order = numpy.random.permutation(len(x_data))
+			for example_i in training_order:
+			    if this_domain == 1:
+				sess.run(f1_train,feed_dict={eta_ph: curr_eta,input_ph: x_data[example_i].reshape([input_shape,1]),target_ph: y_data[example_i].reshape([output_shape,1])})
+			    else:
+				sess.run(f2_train,feed_dict={eta_ph: curr_eta,input_ph: x_data[example_i].reshape([input_shape,1]),target_ph: y_data[example_i].reshape([output_shape,1])})
 
 
-    print "Initial MSEa: %f, %f" %(test_domain_accuracy(1),test_domain_accuracy(2))
+	    print "Initial MSEa: %f, %f" %(test_domain_accuracy(1),test_domain_accuracy(2))
 
-    #loaded_pre_outputs = numpy.loadtxt(pre_output_filename_to_load,delimiter=',')
+	    #loaded_pre_outputs = numpy.loadtxt(pre_output_filename_to_load,delimiter=',')
 
-    curr_eta = init_eta
-    rep_track = []
-    filename = filename_prefix + "rep_tracks.csv"
-    if os.path.exists(filename):
-	os.remove(filename)
-    fout = open(filename,'ab')
-    saved = False
-    for epoch in xrange(nepochs):
-	train_domain_with_standard_loss(1,batch=True)
-	train_domain_with_standard_loss(2,batch=True)
-	if epoch % 10 == 0:
-	    curr_error_1 = test_domain_accuracy(1)
-	    curr_error_2 = test_domain_accuracy(2)
-	    print "epoch: %i, family 1 MSE: %f, family 2 MSE: %f" %(epoch, curr_error_1, curr_error_2)	
-	    fout.write(str(curr_error_1)+','+str(curr_error_2)+'\n')
-	    if (not saved) and curr_error_1+curr_error_2 <= 0.05:
-		save_activations(f1_pre_middle_rep,filename_prefix+"f1_pre_middle_reps_at_0.05MSE.csv",remove_old=True)
-		save_activations(f1_pre_output,filename_prefix+"f1_pre_outputs_at_0.05MSE.csv",remove_old=True)
-		save_activations(f2_pre_middle_rep,filename_prefix+"f2_pre_middle_reps_at_0.05MSE.csv",remove_old=True)
-		save_activations(f2_pre_output,filename_prefix+"f2_pre_outputs_at_0.05MSE.csv",remove_old=True)
-		save_identity_activations(f1_pre_middle_rep,filename_prefix +'f1_single_input_pre_middle_reps_at_0.05MSE.csv',remove_old=True)
-		save_identity_activations(f2_pre_middle_rep,filename_prefix +'f2_single_input_pre_middle_reps_at_0.05MSE.csv',remove_old=True)
-		saved = True
-	    if curr_error_1+curr_error_2 <= early_stopping_MSE:
-		break
-#	if epoch < nepochs/2:  
-#	    train_domain_with_standard_loss(1)
-#	    if epoch % 10 == 0:
-#		curr_error = test_domain_accuracy(1)
-#		print "epoch: %i, family 1 MSE: %f" %(epoch, curr_error)	
-#	else:
-#	    train_domain_with_standard_loss(2)
-#	    if epoch % 10 == 0:
-#		curr_error = test_domain_accuracy(2)
-#		print "epoch: %i, family 2 MSE: %f" %(epoch, curr_error)		    
+	    curr_eta = init_eta
+	    rep_track = []
+	    filename = filename_prefix + "rep_tracks.csv"
+	    if os.path.exists(filename):
+		os.remove(filename)
+	    fout = open(filename,'ab')
+	    saved = False
+	    for epoch in xrange(nepochs):
+		train_domain_with_standard_loss(1,batch=True)
+		train_domain_with_standard_loss(2,batch=True)
+		if epoch % 10 == 0:
+		    curr_error_1 = test_domain_accuracy(1)
+		    curr_error_2 = test_domain_accuracy(2)
+		    print "epoch: %i, family 1 MSE: %f, family 2 MSE: %f" %(epoch, curr_error_1, curr_error_2)	
+		    fout.write(str(curr_error_1)+','+str(curr_error_2)+'\n')
+		    if (not saved) and curr_error_1+curr_error_2 <= 0.05:
+			save_activations(f1_pre_middle_rep,filename_prefix+"f1_pre_middle_reps_at_0.05MSE.csv",remove_old=True)
+			save_activations(f1_pre_output,filename_prefix+"f1_pre_outputs_at_0.05MSE.csv",remove_old=True)
+			save_activations(f2_pre_middle_rep,filename_prefix+"f2_pre_middle_reps_at_0.05MSE.csv",remove_old=True)
+			save_activations(f2_pre_output,filename_prefix+"f2_pre_outputs_at_0.05MSE.csv",remove_old=True)
+			save_identity_activations(f1_pre_middle_rep,filename_prefix +'f1_single_input_pre_middle_reps_at_0.05MSE.csv',remove_old=True)
+			save_identity_activations(f2_pre_middle_rep,filename_prefix +'f2_single_input_pre_middle_reps_at_0.05MSE.csv',remove_old=True)
+			saved = True
+		    if curr_error_1+curr_error_2 <= early_stopping_MSE:
+			break
+	#	if epoch < nepochs/2:  
+	#	    train_domain_with_standard_loss(1)
+	#	    if epoch % 10 == 0:
+	#		curr_error = test_domain_accuracy(1)
+	#		print "epoch: %i, family 1 MSE: %f" %(epoch, curr_error)	
+	#	else:
+	#	    train_domain_with_standard_loss(2)
+	#	    if epoch % 10 == 0:
+	#		curr_error = test_domain_accuracy(2)
+	#		print "epoch: %i, family 2 MSE: %f" %(epoch, curr_error)		    
 
-#	if epoch % 100 == 0:
-#	    display_rep_similarity()
-#	    display_po_similarity()
-	if epoch % eta_decay_epoch == 0 and epoch > 0:
-	    curr_eta *= eta_decay
-#	if epoch == nepochs/2:
-#	    curr_eta = init_eta
-    fout.close()
-	
+	#	if epoch % 100 == 0:
+	#	    display_rep_similarity()
+	#	    display_po_similarity()
+		if epoch % eta_decay_epoch == 0 and epoch > 0:
+		    curr_eta *= eta_decay
+	#	if epoch == nepochs/2:
+	#	    curr_eta = init_eta
+	    fout.close()
+		
 
-    print "final MSEs: %f, %f" %(test_domain_accuracy(1),test_domain_accuracy(2))
+	    print "final MSEs: %f, %f" %(test_domain_accuracy(1),test_domain_accuracy(2))
 
-#    print_preoutputs()
-#    display_rep_similarity()
-#    display_po_similarity()
-    save_activations(f1_pre_output,filename_prefix +'f1_pre_outputs.csv',remove_old=True)
-    save_activations(f2_pre_output,filename_prefix +'f2_pre_outputs.csv',remove_old=True)
-#    save_activations(f1_l2_rep,filename_prefix +'f1_l2_reps.csv',remove_old=True)
-#    save_activations(f2_l2_rep,filename_prefix +'f2_l2_reps.csv',remove_old=True)
-#    save_activations(f1_l3_rep,filename_prefix +'f1_l3_reps.csv',remove_old=True)
-#    save_activations(f2_l3_rep,filename_prefix +'f2_l3_reps.csv',remove_old=True)
-    save_activations(f1_pre_middle_rep,filename_prefix +'f1_pre_middle_reps.csv',remove_old=True)
-    save_activations(f2_pre_middle_rep,filename_prefix +'f2_pre_middle_reps.csv',remove_old=True)
-    save_identity_activations(f1_pre_middle_rep,filename_prefix +'f1_single_input_pre_middle_reps.csv',remove_old=True)
-    save_identity_activations(f2_pre_middle_rep,filename_prefix +'f2_single_input_pre_middle_reps.csv',remove_old=True)
+	#    print_preoutputs()
+	#    display_rep_similarity()
+	#    display_po_similarity()
+	    save_activations(f1_pre_output,filename_prefix +'f1_pre_outputs.csv',remove_old=True)
+	    save_activations(f2_pre_output,filename_prefix +'f2_pre_outputs.csv',remove_old=True)
+	#    save_activations(f1_l2_rep,filename_prefix +'f1_l2_reps.csv',remove_old=True)
+	#    save_activations(f2_l2_rep,filename_prefix +'f2_l2_reps.csv',remove_old=True)
+	#    save_activations(f1_l3_rep,filename_prefix +'f1_l3_reps.csv',remove_old=True)
+	#    save_activations(f2_l3_rep,filename_prefix +'f2_l3_reps.csv',remove_old=True)
+	    save_activations(f1_pre_middle_rep,filename_prefix +'f1_pre_middle_reps.csv',remove_old=True)
+	    save_activations(f2_pre_middle_rep,filename_prefix +'f2_pre_middle_reps.csv',remove_old=True)
+	    save_identity_activations(f1_pre_middle_rep,filename_prefix +'f1_single_input_pre_middle_reps.csv',remove_old=True)
+	    save_identity_activations(f2_pre_middle_rep,filename_prefix +'f2_single_input_pre_middle_reps.csv',remove_old=True)
