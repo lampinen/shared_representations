@@ -8,7 +8,7 @@ momentum = 0.0
 eta_decay = 1.0 #multiplicative per eta_decay_epoch epochs
 eta_decay_epoch = 1000
 
-nepochs = 10000
+nepochs = 13000
 early_stopping_MSE = 0.001 #stop training if MSE reaches this threshold
 #nhidden_separate = 100
 nhidden_shared = 1000
@@ -17,7 +17,7 @@ npeople_per = 12
 nrelationships_per = 12
 nfamilies = 2
 
-init_eta = 0.03/numpy.sqrt(nhidden_shared)
+init_eta = 0.02/numpy.sqrt(nhidden_shared)
 #rseed = 2  #reproducibility
 ###################################
 
@@ -207,7 +207,7 @@ print "y_data shape:"
 print y_data.shape
 print
 
-for rseed in xrange(10):
+for rseed in xrange(10,100):
     print "run %i" %rseed
     filename_prefix = "results/simul_learning_3layer_single_inputs/hinton_batch_nhidden_%i_eta_%f_momentum_%f_weightsize_%f_rseed_%i_" %(nhidden_shared,init_eta,momentum,weight_size,rseed)
 
@@ -381,10 +381,11 @@ for rseed in xrange(10):
 	train_domain_with_standard_loss(1,batch=True)
 	train_domain_with_standard_loss(2,batch=True)
 	if epoch % 10 == 0:
-	    curr_error = test_domain_accuracy(2)
-	    print "epoch: %i, family 2 MSE: %f" %(epoch, curr_error)	
-	    fout.write(str(curr_error)+',')
-	    if (not saved) and curr_error <= 0.05:
+	    curr_error_1 = test_domain_accuracy(1)
+	    curr_error_2 = test_domain_accuracy(2)
+	    print "epoch: %i, family 1 MSE: %f, family 2 MSE: %f" %(epoch, curr_error_1, curr_error_2)	
+	    fout.write(str(curr_error_1)+','+str(curr_error_2)+'\n')
+	    if (not saved) and curr_error_1+curr_error_2 <= 0.05:
 		save_activations(f1_pre_middle_rep,filename_prefix+"f1_pre_middle_reps_at_0.05MSE.csv",remove_old=True)
 		save_activations(f1_pre_output,filename_prefix+"f1_pre_outputs_at_0.05MSE.csv",remove_old=True)
 		save_activations(f2_pre_middle_rep,filename_prefix+"f2_pre_middle_reps_at_0.05MSE.csv",remove_old=True)
@@ -392,7 +393,7 @@ for rseed in xrange(10):
 		save_identity_activations(f1_pre_middle_rep,filename_prefix +'f1_single_input_pre_middle_reps_at_0.05MSE.csv',remove_old=True)
 		save_identity_activations(f2_pre_middle_rep,filename_prefix +'f2_single_input_pre_middle_reps_at_0.05MSE.csv',remove_old=True)
 		saved = True
-	    if curr_error <= early_stopping_MSE:
+	    if curr_error_1+curr_error_2 <= early_stopping_MSE:
 		break
 #	if epoch < nepochs/2:  
 #	    train_domain_with_standard_loss(1)
