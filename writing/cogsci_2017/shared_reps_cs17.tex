@@ -32,7 +32,7 @@
 
 
 \begin{abstract}
-Neural networks have been shown to extract analogous structure from tasks which do not share inputs or outputs. This may explain the value of multi-task training, and also may underlie the power of human analogical reasoning -- rather than an advanced cognitive ability requiring symbolic computation, analogy may be simply a natural feature of learning in neural networks. We generalize linear analysis techniques that have proven helpful in analyzing non-linear networks to explore two tasks, show that analogous structure is commonly extracted, and address some potential implications. 
+Neural networks have been shown to extract analogous structure from tasks which do not share inputs or outputs. This may explain the value of multi-task training, and also may underlie the power of human analogical reasoning -- awareness of analogies may emerge naturally from gradient-based learning in neural networks. We generalize linear analysis techniques that have proven helpful in analyzing non-linear networks to explore two tasks, show that analogous structure is commonly extracted, and address some potential implications. 
 
 \textbf{Keywords:} 
 neural networks; structure learning; representation; analogy; transfer; 
@@ -40,11 +40,11 @@ neural networks; structure learning; representation; analogy; transfer;
 
 
 \section{Introduction}
-Neural networks are capable of extracting analogous structure from knowledge domains that are completely non-overlapping in their inputs and outputs \citep{Hinton1986,Rogers2008}. This sets them apart from simple forms of statistical pattern recognition \citep{Rogers2008} such as linear data analysis techniques like PCA. However, there have been important theoretical developments in linear neural networks recently which have been shown to have applications to understanding learning in non-linear neural networks \citep{Saxe2013}. How can we employ the full power of non-linear neural networks while still gaining insight from linear analysis techniques? Do neural networks commonly extract shared structure when solving tasks?\par 
-\subsection{Why Should We Care?}
-Why might analogy extraction be important? Analogy is often considered an essential part of human cognition \cite[e.g.]{Gentner2003}. When neural networks form representations which reflect analogous structures, this can support analogy \citep{Pennington2014,Kollias2013}. This may explain how analogies can emerge intuitively in the human mind without the computationally expensive search often used in analogical reasoning systems \cite[e.g.]{Falkenhainer1989}. \par
-In addition, multi-task learning has proven beneficial for producing efficient learning and effective generalization in neural networks on a variety of tasks, \cite[e.g.]{Dong2015,Rusu2015}. Even a small amount of learning on distinct but related tasks has been shown to improve performance. For example, training a natural language translation system on image captioning and autoencoding improves translation performance \citep{Luong2016}. Learning on numerous language translation pairs can even give generalization without further training to unseen language pairs \citep{Johnson2016a}. Because human experience is filled with distinct tasks that share common elements (language, various perceptual modalities, etc.) the way that structure is learned across tasks may be essential to understanding human intelligence and building better artificial intelligence systems.\par
-However, we have little understanding of how, why, or when neural networks are able to extract ``hidden'' analogous structure like this. Here, we describe a preliminary investigation into this question, and in the process describe a new approach to analyzing neural network representations that may yield more general insights. 
+Analogical transfer is often considered an essential component of ``what makes us smart'' \citep{Gentner2003}. However, there is a tension in the literature -- other authors have declared that ``significnt transfer is probably rare and accounts for very little human behavior'' \citep{Detterman1993}. Other authors have found that in some cases analogical transfer between superficially dissimilar systems can come so easily that it may not even require explicit awareness of the analogy \citep{Day2011}. How can we reconcile these viewpoints? \par
+One feature that often separates the researchers with these opposing viewpoints is the type of tasks and transfer they consider. When \citet{Detterman1993} says that the manipulations necessary to induce transfer have ``the subtlety of [a] baseball bat'', he cites work like that of \citet{Gick1980} which shows the difficulty of \textbf{rapidly} making an \textbf{explicit} mapping between two superficially disparate domains in order to find an explicit solution to a problem. By contrast, the \citet{Day2011} experiments show transfer when participants learn about a system by \textbf{interacting} with it \textbf{over a longer period of time}, and then transfer is measured on interactions an analogous system. We believe that this distinction between fast-explicit analogical transfer and slow-implicit analogical transfer may explain much of the disagreement in the literature. (See also \citet{Bransford1999}.)\par 
+Previous work has shown that neural networks can provide a good model for the ``slow'' type of analogical transfer in domains as broad as artificial grammar learning \citep{Dienes1999} and verbal analogies \cite{Kollias2013}. In particular, an interesting line of work shows that neural networks are capable of extracting analogous structure from knowledge domains that are completely non-overlapping in their inputs and outputs \citep{Hinton1986,Rogers2008a}. In other words, if you train a neural network to solve two identical tasks, using separate sets of inputs and outputs but sharing the hidden units, in some cases it will generate representations that reflect the analogy (i.e. analogous items will generate more similar patterns of activity in the hidden units than non-analogous items) \citep{Rogers2008a}. This can lead to the ability to correctly make analogical inferences about items not explicitly taught \citep{Hinton1986}. This extraction of shared structure sets neural networks apart from simple forms of statistical pattern recognition \citep{Rogers2008a} such as linear data analysis techniques like PCA (see also below). \par
+Furthermore, recent work has shown that neural networks can show benefits of training on multiple tasks \cite[e.g.]{Dong2015,Rusu2015}. Even a small amount of learning on distinct but related tasks has been shown to improve performance. For example, training a natural language translation system on image captioning and autoencoding improves translation performance \citep{Luong2016}. Learning on numerous language translation pairs can even give generalization without further training to unseen language pairs \citep{Johnson2016a}. We suggest that these effects of multi-task training may be due to neural networks ability to extract shared structure. Furthermore, because human experience is filled with distinct tasks that share common elements (language, various perceptual modalities, etc.) the way that structure is learned across tasks may be essential to understanding human intelligence and building better artificial intelligence systems.\par
+However, we have little understanding of how, why, or when neural networks are able to extract ``hidden'' analogous structure. Here, we describe a preliminary investigation into this question, and in the process describe a new approach to analyzing neural network representations that may yield more general insights. We begin our exploration with a very simple instantiation of a task with analogous structure. \par 
 \section{A Simple Task}
 In the original work of \citet{Hinton1986}, a neural network was taught to answer queries about the structure of two perfectly analogous family trees (one English and one Italian, see fig. \ref{hinton_family_tree_figure}), and was shown to generate representations that extract the analogy, in the sense that analogous people from different families are represented similarly. Here, we pare this task down to its barest essentials: two perfectly analogous domains with separate inputs and ouputs. For our task, the inputs can be thought of as the set of letters \(\{R,L,\rho,\lambda\}\), and the outputs as \(\{P,D,S,\pi,\delta,\sigma\}\). The task can be seen as mapping an input letter onto the letters that it can follow (e.g. ``R'' can follow ``D'' as in ``draw,'' but cannot follow ``S''), where there is an analogy between the Latin and Greek letters. See below for the input-output (I/O) mapping: 
 \[
@@ -67,24 +67,24 @@ We trained a neural network with a single hidden layer (4 units) to solve this t
 \huge{$=$}
 \begin{subfigure}{0.22\textwidth}
 \includegraphics[width=\textwidth]{figures/U_nl.png}
-\caption{$U_{nl}$}
+\caption{Output modes $U_{nl}$}
 \end{subfigure}
 \LARGE{$\times$}
 \begin{subfigure}{0.22\textwidth}
 \includegraphics[width=\textwidth]{figures/S_nl.png}
-\caption{$S_{nl}$}
+\caption{Singular values $S_{nl}$}
 \end{subfigure}
 \LARGE{$\times$}
 \begin{subfigure}{0.22\textwidth}
 \includegraphics[width=\textwidth]{figures/V_nl.png}
-\caption{$V_{nl}$}
+\caption{Input modes $V_{nl}$}
 \end{subfigure}
 \caption{SVD of I/O correlation matrix (colors are scaled to show qualitative features, red = +, white = 0, blue = -)}
 \label{regular_SVD_figure}
 \end{figure*}
 \subsection{Linear Analysis?}
-As mentioned above, there have been recent developments in the theory of linear neural networks which show that the process of learning is entirely driven by the Singular Value Decomposition (SVD) of the input-output correlation matrix \citep{Saxe2013}. These results have been shown to have implications for the learning of non-linear networks as well, so linear neural networks can be a more tractable place to analyzee learning dynamics. In addition, using the I/O SVD allows the discovery of representational components which are distributed across units, so it is more general than simply examining what aspects of the task individual hidden units represent, or examining the weight matrices directly. Thus one might hope to answer our questions in a linear framework. \par
-However, linear networks cannot represent analogous structure from non-overlapping inputs and outputs at convergence. With non-overlapping inputs and outputs, the I/O correlation matrix is block diagonal, and the SVD modes will thus occur within blocks (see Fig. \ref{regular_SVD_figure} for a demonstration of this on our task). Thus, since the final representational components that a linear network learns are precisely the components of the SVD \citep{Saxe2013}, there will not be any sharing of structure across domains.\par 
+There have been recent developments in the theory of linear neural networks which show that the process of learning is entirely driven by the Singular Value Decomposition (SVD) of the input-output correlation matrix \citep{Saxe2013}. The SVD can be seen as breaking the structure of the task into individual ``modes'' -- linear structures in the task, like components in PCA. Specifically, a mode consists of an input pattern (which can be interpreted in this case as the inputs that it responds to), a singular value (which roughly corresponds to the amount of variance explained by this mode), and an output mode (the pattern produced on the outputs by the given pattern on the inputs). For example, see Fig. \ref{regular_SVD_figure} for the SVD of the I/O mapping for the letter task above. Here, we can see that there are three modes, the first represents the difference between the Latin and Greek letters, so it is positive for the Greek inputs and negative for the Latin outputs, and similarly produces a positive pattern on the Greek outputs (corresponding to their base-rate occurrences) and a negative pattern on the Latin outputs. The next two components represent the distinctions within each of the domains between the letters. Using this decomposition tells us more about the task structure the network is using. \citet{Saxe2013} showed these results have implications for the learning of non-linear networks as well, so linear neural networks can be a more tractable place to analyzee learning dynamics. In addition, using the I/O SVD allows the discovery of representational components which are distributed across units, so it is more general than simply examining what aspects of the task individual hidden units represent, or examining the weight matrices directly. Thus one might hope to answer our questions in a linear framework. \par
+However, linear networks cannot represent analogous structure from non-overlapping inputs and outputs at convergence. With non-overlapping inputs and outputs, the I/O correlation matrix is block diagonal, and the SVD modes will thus occur within blocks (this can be seen in Fig. \ref{regular_SVD_figure} for our task). Thus, since the final representational components that a linear network learns are precisely the components of the SVD \citep{Saxe2013}, there will not be any sharing of structure across domains.\par 
 Furthermore, the optimal rank $k$ approximation to a matrix is to take the top $k$ components from the SVD \citep{Mirsky1960}. If a linear network's hidden layers are restricted to rank lower than that of the I/O correlation matrix, detail within the domains will be lost. Thus a linear neural network cannot solve the task perfectly if any of its hidden layers has a number of units smaller than the rank of the I/O correlation matrix. By contrast, a non-linear network can exploit the analogy between the domains to find more parsimonious solutions. Is there a way to leverage linear insights in the non-linear case?  
 \begin{figure*}
 \centering
@@ -95,17 +95,17 @@ Furthermore, the optimal rank $k$ approximation to a matrix is to take the top $
 \huge{$=$}
 \begin{subfigure}{0.22\textwidth}
 \includegraphics[width=\textwidth]{figures/U_lz.png}
-\caption{$U_{lz}$}
+\caption{Output modes $U_{lz}$}
 \end{subfigure}
 \LARGE{$\times$}
 \begin{subfigure}{0.22\textwidth}
 \includegraphics[width=\textwidth]{figures/S_lz.png}
-\caption{$S_{lz}$}
+\caption{Singular values $S_{lz}$}
 \end{subfigure}
 \LARGE{$\times$}
 \begin{subfigure}{0.22\textwidth}
 \includegraphics[width=\textwidth]{figures/V_lz.png}
-\caption{$V_{lz}$}
+\caption{Input modes $V_{lz}$}
 \end{subfigure}
 \caption{SVD of linearized I/O correlation matrix (colors are scaled to show qualitative features, red = +, white = 0, blue = -)}
 \label{linearized_SVD_figure}
@@ -118,31 +118,27 @@ Furthermore, the optimal rank $k$ approximation to a matrix is to take the top $
 \label{network_diagram}
 \end{figure}
 As we shall see, while a linear network cannot extract the analogous structure from the task, inserting a single non-linearity after the output layer can allow it to do so. In the case that the non-linearity is a sigmoid, this essentially reduces the problem to logistic regression; here we will use rectified linear units in our analysis because their structure makes the output patterns more intuitively interpretable. Once this almost-linear network has solved the problem, consider its outputs immediately prior to the non-linearity. These are produced by the linear part of the network, and together with the non-linearity suffice to produce the desired outputs. We can use these to turn the problem into a linearly analyzable one -- simply treat these pre-nonlinearity outputs as outputs of a linear network. Then the problem becomes susceptible to the types of linear analyses discussed above. We will refer to this as the ``linearized'' version of the network. \par 
-In the simple task described above, the solution that the nonlinear network discovers the majority of the time (about 75\%) is to output the same pattern on both sets of output units, but offset the ``incorrect'' domain sufficiently negative so that the output after the rectifier is zero, thus transforming the I/O mapping into a linearized I/O mapping as follows: \par
+In the simple task described above, the solution that the nonlinear network discovers the majority of the time (about 75\%) is to output the same pattern on both sets of output units, but offset the ``incorrect'' domain sufficiently negative so that the output after the rectifier is zero, thus the task that the linear portion of the network is actually performing at convergence is: \par
 \vspace{-1em}
 { \relsize{-1}
 \[
-\left[ \begin{matrix} 
-1 & 1 & 0 & 0 & 0 & 0 \\
-1 & 0 & 1 & 0 & 0 & 0 \\
- 0 & 0 & 0 & 1 & 1 & 0\\
- 0 & 0 & 0 & 1 & 0 & 1\\
-\end{matrix}  \right] 
-\mathlarger{\mathlarger{\Rightarrow}}
-\left[ \begin{matrix} 
-1 & 1 & 0 & 0 & 0 & -1 \\
-1 & 0 & 1 & 0 & -1 & 0 \\
- 0 & 0 & -1 & 1 & 1 & 0\\
- 0 & -1 & 0 & 1 & 0 & 1\\
-\end{matrix}  \right] 
-\] }
+\begin{array}{c|cccccc} 
+& P & D & S & \pi & \delta & \sigma \\
+\hline
+R & 1 & 1 & 0 & 0 & 0 & -1 \\
+L & 1 & 0 & 1 & 0 & -1 & 0 \\
+\rho & 0 & 0 & -1 & 1 & 1 & 0\\
+\lambda & 0 & -1 & 0 & 1 & 0 & 1\\
+\end{array} 
+\]
+}
 (Note that the network can actually map the first element of one domain onto either element of the other, since they are perfectly symmetrical. This solution occurs as well, but we discuss the one shown here for clarity, the other solution just shuffles some rows and columns.) We can use this linearized I/O mapping to perform a linear analysis. When the SVD of this linearized I/O correlation matrix is evaluated, a rank 2 solution emerges. The components of the linearized SVD are (qualitatively): \begin{enumerate}
 \itemsep-0.25em
 \item The separation of the domains
 \item The analogous structure within the domains
 \end{enumerate}
 (see fig. \ref{linearized_SVD_figure}). The first component is similar to the first component of the regular SVD, in that it reflects the separation of the domains, but the second component collapses the two components of the linear SVD. In other words, the analogy has been learned. Thus a network with a single non-linearity is able to represent the analogy by allowing the outputs in both domains to vary, and simply suppressing the output from the ``wrong'' domain for the current task.\par
-Furthermore, because this solution is rank 2, a non-linear network with two hidden units should be able to solve the task, whereas a linear network will require at least 3. We have verified these results empirically for this task -- a non-linear network is always able to solve the task with only 2 hidden units, while a linear network did not solve it with fewer than 3 hidden units. Thus the ability of a non-linear neural network to extract common structure from multiple tasks can allow it to find lower-rank (i.e. more parsimonious) solutions. 
+Furthermore, because this solution is rank 2, a non-linear network with two hidden units should be able to solve the task, whereas a linear network will require at least 3. We have verified these results empirically for this task -- a non-linear network is always able to solve the task with only 2 hidden units, while a linear network did not solve it with fewer than 3 hidden units. Thus the ability of a non-linear neural network to extract common structure from multiple tasks can allow it to find lower-rank (i.e. more parsimonious) solutions. We would like to highlight this point: the representation of the analogy in the SVD is not purely coincidental or epiphenomenal -- it makes a more parsimonious solution possible. \par
 \subsection{Evolution of the I/O Mappings}
 %\begin{figure}
 %\centering
@@ -239,13 +235,13 @@ Indeed, suppose there is any hidden unit which responds differentially within th
 }
 Summing these updates across the four patterns naturally captures the analogy between the domains. The network will exploit this analogy to reduce error, even if it must eventually discard it in the linear case.\footnote{ Why does this structure die out in the linear network but persist in the non-linear one? In the linear network, as mentioned above, the optimal solution the network must reach is precisely the linear SVD. Since the components of the linear SVD do not have shared structure, the linear network cannot represent analogous structure at convergence. By contrast, the non-linear network can simply offset the other domain's outputs further below zero, and thus make use of the analogy rather than being harmed by it.} \par 
 \section{Reanalyzing Hinton's Family Tree Example}
-\begin{figure}
+\begin{figure}[p]
 \centering
-\includegraphics[width=0.5\textwidth]{figures/ft_input_mode_significance_hist.png}
+\includegraphics[width=0.5\textwidth]{figures/input_mode_projetions_violin.png}
 \caption{How many of the input modes from the layer 1 SVD showed significantly more projection than would be expected onto the direct analogy between the families, the flipped analogy, or either of them (without double counting)}
 \label{ft_input_mode_sig_hist}
 \end{figure}
-Next, we briefly turn our attention to the example of \citet{Hinton1986} which inspired this work. Hinton's task involves learning the structure of two isomorphic family trees, one English and one Italian (see fig. \ref{hinton_family_tree_figure}). This structure is taught implicitly by presenting a person (e.g. ``Jennifer'') and a relationship (e.g. ``Father''), and training the network to produce the correct target person (``Andrew'' in this case). There are 52 such relationships per family, for 104 total. Hinton used different inputs for each families members, but used the same relationship inputs for both families. To highlight the extraction of analogous structure we separated these into distinct inputs (these could be thought of as corresponding to the English and Italian words for different relations, e.g. ``uncle'' vs. ``zio'' ). We also reduced his network down from 3 hidden layers to a single hidden layer with 12 units. Unlike the simple problem above, the family tree problem is not linearly separable, so we included a non-linearity at the hidden layer as well as the output (see fig. \ref{family_tree_network_diagram}). We trained this network by SGD with \(\eta = 0.005\) for 1000 epochs. \par 
+Next, we briefly turn our attention to the example of \citet{Hinton1986} which inspired this work. Hinton's task involves learning the structure of two isomorphic family trees, one English and one Italian (see fig. \ref{hinton_family_tree_figure}). This structure is taught implicitly by presenting a person (e.g. ``Jennifer'') and a relationship (e.g. ``Father''), and training the network to produce the correct target person (``Andrew'' in this case). There are 52 such relationships per family, for 104 total. Hinton used different inputs for each families' members, but used the same relationship inputs for both families. To highlight the extraction of analogous structure we separated these into distinct inputs (these could be thought of as corresponding to the English and Italian words for different relations, e.g. ``uncle'' vs. ``zio'' ). We also reduced his network down from 3 hidden layers to a single hidden layer with 12 units. Unlike the simple problem above, the family tree problem is not linearly separable, so we included a non-linearity at the hidden layer as well as the output (see fig. \ref{family_tree_network_diagram}). We trained this network by SGD with \(\eta = 0.005\) for 1000 epochs. \par 
 In a task which requires multiple non-linearities, we cannot perform as simple an analysis as in the earlier task. However, by definition each layer of the network has only a single non-linearity, and so we can perform an analysis like the above on each layer. In this way we can understand something about the computations that the network is performing and the structure it is extracting. However, the interpretation will not be as simple as in the single non-linearity case. \par
 This difficulty is compounded by the complexity of the structure being learned in each family. In the simple problem above it was possible to ``eyeball'' the structure extraction, but here the structure is too rich. There are a variety of possible ways the families can be mapped onto one another (e.g. flipping the tree left to right and swapping all genders), and it's possible that the networks are extracting overlapping structure from several of these analogies. In this setting, how can we examine whether the network is learning the analogy? \par
 %\begin{figure}[H]
