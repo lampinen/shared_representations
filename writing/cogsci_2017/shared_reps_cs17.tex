@@ -118,24 +118,20 @@ Furthermore, the optimal rank $k$ approximation to a matrix is to take the top $
 \label{network_diagram}
 \end{figure}
 As we shall see, while a linear network cannot extract the analogous structure from the task, inserting a single non-linearity after the output layer can allow it to do so. In the case that the non-linearity is a sigmoid, this essentially reduces the problem to logistic regression; here we will use rectified linear units in our analysis because their structure makes the output patterns more intuitively interpretable. Once this almost-linear network has solved the problem, consider its outputs immediately prior to the non-linearity. These are produced by the linear part of the network, and together with the non-linearity suffice to produce the desired outputs. We can use these to turn the problem into a linearly analyzable one -- simply treat these pre-nonlinearity outputs as outputs of a linear network. Then the problem becomes susceptible to the types of linear analyses discussed above. We will refer to this as the ``linearized'' version of the network. \par 
-In the simple task described above, the solution that the nonlinear network discovers the majority of the time (about 75\%) is to output the same pattern on both sets of output units, but offset the ``incorrect'' domain sufficiently negative so that the output after the rectifier is zero, thus transforming the I/O mapping into a linearized I/O mapping as follows: \par
+In the simple task described above, the solution that the nonlinear network discovers the majority of the time (about 75\%) is to output the same pattern on both sets of output units, but offset the ``incorrect'' domain sufficiently negative so that the output after the rectifier is zero, thus the task that the linear portion of the network is actually performing at convergence is: \par
 \vspace{-1em}
 { \relsize{-1}
 \[
-\left[ \begin{matrix} 
-1 & 1 & 0 & 0 & 0 & 0 \\
-1 & 0 & 1 & 0 & 0 & 0 \\
- 0 & 0 & 0 & 1 & 1 & 0\\
- 0 & 0 & 0 & 1 & 0 & 1\\
-\end{matrix}  \right] 
-\mathlarger{\mathlarger{\Rightarrow}}
-\left[ \begin{matrix} 
-1 & 1 & 0 & 0 & 0 & -1 \\
-1 & 0 & 1 & 0 & -1 & 0 \\
- 0 & 0 & -1 & 1 & 1 & 0\\
- 0 & -1 & 0 & 1 & 0 & 1\\
-\end{matrix}  \right] 
-\] }
+\begin{array}{c|cccccc} 
+& P & D & S & \pi & \delta & \sigma \\
+\hline
+R & 1 & 1 & 0 & 0 & 0 & -1 \\
+L & 1 & 0 & 1 & 0 & -1 & 0 \\
+\rho & 0 & 0 & -1 & 1 & 1 & 0\\
+\lambda & 0 & -1 & 0 & 1 & 0 & 1\\
+\end{array} 
+\]
+}
 (Note that the network can actually map the first element of one domain onto either element of the other, since they are perfectly symmetrical. This solution occurs as well, but we discuss the one shown here for clarity, the other solution just shuffles some rows and columns.) We can use this linearized I/O mapping to perform a linear analysis. When the SVD of this linearized I/O correlation matrix is evaluated, a rank 2 solution emerges. The components of the linearized SVD are (qualitatively): \begin{enumerate}
 \itemsep-0.25em
 \item The separation of the domains
