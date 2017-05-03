@@ -4,12 +4,13 @@ intended_analogy = 1:24;
 flipped_analogy = [12,4,8,2,11,10,9,3,7,6,5,1,14,13,16,15,18,17,20,19,22,21,24,23];
 
 
-nhidden = 200;
-eta = 0.003536;
+nhidden = 1000;
+eta = 0.000949;
 weightsize = 2.0;
-run = 8;
+run = 6;
+batch = 'batch_'; %'batch_' or '' 
 
-single_l1_reps = [load(sprintf('results/simul_learning_3layer_single_inputs/hinton_nhidden_%i_eta_%f_momentum_0.000000_weightsize_%f_rseed_%i_f1_single_input_pre_middle_reps.csv',nhidden,eta,weightsize,run-1)); load(sprintf('results/simul_learning_3layer_single_inputs/hinton_nhidden_%i_eta_%f_momentum_0.000000_weightsize_%f_rseed_%i_f2_single_input_pre_middle_reps.csv',nhidden,eta,weightsize,run-1))];
+single_l1_reps = [load(sprintf('results/simul_learning_3layer_single_inputs/hinton_%snhidden_%i_eta_%f_momentum_0.000000_weightsize_%f_rseed_%i_f1_single_input_pre_middle_reps.csv',batch,nhidden,eta,weightsize,run-1)); load(sprintf('results/simul_learning_3layer_single_inputs/hinton_%snhidden_%i_eta_%f_momentum_0.000000_weightsize_%f_rseed_%i_f2_single_input_pre_middle_reps.csv',batch,nhidden,eta,weightsize,run-1))];
 
 dist = squareform(pdist(single_l1_reps));
 dist = dist(1:24,25:end);

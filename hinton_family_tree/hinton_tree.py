@@ -8,7 +8,7 @@ momentum = 0.0
 eta_decay = 1.0 #multiplicative per eta_decay_epoch epochs
 eta_decay_epoch = 1000
 
-nepochs = 5000
+#nepochs = 5000
 early_stopping_MSE = 0.001 #stop training if MSE reaches this threshold
 nhiddens = [12, 24, 48, 100, 1000]
 #nhidden_shared = 1000
@@ -209,14 +209,21 @@ print
 for weight_initialization in weight_initializations:
     for nhidden_shared in nhiddens:
 	for rseed in xrange(0,100):
+
 	    if nhidden_shared < 20: #At very small hidden layer sizes, need lower learning rates than sqrt scaling would suggest 
 		init_eta = 0.001
 	    else:
 		init_eta = 0.02/numpy.sqrt(nhidden_shared)
 	    if nhidden_shared >= 1000:
 		nepochs = 15000 #slower
+	    else:
+		nepochs = 5000
 	    print "weight init: %s, nhidden: %i, run: %i" %(weight_initialization,nhidden_shared,rseed)
-	    filename_prefix = "results/exploring_network_size/hinton_batch_nhidden_%i_eta_%f_momentum_%f_rseed_%i_" %(nhidden_shared,init_eta,momentum,rseed)
+	    filename_prefix = "results/exploring_network_size/hinton_batch_nhidden_%i_eta_%f_weight_%s_momentum_%f_rseed_%i_" %(nhidden_shared,init_eta,weight_initialization,momentum,rseed)
+
+	    if os.path.exists(filename_prefix+'f1_pre_outputs.csv'): #already done this run
+		print "skipping"
+		continue
 
 	    numpy.random.seed(rseed)
 	    tf.set_random_seed(rseed)
@@ -434,3 +441,6 @@ for weight_initialization in weight_initializations:
 	    save_activations(f2_pre_middle_rep,filename_prefix +'f2_pre_middle_reps.csv',remove_old=True)
 	    save_identity_activations(f1_pre_middle_rep,filename_prefix +'f1_single_input_pre_middle_reps.csv',remove_old=True)
 	    save_identity_activations(f2_pre_middle_rep,filename_prefix +'f2_single_input_pre_middle_reps.csv',remove_old=True)
+	    sess.close()
+	    tf.reset_default_graph()
+	    
