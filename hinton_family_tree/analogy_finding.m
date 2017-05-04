@@ -7,7 +7,7 @@ flipped_analogy = [12,4,8,2,11,10,9,3,7,6,5,1,14,13,16,15,18,17,20,19,22,21,24,2
 nhidden = 1000;
 eta = 0.000949;
 weightsize = 2.0;
-run = 10;
+run = 3;
 batch = 'batch_'; %'batch_' or '' 
 
 single_l1_reps = [load(sprintf('results/simul_learning_3layer_single_inputs/hinton_%snhidden_%i_eta_%f_momentum_0.000000_weightsize_%f_rseed_%i_f1_single_input_pre_middle_reps.csv',batch,nhidden,eta,weightsize,run-1)); load(sprintf('results/simul_learning_3layer_single_inputs/hinton_%snhidden_%i_eta_%f_momentum_0.000000_weightsize_%f_rseed_%i_f2_single_input_pre_middle_reps.csv',batch,nhidden,eta,weightsize,run-1))];
@@ -18,8 +18,36 @@ dist_size = size(dist);
 
 %% "settling" based permutation finding
 
+% display('settling')
+% dist_values = max(max(dist))-dist;
+% % figure
+% % imagesc(dist_values)
+% 
+% activity = zeros(size(dist));
+% settling_update_rate = 0.01;
+% for iteration = 1:50000
+%     colsums = sum(activity,1);
+%     rowsums = sum(activity,2);
+%     
+%     for i = 1:24
+%         for j = 1:24
+%             activity(i,j) = activity(i,j) + settling_update_rate*(2*activity(i,j)+dist_values(i,j)-(rowsums(i)+colsums(j)));
+%         end
+%     end
+%     activity = max(activity,0);
+% end
+% % 
+% % figure
+% % imagesc(activity)
+
+%% more sophisticated?
 display('settling')
-dist_values = max(max(dist))-dist;
+
+centered_l1_reps = [single_l1_reps(1:24,:)-ones(24,1)*sum(single_l1_reps(1:24,:),1); single_l1_reps(25:end,:)-ones(24,1)*sum(single_l1_reps(25:end,:),1)];
+rel_dist = squareform(pdist(centered_l1_reps,'cosine'));
+rel_dist = rel_dist(1:24,25:end);
+rel_dist_values = max(max(rel_dist))-rel_dist;
+
 % figure
 % imagesc(dist_values)
 
@@ -31,14 +59,11 @@ for iteration = 1:50000
     
     for i = 1:24
         for j = 1:24
-            activity(i,j) = activity(i,j) + settling_update_rate*(2*activity(i,j)+dist_values(i,j)-(rowsums(i)+colsums(j)));
+            activity(i,j) = activity(i,j) + settling_update_rate*(2*activity(i,j)+rel_dist_values(i,j)-(rowsums(i)+colsums(j)));
         end
     end
     activity = max(activity,0);
 end
-% 
-% figure
-% imagesc(activity)
 
 %%
 
@@ -90,7 +115,7 @@ if ~isempty(curr_missed) %not surjective, not a valid assignment
     end
 end
 
-% search
+%% search
 transpositions = nchoosek(1:24,2);
 trans_as = transpositions(:,1);
 trans_bs = transpositions(:,2);
