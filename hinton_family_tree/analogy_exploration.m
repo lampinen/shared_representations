@@ -8,12 +8,12 @@ Q1 = squareform(pdist(l1_reps,'cosine'));
 imagesc(Q1)
 
 %% 3layer
-nhidden = 200;
-eta = 0.003536;
+nhidden = 1000;
+eta = 0.000949;
 weightsize = 2.0;
 run = 8;
 
-single_l1_reps = [load(sprintf('results/simul_learning_3layer_single_inputs/hinton_nhidden_%i_eta_%f_momentum_0.000000_weightsize_%f_rseed_%i_f1_single_input_pre_middle_reps.csv',nhidden,eta,weightsize,run-1)); load(sprintf('results/simul_learning_3layer_single_inputs/hinton_nhidden_%i_eta_%f_momentum_0.000000_weightsize_%f_rseed_%i_f2_single_input_pre_middle_reps.csv',nhidden,eta,weightsize,run-1))];
+single_l1_reps = [load(sprintf('results/simul_learning_3layer_single_inputs/hinton_batch_nhidden_%i_eta_%f_momentum_0.000000_weightsize_%f_rseed_%i_f1_single_input_pre_middle_reps.csv',nhidden,eta,weightsize,run-1)); load(sprintf('results/simul_learning_3layer_single_inputs/hinton_batch_nhidden_%i_eta_%f_momentum_0.000000_weightsize_%f_rseed_%i_f2_single_input_pre_middle_reps.csv',nhidden,eta,weightsize,run-1))];
 l1_reps = max(single_l1_reps,0);
 
 figure
@@ -26,12 +26,14 @@ Q1 = squareform(pdist(perm_l1_reps));
 imagesc(Q1)
 
 
-actual_l1_reps = [load(sprintf('results/simul_learning_3layer_single_inputs/hinton_nhidden_%i_eta_%f_momentum_0.000000_weightsize_%f_rseed_%i_f1_pre_middle_reps.csv',nhidden,eta,weightsize,run-1)); load(sprintf('results/simul_learning_3layer_single_inputs/hinton_nhidden_%i_eta_%f_momentum_0.000000_weightsize_%f_rseed_%i_f2_pre_middle_reps.csv',nhidden,eta,weightsize,run-1))];
+actual_l1_reps = [load(sprintf('results/simul_learning_3layer_single_inputs/hinton_batch_nhidden_%i_eta_%f_momentum_0.000000_weightsize_%f_rseed_%i_f1_pre_middle_reps.csv',nhidden,eta,weightsize,run-1)); load(sprintf('results/simul_learning_3layer_single_inputs/hinton_batch_nhidden_%i_eta_%f_momentum_0.000000_weightsize_%f_rseed_%i_f2_pre_middle_reps.csv',nhidden,eta,weightsize,run-1))];
 l1_reps = max(actual_l1_reps,0);
 
 figure
 Q1 = squareform(pdist(l1_reps));
 imagesc(Q1)
+
+%% network size runs
 
 %% SVD stuff
 input = load('hinton_x_data.csv');

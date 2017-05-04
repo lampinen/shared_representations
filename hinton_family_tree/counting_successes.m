@@ -21,16 +21,19 @@ U_lz2_gender_flipped_projection_tests_by_run = zeros(100,12);
 rng(0) %Reproducibility
 
 %Which runs to get
-nhidden = 200;
-eta = 0.003536;
-weightsize = 2.0;
+nhidden = 1000;
+eta = 0.02/sqrt(nhidden);
+%weightsize = 2.0;
+batch = 'batch_'; %'batch_' or '' 
+init_type = 'weight_unif_'; %'weight_unif_' or 'weight_He_''
+file_path = 'results/exploring_network_size/';
 
 for run = 1:100
 
     
     %Load
-    actual_pre_middle_reps = [load(sprintf('results/simul_learning_3layer_single_inputs/hinton_nhidden_%i_eta_%f_momentum_0.000000_weightsize_%f_rseed_%i_f1_pre_middle_reps.csv',nhidden,eta,weightsize,run-1)); load(sprintf('results/simul_learning_3layer_single_inputs/hinton_nhidden_%i_eta_%f_momentum_0.000000_weightsize_%f_rseed_%i_f2_pre_middle_reps.csv',nhidden,eta,weightsize,run-1)) ];    actual_middle_reps = max(actual_pre_middle_reps,0);
-    actual_pre_outputs = [load(sprintf('results/simul_learning_3layer_single_inputs/hinton_nhidden_%i_eta_%f_momentum_0.000000_weightsize_%f_rseed_%i_f1_pre_outputs.csv',nhidden,eta,weightsize,run-1)); load(sprintf('results/simul_learning_3layer_single_inputs/hinton_nhidden_%i_eta_%f_momentum_0.000000_weightsize_%f_rseed_%i_f2_pre_outputs.csv',nhidden,eta,weightsize,run-1)) ];    actual_outputs = max(actual_pre_outputs,0);
+    actual_pre_middle_reps = [load(sprintf('%shinton_%snhidden_%i_eta_%f_%smomentum_0.000000_rseed_%i_f1_pre_middle_reps.csv',file_path,batch,nhidden,eta,init_type,run-1)); load(sprintf('%shinton_%snhidden_%i_eta_%f_%smomentum_0.000000_rseed_%i_f2_pre_middle_reps.csv',file_path,batch,nhidden,eta,init_type,run-1)) ];    actual_middle_reps = max(actual_pre_middle_reps,0);
+    actual_pre_outputs = [load(sprintf('%shinton_%snhidden_%i_eta_%f_%smomentum_0.000000_rseed_%i_f1_pre_outputs.csv',file_path,batch,nhidden,eta,init_type,run-1)); load(sprintf('%shinton_%snhidden_%i_eta_%f_%smomentum_0.000000_rseed_%i_f2_pre_outputs.csv',file_path,batch,nhidden,eta,init_type,run-1)) ];    actual_outputs = max(actual_pre_outputs,0);
 
 
     lz_IO = input.'*actual_pre_middle_reps;
