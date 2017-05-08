@@ -26,54 +26,54 @@ for run = 1:100
     dist_size = size(dist);
 
     %% "settling" based permutation finding
-
-    display('settling')
-    dist_values = max(max(dist))-dist;
-    % figure
-    % imagesc(dist_values)
-    
-    activity = zeros(size(dist));
-    settling_update_rate = 0.01;
-    for iteration = 1:50000
-        colsums = sum(activity,1);
-        rowsums = sum(activity,2);
-        
-        for i = 1:24
-            for j = 1:24
-                activity(i,j) = activity(i,j) + settling_update_rate*(2*activity(i,j)+dist_values(i,j)-(rowsums(i)+colsums(j)));
-            end
-        end
-        activity = max(activity,0);
-    end
-    % 
-    % figure
-    % imagesc(activity)
-
-    %% more sophisticated?
+% 
 %     display('settling')
-% 
-%     centered_l1_reps = [single_l1_reps(1:24,:)-ones(24,1)*sum(single_l1_reps(1:24,:),1); single_l1_reps(25:end,:)-ones(24,1)*sum(single_l1_reps(25:end,:),1)];
-%     rel_dist = squareform(pdist(centered_l1_reps,'cosine'));
-%     rel_dist = rel_dist(1:24,25:end);
-%     rel_dist_values = max(max(rel_dist))-rel_dist;
-% 
+%     dist_values = max(max(dist))-dist;
 %     % figure
 %     % imagesc(dist_values)
-% 
+%     
 %     activity = zeros(size(dist));
 %     settling_update_rate = 0.01;
 %     for iteration = 1:50000
 %         colsums = sum(activity,1);
 %         rowsums = sum(activity,2);
-% 
+%         
 %         for i = 1:24
 %             for j = 1:24
-%                 activity(i,j) = activity(i,j) + settling_update_rate*(2*activity(i,j)+rel_dist_values(i,j)-(rowsums(i)+colsums(j)));
+%                 activity(i,j) = activity(i,j) + settling_update_rate*(2*activity(i,j)+dist_values(i,j)-(rowsums(i)+colsums(j)));
 %             end
 %         end
 %         activity = max(activity,0);
 %     end
-% 
+%     % 
+%     % figure
+%     % imagesc(activity)
+
+    %% more sophisticated?
+    display('settling')
+
+    centered_l1_reps = [single_l1_reps(1:24,:)-ones(24,1)*sum(single_l1_reps(1:24,:),1); single_l1_reps(25:end,:)-ones(24,1)*sum(single_l1_reps(25:end,:),1)];
+    rel_dist = squareform(pdist(centered_l1_reps,'cosine'));
+    rel_dist = rel_dist(1:24,25:end);
+    rel_dist_values = max(max(rel_dist))-rel_dist;
+
+    % figure
+    % imagesc(dist_values)
+
+    activity = zeros(size(dist));
+    settling_update_rate = 0.01;
+    for iteration = 1:50000
+        colsums = sum(activity,1);
+        rowsums = sum(activity,2);
+
+        for i = 1:24
+            for j = 1:24
+                activity(i,j) = activity(i,j) + settling_update_rate*(2*activity(i,j)+rel_dist_values(i,j)-(rowsums(i)+colsums(j)));
+            end
+        end
+        activity = max(activity,0);
+    end
+
     %%
 
     [sorted_activity,rank] = sort(activity,1);
