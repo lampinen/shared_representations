@@ -215,7 +215,7 @@ print
 
 for rseed in xrange(100):
     print "run %i" %rseed
-    filename_prefix = "results/factored_3layer/hinton_nhidden_%i_dropout_%f_rseed_%i_" %(nhidden_shared,dropout_prob,rseed)
+    filename_prefix = "results/factored_3layer/hinton_nhidden_shared_%i_nhidden_separate_%i_rseed_%i_" %(nhidden_shared,nhidden_separate,rseed)
 
     numpy.random.seed(rseed)
     tf.set_random_seed(rseed)
