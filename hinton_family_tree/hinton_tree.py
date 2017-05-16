@@ -4,8 +4,9 @@ import matplotlib.pyplot as plt
 import os
 
 ######Parameters###################
-nhidden_shared = 200
-weight_size = 4.0 #weights will be initialized uniform [0,weight_size/nhidden], weight size of 2.0 results in an expectation of preserving representation vector length under each transformation
+nhidden_shared = 24
+nhidden_separate = 12
+weight_size = 2.0 #weights will be initialized uniform [0,weight_size/nhidden], weight size of 2.0 results in an expectation of preserving representation vector length under each transformation
 dropout_prob = 1.0
 
 init_eta = 0.003
@@ -16,7 +17,7 @@ nepochs = 2000
 early_stopping_MSE = 0.001 #MSE at which to stop training even if nepochs not reached
 
 training_type = "minibatch" #one of "single", "batch", "minibatch"
-minibatch_size = 5
+minibatch_size = 10
 
 #rseed = 2  #reproducibility
 ###################################
@@ -214,7 +215,7 @@ print
 
 for rseed in xrange(100):
     print "run %i" %rseed
-    filename_prefix = "results/regular_3layer/hinton_nhidden_%i_dropout_%f_rseed_%i_" %(nhidden_shared,dropout_prob,rseed)
+    filename_prefix = "results/factored_3layer/hinton_nhidden_%i_dropout_%f_rseed_%i_" %(nhidden_shared,dropout_prob,rseed)
 
     numpy.random.seed(rseed)
     tf.set_random_seed(rseed)
@@ -228,22 +229,23 @@ for rseed in xrange(100):
     people_input = tf.concat(people_inputs,axis=0)
     relationship_input = tf.concat(relationship_inputs,axis=0)
     #build the network
-     ############Working simpler network with eta = 0.005, nhidden = 13 
-    W1 = tf.Variable(tf.random_uniform([nhidden_shared,input_shape],0,weight_size/nhidden_shared))
-    b1 = tf.Variable(tf.random_uniform([nhidden_shared,1],0,0.001))
-    W2 = tf.Variable(tf.random_uniform([nhidden_shared,nhidden_shared],0,weight_size/nhidden_shared))
+    W1_p = tf.Variable(tf.random_uniform([nhidden_separate,input_shape/2],0,weight_size/nhidden_separate))
+    b1_p = tf.Variable(tf.random_uniform([nhidden_separate,1],0,0.001))
+    W1_r = tf.Variable(tf.random_uniform([nhidden_separate,input_shape/2],0,weight_size/nhidden_separate))
+    b1_r = tf.Variable(tf.random_uniform([nhidden_separate,1],0,0.001))
+    W2 = tf.Variable(tf.random_uniform([nhidden_shared,2*nhidden_separate],0,weight_size/nhidden_shared))
     b2 = tf.Variable(tf.random_uniform([nhidden_shared,1],0,0.001))
     W3 = tf.Variable(tf.random_uniform([output_shape,nhidden_shared],0,weight_size/nhidden_shared))
-
-
     b3 = tf.Variable(tf.random_uniform([output_shape,1],0,0.001))
-    pre_middle_rep = tf.matmul(W1,tf.concat([people_input,relationship_input],0))+b1
+
+    
+    people_rep = tf.matmul(W1_p,people_input)+b1_p
+    relationship_rep = tf.matmul(W1_r,relationship_input)+b1_r
+
+    pre_middle_rep = tf.matmul(W2,tf.concat([people_rep,relationship_rep],0))+b2
     middle_rep = tf.nn.dropout(tf.nn.relu(pre_middle_rep),dropout_ph)
 
-    pre_l2_rep =  tf.matmul(W2,middle_rep)+b2 
-    l2_rep = tf.nn.dropout(tf.nn.relu(pre_l2_rep),dropout_ph)
-    pre_output = tf.matmul(W3,l2_rep)+b3
-
+    pre_output = tf.matmul(W3,middle_rep)+b3
     output = tf.nn.relu(pre_output)
 
 
@@ -347,7 +349,7 @@ for rseed in xrange(100):
 
     curr_eta = init_eta
     rep_track = []
-    filename = filename_prefix + "rep_tracks.csv"
+    filename = filename_prefix + "MSE_track.csv"
     if os.path.exists(filename):
 	os.remove(filename)
     saved = False
@@ -372,11 +374,9 @@ for rseed in xrange(100):
 	    temp = test_accuracy()
 	    print "epoch: %i, MSE: %f" %(epoch, temp)	
 	    numpy.savetxt(fout,[temp],delimiter=',')
-	    if temp < 0.05 and not saved:
-		save_activations(pre_middle_rep,filename_prefix+"pre_middle_reps_at_MSE=0.05.csv")
-		save_activations(l2_rep,filename_prefix+"l2_reps_at_MSE=0.05.csv")
-		save_activations(pre_output,filename_prefix+"pre_outputs_at_MSE=0.05.csv")
-		saved = True
+#	    if temp < 0.05 and not saved:
+#		pass
+#		saved = True
 	    if temp < early_stopping_MSE:
 		break
 #	if epoch % 100 == 0:
@@ -392,6 +392,7 @@ for rseed in xrange(100):
 #    print_preoutputs()
 #    display_rep_similarity()
 #    display_po_similarity()
+    save_activations(people_rep,filename_prefix+"people_reps.csv")
+    save_activations(relationship_rep,filename_prefix+"relationship_reps.csv")
     save_activations(pre_middle_rep,filename_prefix+"pre_middle_reps.csv")
-    save_activations(l2_rep,filename_prefix+"l2_reps.csv")
     save_activations(pre_output,filename_prefix+"pre_outputs.csv")
