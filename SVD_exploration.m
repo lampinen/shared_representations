@@ -15,7 +15,6 @@ ilz_IO_c = ideal_linearized_IO-ones(4,1)*mean(ideal_linearized_IO,1);
 
 
 
-
 actual_preoutputs = load('nonlinear_nhidden_4_rseed_0_final_pre_outputs.csv')
 ap_c = actual_preoutputs-ones(4,1)*mean(actual_preoutputs,1);
 [U_ap,S_ap,V_ap] = svd(ap_c.')
@@ -390,4 +389,69 @@ det(Q)
 
 
 
+%% playing with rotations
+
+ 
+nonlinear_IO = [[1 1 0 0 0 0]; [1 0 1 0 0 0]; [0 0 0 1 1 0]; [0 0 0 1 0 1]];
+
+
+nl_IO_c = nonlinear_IO-ones(4,1)*mean(nonlinear_IO,1);
+
+[U_nl,S_nl,V_nl] = svd(nl_IO_c.')
+
+V_test = V_nl;
+U_test = U_nl;
+
+V_test(:,2) = 1/sqrt(2)*(V_nl(:,2)+V_nl(:,3));
+V_test(:,3) = 1/sqrt(2)*(V_nl(:,2)-V_nl(:,3));
+U_test(:,2) = 1/sqrt(2)*(U_nl(:,2)+U_nl(:,3));
+U_test(:,3) = 1/sqrt(2)*(U_nl(:,2)-U_nl(:,3));
+
+imagesc(U_test*S_nl*V_test.'); colormap('redbluecmap');
+
+
+actual_preoutputs = load('results/onehundredruns/linear_nhidden_4_rseed_0_pre_outputs.csv')
+ap_c = actual_preoutputs-ones(4,1)*mean(actual_preoutputs,1);
+[U_ap,S_ap,V_ap] = svd(ap_c.')
+
+%% No biases
+
+[U,S,V] = svd(nonlinear_IO)
+
+[Ui,Si,Vi] = svd(ideal_linearized_IO)
+
+%% Redone task
+
+
+actual_preoutputs = load('results/letter_redux/nonlinear_nhidden_4_rseed_0_final_pre_outputs.csv')
+ap_c = actual_preoutputs-ones(6,1)*mean(actual_preoutputs,1);
+[U_ap,S_ap,V_ap] = svd(ap_c.')
+
+
+
+
+nonlinear_IO = [[1 1 0 0 0 0 0 0 0 0]; [1 1 0 0 0 0 0 0 0 0]; [1 0 1 1 1 0 0 0 0 0]; [0 0 0 0 0 1 1 0 0 0]; [0 0 0 0 0 1 1 0 0 0]; [0 0 0 0 0 1 0 1 1 1]];
+ideal_linearized_IO = [[1 1 0 0 0 0 0 -1 -1 -1]; [1 1 0 0 0 0 0 -1 -1 -1]; [1 0 1 1 1 0 -1 0 0 0]; [0 0 -1 -1 -1 1 1 0 0 0]; [0 0 -1 -1 -1 1 1 0 0 0]; [0 -1 0 0 0 1 0 1 1 1]];
+
+
+%nonlinear_IO = [[1 1 0 0 0 0 0 0 0 0];  [1 0 1 1 1 0 0 0 0 0]; [0 0 0 0 0 1 1 0 0 0]; [0 0 0 0 0 1 0 1 1 1]];
+%ideal_linearized_IO = [[1 1 0 0 0 0 0 -1 -1 -1]; [1 0 1 1 1 0 -1 0 0 0]; [0 0 -1 -1 -1 1 1 0 0 0]; [0 -1 0 0 0 1 0 1 1 1]];
+
+
+nl_IO_c = nonlinear_IO-ones(6,1)*mean(nonlinear_IO,1);
+ilz_IO_c = ideal_linearized_IO-ones(6,1)*mean(ideal_linearized_IO,1);
+
+[U_nl,S_nl,V_nl] = svd(nonlinear_IO.')
+[U_ilz,S_ilz,V_ilz] = svd(ideal_linearized_IO.')
+
+
+figure
+imagesc(V_nl(:,1:3).'); colormap('redbluecmap')
+figure
+imagesc(V_ilz(:,1:2).'); colormap('redbluecmap')
+
+figure
+imagesc(U_nl(:,1:3)); colormap('redbluecmap')
+figure
+imagesc(U_ilz(:,1:2)); colormap('redbluecmap')
 

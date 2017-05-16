@@ -7,40 +7,45 @@ import os
 init_eta = 0.01
 eta_decay = 1.0 #multiplicative per eta_decay_epoch epochs
 eta_decay_epoch = 10
-nepochs = 500
-nhidden = 4
+nepochs = 1000
+nhidden = 2
 
 #rseed = 2  #reproducibility
 ###################################
 
-x_data = numpy.array([numpy.roll([1,0,0,0],i) for i in xrange(4)])
-y_data = numpy.array(map(lambda x: [1*(x[0] or x[1]),x[0],x[1],1*(x[2] or x[3]),x[2],x[3]],x_data))
-y_data = y_data.reshape([len(x_data),6])
+
+
+x_data = numpy.array([[1,0,0,0],[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,1,0],[0,0,0,1] ])
+y_data = numpy.array(map(lambda x: [1*(x[0] or x[1]),x[0],x[1],x[1],x[1],1*(x[2] or x[3]),x[2],x[3],x[3],x[3]],x_data))
+y_data = y_data.reshape([len(x_data),10])
 print "x_data:"
 print x_data
 print
 
 print "y_data:"
-print x_data
+print y_data
 print
 
-for rseed in xrange(100):
+noutput = y_data.shape[-1]
+
+
+for rseed in xrange(1):
     print "run %i" %rseed
-    filename_prefix = "results/middle_rep_runs/nonlinear_nhidden_%i_rseed_%i_" %(nhidden,rseed)
+    filename_prefix = "results/letter_redux/nonlinear_nhidden_%i_rseed_%i_" %(nhidden,rseed)
 #    pre_output_filename_to_load = "nonlinear_nhidden_2_rseed_%i_pre_outputs.csv" %(rseed) #If running linearized version, where to load target pre-output values from
 
     numpy.random.seed(rseed)
     tf.set_random_seed(rseed)
 
     input_ph = tf.placeholder(tf.float32, shape=[4,None])
-    target_ph =  tf.placeholder(tf.float32, shape=[6,None])
-    W1 = tf.Variable(tf.random_uniform([nhidden,4],0,0.1))
-    #b1 = tf.Variable(tf.random_normal([nhidden,1],1,0.1))
-    W2 = tf.Variable(tf.random_uniform([6,nhidden],0,0.1))
-    #b2 = tf.Variable(tf.random_normal([6,1],1,0.1))
+    target_ph =  tf.placeholder(tf.float32, shape=[10,None])
+    W1 = tf.Variable(tf.random_uniform([nhidden,4],0.,0.1))
+    b1 = tf.Variable(tf.random_normal([nhidden,1],1,0.1))
+    W2 = tf.Variable(tf.random_uniform([noutput,nhidden],0.,0.1))
+    b2 = tf.Variable(tf.random_normal([noutput,1],1,0.1))
     internal_rep = tf.matmul(W1,input_ph)#+b1
     output = tf.nn.relu(tf.matmul(W2,internal_rep))#+b2)
-    pre_output = (tf.matmul(W2,internal_rep))#+b2)
+    pre_output = tf.matmul(W2,internal_rep)#+b2
 
     rep_mean_ph =  tf.placeholder(tf.float32, shape=[nhidden,1])
 
@@ -53,7 +58,7 @@ for rseed in xrange(100):
     train = optimizer.minimize(loss)
     linearized_train = optimizer.minimize(linearized_loss)
 
-    init = tf.initialize_all_variables()
+    init = tf.global_variables_initializer()
 
     sess = tf.Session()
     sess.run(init)
@@ -61,7 +66,7 @@ for rseed in xrange(100):
     def test_accuracy():
 	MSE = 0.0
 	for i in xrange(len(x_data)):
-	    MSE += sess.run(loss,feed_dict={input_ph: x_data[i].reshape([4,1]),target_ph: y_data[i].reshape([6,1])})
+	    MSE += sess.run(loss,feed_dict={input_ph: x_data[i].reshape([4,1]),target_ph: y_data[i].reshape([noutput,1])})
 	MSE /= 4.0
 	return MSE
 
@@ -114,12 +119,12 @@ for rseed in xrange(100):
     def train_with_standard_loss():
 	training_order = numpy.random.permutation(len(x_data))
 	for example_i in training_order:
-	    sess.run(train,feed_dict={eta_ph: curr_eta,input_ph: x_data[example_i].reshape([4,1]),target_ph: y_data[example_i].reshape([6,1])})
+	    sess.run(train,feed_dict={eta_ph: curr_eta,input_ph: x_data[example_i].reshape([4,1]),target_ph: y_data[example_i].reshape([noutput,1])})
 
     def train_with_linearized_loss(targets):
 	training_order = numpy.random.permutation(len(x_data))
 	for example_i in training_order:
-	    sess.run(linearized_train,feed_dict={eta_ph: curr_eta,input_ph: x_data[example_i].reshape([4,1]),target_ph: targets[example_i].reshape([6,1])})
+	    sess.run(linearized_train,feed_dict={eta_ph: curr_eta,input_ph: x_data[example_i].reshape([4,1]),target_ph: targets[example_i].reshape([noutput,1])})
 
     print "Initial MSE: %f" %(test_accuracy())
 
@@ -128,11 +133,11 @@ for rseed in xrange(100):
     curr_eta = init_eta
     rep_track = []
     filename = filename_prefix + "rep_tracks.csv"
-    if os.path.exists(filename):
-	os.remove(filename)
+    #if os.path.exists(filename):
+#	os.remove(filename)
     save_activations(pre_output,filename_prefix+"initial_pre_outputs.csv")
     save_activations(internal_rep,filename_prefix+"initial_reps.csv")
-    fout = open(filename,'ab')
+#    fout = open(filename,'ab')
     for epoch in xrange(nepochs):
         train_with_standard_loss()
     #    train_with_linearized_loss(loaded_pre_outputs)
@@ -146,17 +151,19 @@ for rseed in xrange(100):
 	if epoch % 10 == 0:
 	    print "epoch: %i, MSE: %f" %(epoch, test_accuracy())	
 #	    save_activations(pre_output,filename_prefix+"epoch_%i_pre_outputs.csv" %epoch)
-#	    print_preoutputs()
+	    print_preoutputs()
 #	    print_reps()	
 #	    print sess.run(W1)
 #	    print "grad"
 #	    print sess.run(W1_grad,feed_dict={eta_ph: curr_eta,input_ph: x_data.transpose(),target_ph: y_data.transpose()})
+#	    raw_input('Press ENTER to continue')
+
 #	if epoch % 100 == 0:
 #	    print_reps()	
     #	display_rep_similarity()
 	if epoch % eta_decay_epoch == 0:
 	    curr_eta *= eta_decay
-    fout.close()
+    #fout.close()
 	
 
     print "Final MSE: %f" %(test_accuracy())
