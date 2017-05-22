@@ -444,14 +444,28 @@ ilz_IO_c = ideal_linearized_IO-ones(6,1)*mean(ideal_linearized_IO,1);
 [U_nl,S_nl,V_nl] = svd(nonlinear_IO.')
 [U_ilz,S_ilz,V_ilz] = svd(ideal_linearized_IO.')
 
+figure
+imagesc(nonlinear_IO.',[-1 1]); colormap('redbluecmap')
+figure
+imagesc(ideal_linearized_IO.',[-1 1]); colormap('redbluecmap')
+
 
 figure
-imagesc(V_nl(:,1:3).'); colormap('redbluecmap')
+imagesc(V_nl(:,1:4).',[-1 1]); colormap('redbluecmap')
 figure
-imagesc(V_ilz(:,1:2).'); colormap('redbluecmap')
+imagesc(V_ilz(:,1:3).',[-1 1]); colormap('redbluecmap')
+
+m_S_nl = max(max(S_nl));
+figure
+imagesc(S_nl(1:4,1:4),[-m_S_nl, m_S_nl]); colormap('redbluecmap')
+
+m_S_ilz = max(max(S_ilz));
+figure
+imagesc(S_ilz(1:3,1:3),[-m_S_ilz, m_S_ilz]); colormap('redbluecmap')
+
 
 figure
-imagesc(U_nl(:,1:3)); colormap('redbluecmap')
+imagesc(U_nl(:,1:4),[-1 1]); colormap('redbluecmap')
 figure
-imagesc(U_ilz(:,1:2)); colormap('redbluecmap')
+imagesc(U_ilz(:,1:3),[-1 1]); colormap('redbluecmap')
 
