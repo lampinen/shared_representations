@@ -3,7 +3,7 @@ nonlinear_IO = [[1 1 0 0 0 0]; [1 0 1 0 0 0]; [0 0 0 1 1 0]; [0 0 0 1 0 1]];
 
 linearized_IO = [[1 1 0 -1 0 -2]; [1 0 1 0 -1 0]; [-1 0 -2 1 1 0]; [0 -1 0 1 0 1]];
 
-ideal_linearized_IO = [[1 1 0 0 0 -1]; [1 0 1 0 -1 0]; [0 0 -1 1 1 0]; [0 -1 0 1 0 1]];
+ideal_linearized_IO = [[1 1 0 -1 0 -1]; [1 0 1 -1 -1 0]; [-1 0 -1 1 1 0]; [-1 -1 0 1 0 1]];
 
 nl_IO_c = nonlinear_IO-ones(4,1)*mean(nonlinear_IO,1);
 lz_IO_c = linearized_IO-ones(4,1)*mean(linearized_IO,1);
@@ -208,7 +208,7 @@ pos(4) = pos(4)+0.02;
 set(gca, 'Position', pos)
 
 
-imagesc(round(V_ilz(:,1:3).'*10)/10,[-1,1]) %round is to handle small floating point errors that are polluting plot
+imagesc(round(V_ilz(:,1:2).'*10)/10,[-1,1]) %round is to handle small floating point errors that are polluting plot
 xlabel('inputs','fontsize',30)
 ylabel('modes','fontsize',30)
 set(gca,'xtick',1:4)
@@ -217,47 +217,41 @@ colormap(redbluecmap)
 hold on;
 rectangle('Position',[0.53,0.52,3.96,0.98],...
          'LineWidth',5)
-rectangle('Position',[0.53,1.5,3.96,1.0],...
+rectangle('Position',[0.53,1.5,3.96,0.99],...
          'LineWidth',5)   
-rectangle('Position',[0.53,2.5,3.96,0.99],...
-         'LineWidth',5) 
 hold off;
 pos = get(gca, 'Position');
 pos(2) = pos(2)+0.02;
 pos(4) = pos(4)+0.02;
 set(gca, 'Position', pos)
 
-imagesc(S_ilz(1:3,1:3),[-2.4495,2.4495])
+imagesc(S_ilz(1:2,1:2),[-2.4495,2.4495])
 xlabel('modes','fontsize',30)
-set(gca,'xtick',1:3)
-set(gca,'ytick',1:3)
+set(gca,'xtick',1:2)
+set(gca,'ytick',1:2)
 colormap(redbluecmap)
 hold on;
 rectangle('Position',[0.52,0.52,0.98,0.98],...
          'LineWidth',5)
 rectangle('Position',[1.5,1.5,0.99,0.99],...
          'LineWidth',5) 
-rectangle('Position',[2.5,2.5,0.99,0.99],...
-         'LineWidth',5)  
 hold off;
 pos = get(gca, 'Position');
 pos(2) = pos(2)+0.02;
 pos(4) = pos(4)+0.02;
 set(gca, 'Position', pos)
 
-imagesc(U_ilz(:,1:3),[-1,1])
+imagesc(U_ilz(:,1:2),[-1,1])
 xlabel('modes','fontsize',30)
 ylabel('outputs','fontsize',30)
 set(gca,'ytick',1:6)
-set(gca,'xtick',1:3)
+set(gca,'xtick',1:2)
 colormap(redbluecmap)
 hold on;
 rectangle('Position',[0.52,0.52,0.98,6.0],...
          'LineWidth',5)
-rectangle('Position',[1.5,0.52,1.0,6.0],...
-         'LineWidth',5)   
-rectangle('Position',[2.5,0.52,0.99,6.0],...
-         'LineWidth',5)   
+rectangle('Position',[1.5,0.52,0.99,6.0],...
+         'LineWidth',5)     
 hold off;
 pos = get(gca, 'Position');
 pos(2) = pos(2)+0.02;
@@ -479,3 +473,15 @@ imagesc(U_nl(:,1:4),[-1 1]); colormap('redbluecmap')
 figure
 imagesc(U_ilz(:,1:2),[-1 1]); colormap('redbluecmap')
 
+%% blah
+counts = zeros(100,1);
+counts2 = zeros(100,1);
+for run = 0:99
+    actual_preoutputs = load(sprintf('nonlinear_nhidden_4_rseed_%i_final_pre_outputs.csv',run));  
+    counts(run+1) = sum(actual_preoutputs(1:2,4) > min(actual_preoutputs(1:2,5:6),[],2)) + sum(actual_preoutputs(3:4,1) > min(actual_preoutputs(3:4,2:3),[],2));
+    counts2(run+1) = sum(actual_preoutputs(1:2,4) < max(actual_preoutputs(1:2,5:6),[],2)) + sum(actual_preoutputs(3:4,1) < max(actual_preoutputs(3:4,2:3),[],2));
+
+end
+hist(counts)
+[~,i] = sort(counts)
+hist(counts2)
