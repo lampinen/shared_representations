@@ -7,14 +7,14 @@ import os
 init_eta = 0.01
 eta_decay = 1.0 #multiplicative per eta_decay_epoch epochs
 eta_decay_epoch = 10
-nepochs = 3000
+nepochs = 2000
 nhidden = 4
 #rseed = 2  #reproducibility
 ###################################
 
 
 
-x_data = numpy.array([[1,0,0,0],[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,1,0],[0,0,0,1] ])
+x_data = numpy.array([[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1] ])
 y_data = numpy.array(map(lambda x: [1*(x[0] or x[1]),x[0],x[1],1*(x[2] or x[3]),x[2],x[3]],x_data))
 y_data = y_data.reshape([len(x_data),6])
 print "x_data:"
@@ -28,7 +28,7 @@ print
 noutput = y_data.shape[-1]
 
 
-for nlayer in [3,2]:
+for nlayer in [4,3,2]:
     for rseed in xrange(1):
 	print "nlayer %i run %i" %(nlayer,rseed)
 	filename_prefix = "results/depth_comp_for_PNAS/original_linear_nlayer_%i_nhidden_%i_rseed_%i_" %(nlayer,nhidden,rseed)
@@ -40,17 +40,25 @@ for nlayer in [3,2]:
 	input_ph = tf.placeholder(tf.float32, shape=[4,None])
 	target_ph =  tf.placeholder(tf.float32, shape=[noutput,None])
 	if nlayer == 2:
-	    W1 = tf.Variable(tf.random_uniform([nhidden,4],0.,0.1))
-	    W2 = tf.Variable(tf.random_uniform([noutput,nhidden],0.,0.1))
+	    W1 = tf.Variable(tf.random_normal([nhidden,4],0.,2.0/(nhidden+4)))
+	    W2 = tf.Variable(tf.random_normal([noutput,nhidden],0.,2./(nhidden+noutput)))
 	    internal_rep = tf.matmul(W1,input_ph)
 	    pre_output = tf.matmul(W2,internal_rep)
 	elif nlayer == 3:
-	    W1 = tf.Variable(tf.random_uniform([nhidden,4],0.,0.1))
-	    W2 = tf.Variable(tf.random_uniform([nhidden,nhidden],0.,0.1))
-	    W3 = tf.Variable(tf.random_uniform([noutput,nhidden],0.,0.1))
+	    W1 = tf.Variable(tf.random_normal([nhidden,4],0.,2./(nhidden+4)))
+	    W2 = tf.Variable(tf.random_normal([nhidden,nhidden],0.,1./nhidden))
+	    W3 = tf.Variable(tf.random_normal([noutput,nhidden],0.,2./(nhidden+noutput)))
 	    internal_rep = tf.matmul(W1,input_ph)
 		
 	    pre_output = tf.matmul(W3,tf.matmul(W2,internal_rep))
+	elif nlayer == 4:
+	    W1 = tf.Variable(tf.random_normal([nhidden,4],0.,2./(nhidden+4)))
+	    W2 = tf.Variable(tf.random_normal([nhidden,nhidden],0.,1./nhidden))
+	    W3 = tf.Variable(tf.random_normal([nhidden,nhidden],0.,1./nhidden))
+	    W4 = tf.Variable(tf.random_normal([noutput,nhidden],0.,2./(nhidden+noutput)))
+	    internal_rep = tf.matmul(W1,input_ph)
+		
+	    pre_output = tf.matmul(W4,tf.matmul(W3,tf.matmul(W2,internal_rep)))
 	else:
 	    print "Error, invalid number of layers given"
 	    exit(1)
