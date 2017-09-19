@@ -1,0 +1,56 @@
+---
+title: "Depth & Number of Domains Comparison"
+author: "AndrewLampinen"
+date: "September 19, 2017"
+output: html_document
+---
+```{r}
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+```
+
+```{r}
+num_runs = 10
+networks = c('linear', 'nonlinear')
+
+d = data.frame()
+for (network in networks) {
+  for (nlayer in c(2, 3)) {
+    for (ndomains in 1:3) {
+      for (rseed in 0:(num_runs-1)) {
+        filename = sprintf("./results/depth_and_ndom_comp/%s_nlayer_%i_ndomains_%i_rseed_%i_loss_track.csv",network,nlayer,ndomains,rseed)
+        this_d = read.csv(filename, header=T)
+        this_d = this_d %>%
+          mutate(num_layers=nlayer,
+                 num_domains=ndomains,
+                 network=network,
+                 rseed=rseed)
+        d = bind_rows(d, this_d)
+      }
+    }
+  }
+}
+```
+
+```{r}
+d = d %>%
+  filter(num_layers > 2 | epoch < 1000) %>%
+  mutate(num_domains = factor(num_domains),
+         num_layers = factor(num_layers))
+```
+
+```{r}
+avg_d = d %>% 
+  group_by(num_layers, num_domains, network, epoch) %>%
+  summarize(MSE=mean(MSE)) %>%
+  ungroup()
+```
+
+```{r}
+ggplot(data=avg_d, aes(x=epoch, y=MSE, color=num_domains)) +
+  geom_line() +
+  facet_grid(network ~ num_layers, scales="free_x") +
+  theme_bw()
+```
+
