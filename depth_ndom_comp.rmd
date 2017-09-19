@@ -35,7 +35,7 @@ for (network in networks) {
 
 ```{r}
 d = d %>%
-  filter(num_layers > 2 | epoch < 1000) %>%
+  filter(epoch < 1000 | (num_layers == 3 & epoch < 5000)) %>%
   mutate(num_domains = factor(num_domains),
          num_layers = factor(num_layers))
 ```
