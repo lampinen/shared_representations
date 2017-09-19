@@ -38,7 +38,7 @@ for nlayer in [3,2]:
 	noutput = 3*ndomains 
 	for rseed in xrange(1,10):
 	    print "nlayer %i ndomains %i run %i" % (nlayer, ndomains, rseed)
-	    filename_prefix = "results/depth_and_ndom_comp/linear_nlayer_%i_nhidden_%i_rseed_%i_" %(nlayer,nhidden,rseed)
+	    filename_prefix = "results/depth_and_ndom_comp/linear_nlayer_%i_ndomains_%i_rseed_%i_" %(nlayer,ndomains,rseed)
 
 	    numpy.random.seed(rseed)
 	    tf.set_random_seed(rseed)
