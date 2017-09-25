@@ -8,7 +8,7 @@ init_eta = 0.01
 eta_decay = 1.0 #multiplicative per eta_decay_epoch epochs
 eta_decay_epoch = 10
 nepochs = 10000
-nruns = 10
+nruns = 5
 #nhidden = 6
 #rseed = 2  #reproducibility
 ###################################
@@ -42,7 +42,7 @@ for network in ['nonlinear', 'linear']:
 	    ninput = 2*ndomains
 	    noutput = 3*ndomains 
 	    nhidden = ninput
-	    for rseed in xrange(nruns):
+	    for rseed in xrange(2, nruns):
 		print "nlayer %i ndomains %i run %i" % (nlayer, ndomains, rseed)
 		filename_prefix = "results/depth_and_ndom_comp/%s_nlayer_%i_ndomains_%i_rseed_%i_" %(network,nlayer,ndomains,rseed)
 
@@ -175,6 +175,7 @@ for network in ['nonlinear', 'linear']:
 			    print "epoch: %i, MSE: %f" %(epoch, curr_mse)	
 			    fout.write("%i, %f\n" %(epoch, curr_mse))
 			if epoch % 100 == 0:
+			    save_activations(internal_rep,filename_prefix+"epoch_%i_internal_rep.csv" %epoch)
 			    save_activations(pre_output,filename_prefix+"epoch_%i_pre_outputs.csv" %epoch)
 			
 			if epoch % eta_decay_epoch == 0:
