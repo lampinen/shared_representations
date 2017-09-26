@@ -8,7 +8,7 @@ init_eta = 0.01
 eta_decay = 1.0 #multiplicative per eta_decay_epoch epochs
 eta_decay_epoch = 10
 nepochs = 10000
-nruns = 5
+nruns = 10
 #nhidden = 6
 #rseed = 2  #reproducibility
 ###################################
@@ -38,18 +38,19 @@ print
 
 for network in ['nonlinear', 'linear']:
     for nlayer in [3,2]:
-	for ndomains in [1,2,3]:
+	for ndomains in [2,3,1]:
 	    ninput = 2*ndomains
 	    noutput = 3*ndomains 
 	    nhidden = ninput
-	    for rseed in xrange(2, nruns):
+	    for rseed in xrange(0, nruns):
 		print "nlayer %i ndomains %i run %i" % (nlayer, ndomains, rseed)
-		filename_prefix = "results/depth_and_ndom_comp/%s_nlayer_%i_ndomains_%i_rseed_%i_" %(network,nlayer,ndomains,rseed)
+		filename_prefix = "results/depth_and_ndom_comp_dontcares/%s_nlayer_%i_ndomains_%i_rseed_%i_" %(network,nlayer,ndomains,rseed)
 
 		numpy.random.seed(rseed)
 		tf.set_random_seed(rseed)
 
 		input_ph = tf.placeholder(tf.float32, shape=[2*ndomains,None])
+		    
 		target_ph = tf.placeholder(tf.float32, shape=[noutput,None])
 		if nlayer == 2:
 		    W1 = tf.Variable(tf.random_uniform([nhidden,ninput],0.,2.0/(nhidden+ninput)))
@@ -74,6 +75,14 @@ for network in ['nonlinear', 'linear']:
 		else:
 		    print "Error, invalid number of layers given"
 		    exit(1)
+
+		# Create a matrix of output masks indexed by inputs
+		mask_template = [1.] * 3 + [0.] * (3 * (ndomains - 1))
+		domain_output_masks = tf.constant(numpy.array(
+		    [numpy.roll(mask_template, 3 * (i//2)) for i in xrange(2 * ndomains)]),
+		    dtype=tf.float32)
+		this_output_mask = tf.matmul(tf.transpose(domain_output_masks), input_ph)
+		pre_output = tf.multiply(pre_output, this_output_mask)
 
 		output = tf.nn.relu(pre_output)
 		rep_mean_ph =  tf.placeholder(tf.float32, shape=[nhidden,1])
