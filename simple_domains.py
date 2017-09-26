@@ -8,7 +8,7 @@ init_eta = 0.01
 eta_decay = 1.0 #multiplicative per eta_decay_epoch epochs
 eta_decay_epoch = 10
 nepochs = 10000
-nruns = 10
+nruns = 20
 #nhidden = 6
 #rseed = 2  #reproducibility
 ###################################
@@ -38,7 +38,7 @@ print
 
 for network in ['nonlinear', 'linear']:
     for nlayer in [3,2]:
-	for ndomains in [2,3,1]:
+	for ndomains in [3, 2, 1]:
 	    ninput = 2*ndomains
 	    noutput = 3*ndomains 
 	    nhidden = ninput

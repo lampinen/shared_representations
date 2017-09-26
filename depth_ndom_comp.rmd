@@ -11,7 +11,7 @@ library(ggplot2)
 ```
 
 ```{r}
-num_runs = 10
+num_runs = 20
 networks = c('linear', 'nonlinear')
 
 d = data.frame()
@@ -19,7 +19,7 @@ for (network in networks) {
   for (nlayer in c(2, 3)) {
     for (ndomains in 1:3) {
       for (rseed in 0:(num_runs-1)) {
-        filename = sprintf("./results/depth_and_ndom_comp/%s_nlayer_%i_ndomains_%i_rseed_%i_loss_track.csv",network,nlayer,ndomains,rseed)
+        filename = sprintf("./results/depth_and_ndom_comp_dontcares/%s_nlayer_%i_ndomains_%i_rseed_%i_loss_track.csv",network,nlayer,ndomains,rseed)
         this_d = read.csv(filename, header=T)
         this_d = this_d %>%
           mutate(num_layers=nlayer,
