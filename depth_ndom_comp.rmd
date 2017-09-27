@@ -53,4 +53,7 @@ ggplot(data=avg_d, aes(x=epoch, y=MSE, color=num_domains)) +
   facet_grid(network ~ num_layers, scales="free_x") +
   theme_bw()
 ```
+```{r}
+ggsave("result_plots/depth_ndom_comp.png")
+```
 
