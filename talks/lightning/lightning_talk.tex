@@ -8,7 +8,7 @@
 \lstset{language=python,frame=single}
 \usepackage{verbatim}
 %\usepackage{apacite}
-\usepackage{natbib}
+\usepackage[longnamesfirst]{natbib}
 \usepackage{subcaption}
 \usepackage{amsmath}
 \usepackage{relsize}
@@ -20,6 +20,13 @@
 \usepackage{tikz}
 \usetikzlibrary{matrix,backgrounds}
 \usetikzlibrary{positioning}
+\usetikzlibrary{shapes,arrows}
+\usetikzlibrary{positioning}
+
+\tikzstyle{block} = [rectangle, draw, fill=red!20!blue!10, 
+    text width=5em, text centered, rounded corners, minimum height=4em]
+\tikzstyle{line} = [draw, line width=1.5pt, -latex']
+
 \pgfdeclarelayer{myback}
 \pgfsetlayers{myback,background,main}
 
@@ -50,11 +57,50 @@
 \end{frame}
 
 \begin{frame}{The human condition}
+\begin{figure}
+\centering
+\uncover<1->{%
+\begin{subfigure}{0.5\textwidth}
+\includegraphics[width=\textwidth]{figures/chess_cropped.jpg}
+\end{subfigure}}%
+\uncover<2->{%
+\begin{subfigure}{0.5\textwidth}
+\includegraphics[width=\textwidth]{figures/go.jpg}
+\end{subfigure}}\\%
+\uncover<3->{%
+\begin{subfigure}{0.5\textwidth}
+\includegraphics[width=\textwidth]{figures/math.jpg}
+\end{subfigure}}%
+\uncover<4->{%
+\begin{subfigure}{0.5\textwidth}
+\includegraphics[width=\textwidth]{figures/piano.jpg}
+\end{subfigure}}%
+\end{figure}
+{\small \citealp*{Hansen2017}}
 \end{frame}
 
 \begin{frame}{Neural nets transfer too!}
+\begin{figure}
+\centering
+\begin{tikzpicture}
+\node (brain) {\includegraphics[width=0.25\textwidth]{figures/google_brain.jpg}}; 
+\node [below = 1cm of brain] (input) {%
+\only<2-3>{Ceci n'est pas une pipe.}
+\only<5-6>{\includegraphics[width=0.25\textwidth]{figures/un_pipe.jpg}}
+};
+\node [above = 1cm of brain] (output) {%
+\only<3>{This is not a pipe.}
+\only<6>{This is a pipe.}
+};
 
-%%TODO? Hinton results as framing
+\only<2-3,5-6>{
+\path [line] (input) -- (brain); 
+}
+\only<3,6>{
+\path [line] (brain) -- (output); 
+}
+\end{tikzpicture}
+\end{figure}
 \end{frame}
 
 
@@ -77,20 +123,22 @@
 
 \end{frame}
 
-\begin{frame}{Acknowledgements}
-Thanks to:
-\begin{itemize}
-    \item Jay McClelland.
-    \item The rest of the lab.
-    \item The NSF, for funding.
-    \item You, for listening. 
-\end{itemize}
+%%\begin{frame}{Acknowledgements}
+%%Thanks to:
+%%\begin{itemize}
+%%    \item Jay McClelland.
+%%    \item The rest of the lab.
+%%    \item The NSF, for funding.
+%%    \item You, for listening. 
+%%\end{itemize}
+%%\end{frame}
+
+\begin{frame}[standout]
+Questions?
 \end{frame}
 
-\section{Questions?}
-
 \begin{frame}[allowframebreaks]
-\bibliographystyle{apalike}
+\bibliographystyle{plainnat}
 {\tiny \bibliography{shared_reps}}
 \end{frame}
 
