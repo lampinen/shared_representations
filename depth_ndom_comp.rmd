@@ -11,13 +11,13 @@ library(ggplot2)
 ```
 
 ```{r}
-num_runs = 10
+num_runs = 100
 networks = c('linear', 'nonlinear')
 
 d = data.frame()
 for (network in networks) {
   for (nlayer in c(2, 3)) {
-    for (ndomains in 1:3) {
+    for (ndomains in 1:2) {
       for (rseed in 0:(num_runs-1)) {
         filename = sprintf("./results/depth_and_ndom_comp/%s_nlayer_%i_ndomains_%i_rseed_%i_loss_track.csv",network,nlayer,ndomains,rseed)
         this_d = read.csv(filename, header=T)
@@ -35,9 +35,10 @@ for (network in networks) {
 
 ```{r}
 d = d %>%
-  filter(epoch < 1000 | (num_layers == 3 & epoch < 5000)) %>%
+  filter(epoch < 1000 | (num_layers == 3 & epoch < 2000)) %>%
   mutate(num_domains = factor(num_domains),
-         num_layers = factor(num_layers))
+         num_layers = factor(num_layers, labels=c("Two layers", "Three layers")),
+         network = factor(network, labels=c("Fully linear", "Final layer nonlinear")))
 ```
 
 ```{r}
@@ -49,11 +50,15 @@ avg_d = d %>%
 
 ```{r}
 ggplot(data=avg_d, aes(x=epoch, y=MSE, color=num_domains)) +
-  geom_line() +
+  geom_line(size=1.25) +
   facet_grid(network ~ num_layers, scales="free_x") +
-  theme_bw()
+  scale_color_brewer(palette="Set1") +
+  theme_bw(base_size=15) +
+  theme(plot.background = element_blank(),panel.grid.major = element_blank(),panel.grid.minor = element_blank())
 ```
 ```{r}
-ggsave("result_plots/depth_ndom_comp.png")
+#ggsave("result_plots/depth_ndom_comp_fixed_hidden.png")
+ggsave("talks/lightning/figures/depth_ndom_comp_fixed_hidden.png", width=7, height=5)
+
 ```
 
