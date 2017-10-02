@@ -58,7 +58,7 @@ ggplot(data=avg_d, aes(x=epoch, y=MSE, color=num_domains)) +
 ```
 ```{r}
 #ggsave("result_plots/depth_ndom_comp_fixed_hidden.png")
-ggsave("talks/lightning/figures/depth_ndom_comp_fixed_hidden.png", width=7, height=5)
+ggsave("talks/lightning/figures/depth_ndom_comp.png", width=7, height=5)
 
 ```
 
