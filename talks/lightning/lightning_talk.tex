@@ -183,20 +183,20 @@ Can we develop a theory?
 \begin{tikzpicture}[auto]
 \begin{scope}[shift={(-1.5, 0)}]
 \node [text width=3cm, text centered, anchor=north] at (0,-0.33) (input1) {%
-\only<1-4,10-13>{``Who are Alexa's parents?''}
+{\uncover<2-5,11-14>{``Who are Alexa's parents?''}}
 };
 
-\node [netnode, onslide={<2-4,11-13,15-17>{fill=red!20}}] at (-1,1) (h111) {};
-\node [netnode, onslide={<2-4,11-13,15-17>{fill=red!90}}] at (0,1) (h112) {};
-\node [netnode, onslide={<2-4,11-13,15-17>{fill=blue!60}}] at (1,1) (h113) {};
+\node [netnode, onslide={<3-5,12-14,16-18>{fill=red!20}}] at (-1,1) (h111) {};
+\node [netnode, onslide={<3-5,12-14,16-18>{fill=red!90}}] at (0,1) (h112) {};
+\node [netnode, onslide={<3-5,12-14,16-18>{fill=blue!60}}] at (1,1) (h113) {};
 
 \path [draw, very thick] (input1.north) to (h111);
 \path [draw, very thick] (input1.north) to (h112);
 \path [draw, very thick] (input1.north) to (h113);
 
-\node [netnode, onslide={<3-4,12-13,16-17>{fill=blue!20}}] at (-1,3) (h121) {};
-\node [netnode, onslide={<3-4,12-13,16-17>{fill=red!40}}] at (0,3) (h122) {};
-\node [netnode, onslide={<3-4,12-13,16-17>{fill=blue!40}}] at (1,3) (h123) {};
+\node [netnode, onslide={<4-5,13-14,17-18>{fill=blue!20}}] at (-1,3) (h121) {};
+\node [netnode, onslide={<4-5,13-14,17-18>{fill=red!40}}] at (0,3) (h122) {};
+\node [netnode, onslide={<4-5,13-14,17-18>{fill=blue!40}}] at (1,3) (h123) {};
 
 \path [draw, very thick] (h111) to (h121);
 \path [draw, very thick] (h111) to (h122);
@@ -208,8 +208,8 @@ Can we develop a theory?
 \path [draw, very thick] (h113) to (h122);
 \path [draw, very thick] (h113) to (h123);
 
-\node [anchor=south, align=center] at (0,4.33) (output1) {%
-\only<4,13>{``Louis and\\ Christine''}
+\node [text width=3cm, anchor=south, align=center] at (0,4.33) (output1) {%
+{\uncover<5,14>{``Louis and\\ Christine''}}
 };
 
 \path [draw, very thick] (h121) to (output1.south);
@@ -219,20 +219,20 @@ Can we develop a theory?
 
 \begin{scope}[shift={(1.5, 0)}]
 \node [text width=3cm, text centered, anchor=north] at (0,-0.33) (input2) {%
-\only<5-8,14-17>{``Who are Alex's parents?''}
+{\uncover<6-9,15-18>{``Who are Alex's parents?''}}
 };
 
-\node [netnode, onslide={<6-8,11-13,15-17>{fill=red!40}}] at (-1,1) (h211) {};
-\node [netnode, onslide={<6-8,11-13,15-17>{fill=blue!10}}] at (0,1) (h212) {};
-\node [netnode, onslide={<6-8,11-13,15-17>{fill=blue!80}}] at (1,1) (h213) {};
+\node [netnode, onslide={<7-9,12-14,16-18>{fill=red!40}}] at (-1,1) (h211) {};
+\node [netnode, onslide={<7-9,12-14,16-18>{fill=blue!10}}] at (0,1) (h212) {};
+\node [netnode, onslide={<7-9,12-14,16-18>{fill=blue!80}}] at (1,1) (h213) {};
 
 \path [draw, very thick] (input2.north) to (h211);
 \path [draw, very thick] (input2.north) to (h212);
 \path [draw, very thick] (input2.north) to (h213);
 
-\node [netnode, onslide={<7-8,12-13,16-17>{fill=red!60}}] at (-1,3) (h221) {};
-\node [netnode, onslide={<7-8,12-13,16-17>{fill=red!30}}] at (0,3) (h222) {};
-\node [netnode, onslide={<7-8,12-13,16-17>{fill=red!80}}] at (1,3) (h223) {};
+\node [netnode, onslide={<8-9,13-14,17-18>{fill=red!60}}] at (-1,3) (h221) {};
+\node [netnode, onslide={<8-9,13-14,17-18>{fill=red!30}}] at (0,3) (h222) {};
+\node [netnode, onslide={<8-9,13-14,17-18>{fill=red!80}}] at (1,3) (h223) {};
 
 \path [draw, very thick] (h211) to (h221);
 \path [draw, very thick] (h211) to (h222);
@@ -244,8 +244,8 @@ Can we develop a theory?
 \path [draw, very thick] (h213) to (h222);
 \path [draw, very thick] (h213) to (h223);
 
-\node [anchor=south, yshift=-0.07cm, align=center] at (0,4.33) (output2) {%
-\only<8,17>{``Louise and\\ Christopher''}
+\node [text width=3cm, anchor=south, yshift=-0.07cm, align=center] at (0,4.33) (output2) {%
+{\uncover<9,18>{``Louise and\\ Christopher''}}
 };
 
 \path [draw, very thick] (h221) to ([yshift=0.05cm]output2.south);
@@ -253,7 +253,7 @@ Can we develop a theory?
 \path [draw, very thick] (h223) to ([yshift=0.05cm]output2.south);
 \end{scope}
 
-\uncover<9->{
+\uncover<10->{
 \path [draw, very thick] (input1.north) to (h211);
 \path [draw, very thick] (input1.north) to (h212);
 \path [draw, very thick] (input1.north) to (h213);
