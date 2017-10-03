@@ -45,15 +45,17 @@ d = d %>%
 avg_d = d %>% 
   group_by(num_layers, num_domains, network, epoch) %>%
   summarize(MSE=mean(MSE)) %>%
-  ungroup()
+  ungroup() %>%
+  mutate(log_MSE=log(MSE))
 ```
 
 ```{r}
 ggplot(data=avg_d, aes(x=epoch, y=MSE, color=num_domains)) +
   geom_line(size=1.25) +
   facet_grid(network ~ num_layers, scales="free_x") +
-  scale_color_brewer(palette="Set1") +
+  scale_color_brewer(palette="Set1", labels=c("One task", "Both")) +
   theme_bw(base_size=15) +
+  labs(color='# of Domains') +
   theme(plot.background = element_blank(),panel.grid.major = element_blank(),panel.grid.minor = element_blank())
 ```
 ```{r}
