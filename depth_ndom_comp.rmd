@@ -37,7 +37,7 @@ for (network in networks) {
 d = d %>%
   filter(epoch < 1000 | (num_layers == 3 & epoch < 2000)) %>%
   mutate(num_domains = factor(num_domains),
-         num_layers = factor(num_layers, labels=c("Two layers", "Three layers")),
+         num_layers = factor(num_layers, labels=c("One hidden layer", "Two hidden layers")),
          network = factor(network, labels=c("Fully linear", "Final layer nonlinear")))
 ```
 
@@ -46,16 +46,16 @@ avg_d = d %>%
   group_by(num_layers, num_domains, network, epoch) %>%
   summarize(MSE=mean(MSE)) %>%
   ungroup() %>%
-  mutate(log_MSE=log(MSE))
+  mutate(log_MSE=log(MSE), scaled_MSE=MSE/as.numeric(num_domains))
 ```
 
 ```{r}
-ggplot(data=avg_d, aes(x=epoch, y=MSE, color=num_domains)) +
+ggplot(data=avg_d, aes(x=epoch, y=scaled_MSE, color=num_domains)) +
   geom_line(size=1.25) +
   facet_grid(network ~ num_layers, scales="free_x") +
-  scale_color_brewer(palette="Set1", labels=c("One task", "Both")) +
+  scale_color_brewer(palette="Set1", labels=c("Separate", "Together")) +
   theme_bw(base_size=15) +
-  labs(color='# of Domains') +
+  labs(color='Networks', x='Epoch (number of times through training dataset)', y='Error (per family)') +
   theme(plot.background = element_blank(),panel.grid.major = element_blank(),panel.grid.minor = element_blank())
 ```
 ```{r}
