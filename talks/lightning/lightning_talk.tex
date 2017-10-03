@@ -68,6 +68,10 @@
 \begin{figure}
 \centering
 \begin{tikzpicture}[auto]
+\only<1>{
+\node at (0, -3) {\huge Audience participation!!!};
+}
+\uncover<2->{
 \node at (0, 0) (Louis) {Louis};  
 \node at (-3, 0) (p11) {Charlotte};
 \path [draw, dashed, opacity=0.5, line width=1.0pt] (p11) -- node {\small divorced} (Louis);
@@ -87,8 +91,9 @@
 \path [draw, dashed, opacity=0.5, line width=1.0pt] ([xshift=0.2cm]Louis) |- (m12);
 \path [draw, dashed, opacity=0.5, line width=1.0pt] (m12) -- node [anchor=center, xshift=0.8cm] {\small daughter} (Alexa);
 \path [draw, dashed, opacity=0.5, line width=1.0pt] (Jane) -- node {\small half sisters} (Alexa);
+}
 \begin{scope}[shift={(0, -4)}]
-\uncover<2->{
+\uncover<3->{
 \node at (0, 0) (Louise) {Louise};  
 \node at (-3, 0) (p11) {Charlie};
 \path [draw, dashed, opacity=0.5, line width=1.0pt] (p11) -- node {\small divorced} (Louise);
@@ -101,9 +106,7 @@
 \path [draw, dashed, opacity=0.5, line width=1.0pt] ([xshift=-0.2cm]Louise) |- (m11);
 \path [draw, dashed, opacity=0.5, line width=1.0pt] (m11) -- node [anchor=center, xshift=-0.4cm] {\small son} (John);
 }
-\uncover<3->{
-
-
+\uncover<4->{
 \node at (1.5, -0.75) [inner sep=0, outer sep=0] (m12) {};
 \node at (1.5, -2) (Alex) {Alex};
 \path [draw, dashed, opacity=0.5, line width=1.0pt] (p12) |- (m12);
@@ -116,7 +119,7 @@
 \note{I'm gonna tell you about a family... Louis is divorced from Barbara but they have a daughter named Jane, and now Louis is married to Katie, and they have a daughter named Alexa}
 \end{figure}
 
-\blfootnote{\citep*{Hinton1986}}
+\blfootnote{\uncover<2->{\citep*{Hinton1986}}}
 \end{frame}
 
 \begin{frame}{The human condition}
@@ -292,10 +295,14 @@ Can we develop a theory?
 \centering
 \begin{tikzpicture}[auto]
 \node [anchor=center, inner sep=0] at (0,0) {\includegraphics[width=\textwidth]{figures/depth_ndom_comp.png}};
-\fill<1> [white] (-4.53, 3.3) rectangle (-0.89, 0.2);
-\fill<-2> [white] (2.86, 3.3) rectangle (-0.89, 0.2);
-\fill<-3> [white] (-4.53, -3.02) rectangle (-0.89, 0.2);
-\fill<-4> [white] (2.86, -3.02) rectangle (-0.89, 0.2);
+%\fill<1> [white] (-4.53, 3.3) rectangle (-0.89, 0.2);
+%\fill<-2> [white] (2.86, 3.3) rectangle (-0.89, 0.2);
+%\fill<-3> [white] (-4.53, -3.02) rectangle (-0.89, 0.2);
+%\fill<-4> [white] (2.86, -3.02) rectangle (-0.89, 0.2);
+\fill<1> [white] (-4.25, 3.15) rectangle (-0.79, 0.2);
+\fill<-2> [white] (2.75, 3.15) rectangle (-0.79, 0.2);
+\fill<-3> [white] (-4.25, -2.89) rectangle (-0.79, 0.2);
+\fill<-4> [white] (2.75, -2.89) rectangle (-0.79, 0.2);
 \end{tikzpicture}
 \end{figure}
 
