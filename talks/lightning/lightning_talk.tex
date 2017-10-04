@@ -31,6 +31,7 @@
 \tikzstyle{block} = [rectangle, draw, fill=red!20!blue!10, 
     text width=5em, text centered, rounded corners, minimum height=4em]
 \tikzstyle{netnode} = [circle, draw, very thick, inner sep=0pt, minimum size=0.5cm] 
+\tikzstyle{relunode} = [rectangle, draw, very thick, inner sep=0pt, minimum size=0.5cm] 
     
 \tikzstyle{line} = [draw, line width=1.5pt, -latex']
 
@@ -64,7 +65,7 @@
 \date{Lightning Talk, Oct. 4th 2017}
 \frame{\titlepage}
 
-\begin{frame}{Transfer}
+\begin{frame}[label=families]{Transfer}
 \begin{figure}
 \centering
 \begin{tikzpicture}[auto]
@@ -177,13 +178,21 @@ Can we develop a theory?
 
 %\section{Can we make a theory?}
 
-\begin{frame}{Isomorphic tasks for neural networks}
+\againframe<5>{families}
+
+
+\begin{frame}{Teaching networks about families}
 \begin{figure}
 \centering
 \begin{tikzpicture}[auto]
 \begin{scope}[shift={(-1.5, 0)}]
 \node [text width=3cm, text centered, anchor=north] at (0,-0.33) (input1) {%
-{\uncover<2-5,11-14>{``Who are Alexa's parents?''}}
+\only<-19>{
+{\uncover<2-5,11-14,19>{``Who are Alexa's parents?''}}
+}
+\only<20->{
+\([0, 1, 0, 0]\)
+}
 };
 
 \node [netnode, onslide={<3-5,12-14,16-18>{fill=red!20}}] at (-1,1) (h111) {};
@@ -194,6 +203,7 @@ Can we develop a theory?
 \path [draw, very thick] (input1.north) to (h112);
 \path [draw, very thick] (input1.north) to (h113);
 
+\only<-20>{
 \node [netnode, onslide={<4-5,13-14,17-18>{fill=blue!20}}] at (-1,3) (h121) {};
 \node [netnode, onslide={<4-5,13-14,17-18>{fill=red!40}}] at (0,3) (h122) {};
 \node [netnode, onslide={<4-5,13-14,17-18>{fill=blue!40}}] at (1,3) (h123) {};
@@ -207,14 +217,23 @@ Can we develop a theory?
 \path [draw, very thick] (h113) to (h121);
 \path [draw, very thick] (h113) to (h122);
 \path [draw, very thick] (h113) to (h123);
+}
 
 \node [text width=3cm, anchor=south, align=center] at (0,4.33) (output1) {%
-{\uncover<5,14>{``Louis and\\ Christine''}}
+\only<-19>{
+{\uncover<5,14,19>{``Louis and\\ Christine''}}
+}
+\only<20->{
+\([1, 0, 1, 0, 0, 0]\)
+}
 };
 
+
+\only<-20>{
 \path [draw, very thick] (h121) to (output1.south);
 \path [draw, very thick] (h122) to (output1.south);
 \path [draw, very thick] (h123) to (output1.south);
+}
 \end{scope}
 
 \begin{scope}[shift={(1.5, 0)}]
@@ -230,6 +249,7 @@ Can we develop a theory?
 \path [draw, very thick] (input2.north) to (h212);
 \path [draw, very thick] (input2.north) to (h213);
 
+\only<-20>{
 \node [netnode, onslide={<8-9,13-14,17-18>{fill=red!60}}] at (-1,3) (h221) {};
 \node [netnode, onslide={<8-9,13-14,17-18>{fill=red!30}}] at (0,3) (h222) {};
 \node [netnode, onslide={<8-9,13-14,17-18>{fill=red!80}}] at (1,3) (h223) {};
@@ -243,17 +263,132 @@ Can we develop a theory?
 \path [draw, very thick] (h213) to (h221);
 \path [draw, very thick] (h213) to (h222);
 \path [draw, very thick] (h213) to (h223);
+}
 
 \node [text width=3cm, anchor=south, yshift=-0.07cm, align=center] at (0,4.33) (output2) {%
 {\uncover<9,18>{``Louise and\\ Christopher''}}
 };
+
+
+\only<-20>{
+\path [draw, very thick] (h221) to ([yshift=0.05cm]output2.south);
+\path [draw, very thick] (h222) to ([yshift=0.05cm]output2.south);
+\path [draw, very thick] (h223) to ([yshift=0.05cm]output2.south);
+}
+\end{scope}
+
+\uncover<10->{
+\path [draw, very thick] (input1.north) to (h211);
+\path [draw, very thick] (input1.north) to (h212);
+\path [draw, very thick] (input1.north) to (h213);
+\path [draw, very thick] (input2.north) to (h111);
+\path [draw, very thick] (input2.north) to (h112);
+\path [draw, very thick] (input2.north) to (h113);
+\only<-20>{
+\path [draw, very thick] (h111) to (h221);
+\path [draw, very thick] (h111) to (h222);
+\path [draw, very thick] (h111) to (h223);
+\path [draw, very thick] (h112) to (h221);
+\path [draw, very thick] (h112) to (h222);
+\path [draw, very thick] (h112) to (h223);
+\path [draw, very thick] (h113) to (h221);
+\path [draw, very thick] (h113) to (h222);
+\path [draw, very thick] (h113) to (h223);
+\path [draw, very thick] (h211) to (h121);
+\path [draw, very thick] (h211) to (h122);
+\path [draw, very thick] (h211) to (h123);
+\path [draw, very thick] (h212) to (h121);
+\path [draw, very thick] (h212) to (h122);
+\path [draw, very thick] (h212) to (h123);
+\path [draw, very thick] (h213) to (h121);
+\path [draw, very thick] (h213) to (h122);
+\path [draw, very thick] (h213) to (h123);
+\path [draw, very thick] (h221) to (output1.south);
+\path [draw, very thick] (h222) to (output1.south);
+\path [draw, very thick] (h223) to (output1.south);
+\path [draw, very thick] (h121) to ([yshift=0.05cm]output2.south);
+\path [draw, very thick] (h122) to ([yshift=0.05cm]output2.south);
+\path [draw, very thick] (h123) to ([yshift=0.05cm]output2.south);
+}
+}
+\end{tikzpicture}
+\end{figure}
+\note{Described tasks that share structure but are not identical, but to make our analysis simpler we are beginning with networks learning two tasks that are truly identical.}
+\end{frame}
+
+\begin{frame}{For what networks?}
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}[auto]
+\begin{scope}[shift={(-1.5, 0)}]
+\node [text width=3cm, text centered, anchor=north] at (0,-0.33) (input1) {%
+};
+
+\node [netnode] at (-1,1) (h111) {};
+\node [netnode] at (0,1) (h112) {};
+\node [netnode] at (1,1) (h113) {};
+
+\path [draw, very thick] (input1.north) to (h111);
+\path [draw, very thick] (input1.north) to (h112);
+\path [draw, very thick] (input1.north) to (h113);
+
+\node [netnode] at (-1,3) (h121) {};
+\node [netnode] at (0,3) (h122) {};
+\node [netnode] at (1,3) (h123) {};
+
+\path [draw, very thick] (h111) to (h121);
+\path [draw, very thick] (h111) to (h122);
+\path [draw, very thick] (h111) to (h123);
+\path [draw, very thick] (h112) to (h121);
+\path [draw, very thick] (h112) to (h122);
+\path [draw, very thick] (h112) to (h123);
+\path [draw, very thick] (h113) to (h121);
+\path [draw, very thick] (h113) to (h122);
+\path [draw, very thick] (h113) to (h123);
+
+\node [text width=3cm, anchor=south, align=center] at (0,4.33) (output1) {%
+};
+
+\path [draw, very thick] (h121) to (output1.south);
+\path [draw, very thick] (h122) to (output1.south);
+\path [draw, very thick] (h123) to (output1.south);
+\end{scope}
+
+\begin{scope}[shift={(1.5, 0)}]
+\node [text width=3cm, text centered, anchor=north] at (0,-0.33) (input2) {%
+};
+
+\node [netnode] at (-1,1) (h211) {};
+\node [netnode] at (0,1) (h212) {};
+\node [netnode] at (1,1) (h213) {};
+
+\path [draw, very thick] (input2.north) to (h211);
+\path [draw, very thick] (input2.north) to (h212);
+\path [draw, very thick] (input2.north) to (h213);
+
+\node [netnode] at (-1,3) (h221) {};
+\node [netnode] at (0,3) (h222) {};
+\node [netnode] at (1,3) (h223) {};
+
+\path [draw, very thick] (h211) to (h221);
+\path [draw, very thick] (h211) to (h222);
+\path [draw, very thick] (h211) to (h223);
+\path [draw, very thick] (h212) to (h221);
+\path [draw, very thick] (h212) to (h222);
+\path [draw, very thick] (h212) to (h223);
+\path [draw, very thick] (h213) to (h221);
+\path [draw, very thick] (h213) to (h222);
+\path [draw, very thick] (h213) to (h223);
+
+\node [text width=3cm, anchor=south, yshift=-0.07cm, align=center] at (0,4.33) (output2) {%
+};
+
 
 \path [draw, very thick] (h221) to ([yshift=0.05cm]output2.south);
 \path [draw, very thick] (h222) to ([yshift=0.05cm]output2.south);
 \path [draw, very thick] (h223) to ([yshift=0.05cm]output2.south);
 \end{scope}
 
-\uncover<10->{
 \path [draw, very thick] (input1.north) to (h211);
 \path [draw, very thick] (input1.north) to (h212);
 \path [draw, very thick] (input1.north) to (h213);
@@ -284,13 +419,245 @@ Can we develop a theory?
 \path [draw, very thick] (h121) to ([yshift=0.05cm]output2.south);
 \path [draw, very thick] (h122) to ([yshift=0.05cm]output2.south);
 \path [draw, very thick] (h123) to ([yshift=0.05cm]output2.south);
-}
+
+\begin{scope}[shift={(-10, 1)}]
+\begin{scope}[shift={(-1.5, 0)}]
+\node [text width=3cm, text centered, anchor=north] at (0,-0.33) (input1) {%
+};
+
+\node [netnode] at (-1,1) (h111) {};
+\node [netnode] at (0,1) (h112) {};
+\node [netnode] at (1,1) (h113) {};
+
+\path [draw, very thick] (input1.north) to (h111);
+\path [draw, very thick] (input1.north) to (h112);
+\path [draw, very thick] (input1.north) to (h113);
+
+\node [text width=3cm, anchor=south, align=center] at (0,2.33) (output1) {%
+};
+
+\path [draw, very thick] (h111) to (output1.south);
+\path [draw, very thick] (h112) to (output1.south);
+\path [draw, very thick] (h113) to (output1.south);
+\end{scope}
+
+\begin{scope}[shift={(1.5, 0)}]
+\node [text width=3cm, text centered, anchor=north] at (0,-0.33) (input2) {%
+};
+
+\node [netnode] at (-1,1) (h211) {};
+\node [netnode] at (0,1) (h212) {};
+\node [netnode] at (1,1) (h213) {};
+
+\path [draw, very thick] (input2.north) to (h211);
+\path [draw, very thick] (input2.north) to (h212);
+\path [draw, very thick] (input2.north) to (h213);
+
+\node [text width=3cm, anchor=south, yshift=-0.07cm, align=center] at (0,2.33) (output2) {%
+};
+
+
+\path [draw, very thick] (h211) to ([yshift=0.05cm]output2.south);
+\path [draw, very thick] (h212) to ([yshift=0.05cm]output2.south);
+\path [draw, very thick] (h213) to ([yshift=0.05cm]output2.south);
+\end{scope}
+
+\path [draw, very thick] (input1.north) to (h211);
+\path [draw, very thick] (input1.north) to (h212);
+\path [draw, very thick] (input1.north) to (h213);
+\path [draw, very thick] (input2.north) to (h111);
+\path [draw, very thick] (input2.north) to (h112);
+\path [draw, very thick] (input2.north) to (h113);
+\path [draw, very thick] (h211) to (output1.south);
+\path [draw, very thick] (h212) to (output1.south);
+\path [draw, very thick] (h213) to (output1.south);
+\path [draw, very thick] (h111) to ([yshift=0.05cm]output2.south);
+\path [draw, very thick] (h112) to ([yshift=0.05cm]output2.south);
+\path [draw, very thick] (h113) to ([yshift=0.05cm]output2.south);
+
+\end{scope}
+
+\begin{scope}[shift={(0, -7)}]
+
+\begin{scope}[shift={(-1.5, 0)}]
+\node [text width=3cm, text centered, anchor=north] at (0,-0.33) (input1) {%
+};
+
+\node [netnode] at (-1,1) (h111) {};
+\node [netnode] at (0,1) (h112) {};
+\node [netnode] at (1,1) (h113) {};
+
+\path [draw, very thick] (input1.north) to (h111);
+\path [draw, very thick] (input1.north) to (h112);
+\path [draw, very thick] (input1.north) to (h113);
+
+\node [netnode] at (-1,3) (h121) {};
+\node [netnode] at (0,3) (h122) {};
+\node [netnode] at (1,3) (h123) {};
+
+\path [draw, very thick] (h111) to (h121);
+\path [draw, very thick] (h111) to (h122);
+\path [draw, very thick] (h111) to (h123);
+\path [draw, very thick] (h112) to (h121);
+\path [draw, very thick] (h112) to (h122);
+\path [draw, very thick] (h112) to (h123);
+\path [draw, very thick] (h113) to (h121);
+\path [draw, very thick] (h113) to (h122);
+\path [draw, very thick] (h113) to (h123);
+
+\node [relunode] at (0,4.33) (output1) {%
+\begin{tikzpicture}
+\path [draw, very thick] (-0.2, 0) to (0, 0) to (0.2, 0.2);
+\node [inner sep=0cm, outer sep=0cm, minimum size=0cm] at (0, -0.1) {};
 \end{tikzpicture}
-\end{figure}
-\note{Described tasks that share structure but are not identical, but to make our analysis simpler we are beginning with networks learning two tasks that are truly identical.}
+};
+
+\path [draw, very thick] (h121) to (output1.south);
+\path [draw, very thick] (h122) to (output1.south);
+\path [draw, very thick] (h123) to (output1.south);
+\end{scope}
+
+\begin{scope}[shift={(1.5, 0)}]
+\node [text width=3cm, text centered, anchor=north] at (0,-0.33) (input2) {%
+};
+
+\node [netnode] at (-1,1) (h211) {};
+\node [netnode] at (0,1) (h212) {};
+\node [netnode] at (1,1) (h213) {};
+
+\path [draw, very thick] (input2.north) to (h211);
+\path [draw, very thick] (input2.north) to (h212);
+\path [draw, very thick] (input2.north) to (h213);
+
+\node [netnode] at (-1,3) (h221) {};
+\node [netnode] at (0,3) (h222) {};
+\node [netnode] at (1,3) (h223) {};
+
+\path [draw, very thick] (h211) to (h221);
+\path [draw, very thick] (h211) to (h222);
+\path [draw, very thick] (h211) to (h223);
+\path [draw, very thick] (h212) to (h221);
+\path [draw, very thick] (h212) to (h222);
+\path [draw, very thick] (h212) to (h223);
+\path [draw, very thick] (h213) to (h221);
+\path [draw, very thick] (h213) to (h222);
+\path [draw, very thick] (h213) to (h223);
+
+\node [relunode] at (0,4.33) (output2) {%
+\begin{tikzpicture}
+\path [draw, very thick] (-0.2, 0) to (0, 0) to (0.2, 0.2);
+\node [inner sep=0cm, outer sep=0cm, minimum size=0cm] at (0, -0.1) {};
+\end{tikzpicture}
+};
+
+
+\path [draw, very thick] (h221) to (output2.south);
+\path [draw, very thick] (h222) to (output2.south);
+\path [draw, very thick] (h223) to (output2.south);
+\end{scope}
+
+\path [draw, very thick] (input1.north) to (h211);
+\path [draw, very thick] (input1.north) to (h212);
+\path [draw, very thick] (input1.north) to (h213);
+\path [draw, very thick] (input2.north) to (h111);
+\path [draw, very thick] (input2.north) to (h112);
+\path [draw, very thick] (input2.north) to (h113);
+\path [draw, very thick] (h111) to (h221);
+\path [draw, very thick] (h111) to (h222);
+\path [draw, very thick] (h111) to (h223);
+\path [draw, very thick] (h112) to (h221);
+\path [draw, very thick] (h112) to (h222);
+\path [draw, very thick] (h112) to (h223);
+\path [draw, very thick] (h113) to (h221);
+\path [draw, very thick] (h113) to (h222);
+\path [draw, very thick] (h113) to (h223);
+\path [draw, very thick] (h211) to (h121);
+\path [draw, very thick] (h211) to (h122);
+\path [draw, very thick] (h211) to (h123);
+\path [draw, very thick] (h212) to (h121);
+\path [draw, very thick] (h212) to (h122);
+\path [draw, very thick] (h212) to (h123);
+\path [draw, very thick] (h213) to (h121);
+\path [draw, very thick] (h213) to (h122);
+\path [draw, very thick] (h213) to (h123);
+\path [draw, very thick] (h221) to (output1.south);
+\path [draw, very thick] (h222) to (output1.south);
+\path [draw, very thick] (h223) to (output1.south);
+\path [draw, very thick] (h121) to (output2.south);
+\path [draw, very thick] (h122) to (output2.south);
+\path [draw, very thick] (h123) to (output2.south);
+
+\begin{scope}[shift={(-10, 1)}]
+\begin{scope}[shift={(-1.5, 0)}]
+\node [text width=3cm, text centered, anchor=north] at (0,-0.33) (input1) {%
+};
+
+\node [netnode] at (-1,1) (h111) {};
+\node [netnode] at (0,1) (h112) {};
+\node [netnode] at (1,1) (h113) {};
+
+\path [draw, very thick] (input1.north) to (h111);
+\path [draw, very thick] (input1.north) to (h112);
+\path [draw, very thick] (input1.north) to (h113);
+
+\node [relunode] at (0,2.33) (output1) {%
+\begin{tikzpicture}
+\path [draw, very thick] (-0.2, 0) to (0, 0) to (0.2, 0.2);
+\node [inner sep=0cm, outer sep=0cm, minimum size=0cm] at (0, -0.1) {};
+\end{tikzpicture}
+};
+
+\path [draw, very thick] (h111) to (output1.south);
+\path [draw, very thick] (h112) to (output1.south);
+\path [draw, very thick] (h113) to (output1.south);
+\end{scope}
+
+\begin{scope}[shift={(1.5, 0)}]
+\node [text width=3cm, text centered, anchor=north] at (0,-0.33) (input2) {%
+};
+
+\node [netnode] at (-1,1) (h211) {};
+\node [netnode] at (0,1) (h212) {};
+\node [netnode] at (1,1) (h213) {};
+
+\path [draw, very thick] (input2.north) to (h211);
+\path [draw, very thick] (input2.north) to (h212);
+\path [draw, very thick] (input2.north) to (h213);
+
+\node [relunode] at (0,2.33) (output2) {%
+\begin{tikzpicture}
+\path [draw, very thick] (-0.2, 0) to (0, 0) to (0.2, 0.2);
+\node [inner sep=0cm, outer sep=0cm, minimum size=0cm] at (0, -0.1) {};
+\end{tikzpicture}
+};
+
+
+\path [draw, very thick] (h211) to (output2.south);
+\path [draw, very thick] (h212) to (output2.south);
+\path [draw, very thick] (h213) to (output2.south);
+\end{scope}
+
+\path [draw, very thick] (input1.north) to (h211);
+\path [draw, very thick] (input1.north) to (h212);
+\path [draw, very thick] (input1.north) to (h213);
+\path [draw, very thick] (input2.north) to (h111);
+\path [draw, very thick] (input2.north) to (h112);
+\path [draw, very thick] (input2.north) to (h113);
+\path [draw, very thick] (h211) to (output1.south);
+\path [draw, very thick] (h212) to (output1.south);
+\path [draw, very thick] (h213) to (output1.south);
+\path [draw, very thick] (h111) to (output2.south);
+\path [draw, very thick] (h112) to (output2.south);
+\path [draw, very thick] (h113) to (output2.south);
+
+\end{scope}
+\end{scope}
+\end{tikzpicture}
+}
+\nocite{Saxe2013}
 \end{frame}
 
-\begin{frame}<1-5>{Under what conditions?}
+\begin{frame}<1-5>{Results}
 \begin{figure}
 \centering
 \begin{tikzpicture}[auto]
