@@ -69,10 +69,7 @@
 \begin{figure}
 \centering
 \begin{tikzpicture}[auto]
-\only<1>{
-\node at (0, -3) {\huge Audience participation!!!};
-}
-\uncover<2->{
+\uncover<1->{
 \node at (0, 0) (Louis) {Louis};  
 \node at (-3, 0) (p11) {Charlotte};
 \path [draw, dashed, opacity=0.5, line width=1.0pt] (p11) -- node {\small divorced} (Louis);
@@ -94,7 +91,7 @@
 \path [draw, dashed, opacity=0.5, line width=1.0pt] (Jane) -- node {\small half sisters} (Alexa);
 }
 \begin{scope}[shift={(0, -4)}]
-\uncover<3->{
+\uncover<2->{
 \node at (0, 0) (Louise) {Louise};  
 \node at (-3, 0) (p11) {Charlie};
 \path [draw, dashed, opacity=0.5, line width=1.0pt] (p11) -- node {\small divorced} (Louise);
@@ -107,7 +104,7 @@
 \path [draw, dashed, opacity=0.5, line width=1.0pt] ([xshift=-0.2cm]Louise) |- (m11);
 \path [draw, dashed, opacity=0.5, line width=1.0pt] (m11) -- node [anchor=center, xshift=-0.4cm] {\small son} (John);
 }
-\uncover<4->{
+\uncover<3->{
 \node at (1.5, -0.75) [inner sep=0, outer sep=0] (m12) {};
 \node at (1.5, -2) (Alex) {Alex};
 \path [draw, dashed, opacity=0.5, line width=1.0pt] (p12) |- (m12);
