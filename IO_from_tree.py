@@ -19,12 +19,12 @@ def IO_from_tree(tree, top=True):
     return IO 
 
 
-
-print IO_from_tree([[1,1],[1,1]])
-print IO_from_tree([
-[[1,1],[1,1,[1,1]]],
-[[1,1],[1,1,[1,1]]],
-])
+if __name__ == "__main__":
+    print IO_from_tree([[1,1],[1,1]])
+    print IO_from_tree([
+    [[1,1],[1,1,[1,1]]],
+    [[1,1],[1,1,[1,1]]],
+    ])
 
 
 
