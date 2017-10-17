@@ -44,14 +44,15 @@ d = d %>%
 ```{r}
 avg_d = d %>% 
   group_by(num_layers, num_domains, network, epoch) %>%
-  summarize(MSE=mean(MSE)) %>%
+  summarize(min_MSE=min(MSE), max_MSE=max(MSE), mean_MSE=mean(MSE)) %>%
   ungroup() %>%
-  mutate(log_MSE=log(MSE), scaled_MSE=MSE/as.numeric(num_domains))
+  mutate(log_MSE=log(mean_MSE), scaled_MSE=mean_MSE/as.numeric(num_domains), scaled_min_MSE=min_MSE/as.numeric(num_domains), scaled_max_MSE=max_MSE/as.numeric(num_domains))
 ```
 
 ```{r}
 ggplot(data=avg_d, aes(x=epoch, y=scaled_MSE, color=num_domains)) +
   geom_line(size=1.25) +
+  geom_ribbon(aes(x=epoch, ymin=scaled_min_MSE, ymax=scaled_max_MSE, fill=num_domains), alpha=0.3) +
   facet_grid(network ~ num_layers, scales="free_x") +
   scale_color_brewer(palette="Set1", labels=c("Separate", "Together")) +
   theme_bw(base_size=15) +
