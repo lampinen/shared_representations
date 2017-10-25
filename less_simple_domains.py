@@ -5,7 +5,7 @@ import os
 from IO_from_tree import IO_from_tree
 
 ######Parameters###################
-init_eta = 0.01
+init_eta = 0.001
 eta_decay = 1.0 #multiplicative per eta_decay_epoch epochs
 eta_decay_epoch = 10
 nepochs = 5000
@@ -40,7 +40,7 @@ for network in ['nonlinear', 'linear']:
 	    nhidden = ninput
 	    for rseed in xrange(0, nruns):
 		print "nlayer %i ndomains %i run %i" % (nlayer, ndomains, rseed)
-		filename_prefix = "results/less_simple_3/%s_nlayer_%i_ndomains_%i_rseed_%i_" %(network,nlayer,ndomains,rseed)
+		filename_prefix = "results/less_simple_4/%s_nlayer_%i_ndomains_%i_rseed_%i_" %(network,nlayer,ndomains,rseed)
 
 		numpy.random.seed(rseed)
 		tf.set_random_seed(rseed)
@@ -48,27 +48,27 @@ for network in ['nonlinear', 'linear']:
 		input_ph = tf.placeholder(tf.float32, shape=[ninput,None])
 		target_ph = tf.placeholder(tf.float32, shape=[noutput,None])
 		if nlayer == 2:
-		    W1 = tf.Variable(tf.random_uniform([nhidden,ninput],0.,2.0/(nhidden+ninput)))
-		    W2 = tf.Variable(tf.random_uniform([noutput,nhidden],0.,2./(nhidden+noutput)))
-		    b_out = tf.Variable(tf.zeros([noutput, 1]))
+		    W1 = tf.Variable(tf.random_normal([nhidden,ninput],0.,2.0/(nhidden+ninput)))
+		    W2 = tf.Variable(tf.random_normal([noutput,nhidden],0.,2./(nhidden+noutput)))
+#		    b_out = tf.Variable(tf.zeros([noutput, 1]))
 		    internal_rep = tf.matmul(W1,input_ph)
-		    pre_output = tf.matmul(W2,internal_rep) + b_out
+		    pre_output = tf.matmul(W2,internal_rep)# + b_out
 		elif nlayer == 3:
-		    W1 = tf.Variable(tf.random_uniform([nhidden,ninput],0.,2./(nhidden+ninput)))
-		    W2 = tf.Variable(tf.random_uniform([nhidden,nhidden],0.,1./nhidden))
-		    W3 = tf.Variable(tf.random_uniform([noutput,nhidden],0.,2./(nhidden+noutput)))
-		    b_out = tf.Variable(tf.zeros([noutput, 1]))
+		    W1 = tf.Variable(tf.random_normal([nhidden,ninput],0.,2./(nhidden+ninput)))
+		    W2 = tf.Variable(tf.random_normal([nhidden,nhidden],0.,1./nhidden))
+		    W3 = tf.Variable(tf.random_normal([noutput,nhidden],0.,2./(nhidden+noutput)))
+#		    b_out = tf.Variable(tf.zeros([noutput, 1]))
 		    internal_rep = tf.matmul(W1,input_ph)
-		    pre_output = tf.matmul(W3,tf.matmul(W2,internal_rep)) + b_out
+		    pre_output = tf.matmul(W3,tf.matmul(W2,internal_rep))# + b_out
 		elif nlayer == 4:
-		    W1 = tf.Variable(tf.random_uniform([nhidden,ninput],0.,2./(nhidden+ninput)))
-		    W2 = tf.Variable(tf.random_uniform([nhidden,nhidden],0.,1./nhidden))
-		    W3 = tf.Variable(tf.random_uniform([nhidden,nhidden],0.,1./nhidden))
-		    W4 = tf.Variable(tf.random_uniform([noutput,nhidden],0.,2./(nhidden+noutput)))
-		    b_out = tf.Variable(tf.zeros([noutput, 1]))
+		    W1 = tf.Variable(tf.random_normal([nhidden,ninput],0.,2./(nhidden+ninput)))
+		    W2 = tf.Variable(tf.random_normal([nhidden,nhidden],0.,1./nhidden))
+		    W3 = tf.Variable(tf.random_normal([nhidden,nhidden],0.,1./nhidden))
+		    W4 = tf.Variable(tf.random_normal([noutput,nhidden],0.,2./(nhidden+noutput)))
+#		    b_out = tf.Variable(tf.zeros([noutput, 1]))
 		    internal_rep = tf.matmul(W1,input_ph)
 			
-		    pre_output = tf.matmul(W4,tf.matmul(W3,tf.matmul(W2,internal_rep))) + b_out
+		    pre_output = tf.matmul(W4,tf.matmul(W3,tf.matmul(W2,internal_rep)))# + b_out
 		else:
 		    print "Error, invalid number of layers given"
 		    exit(1)
