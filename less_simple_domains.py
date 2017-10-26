@@ -48,23 +48,23 @@ for network in ['nonlinear', 'linear']:
 		input_ph = tf.placeholder(tf.float32, shape=[ninput,None])
 		target_ph = tf.placeholder(tf.float32, shape=[noutput,None])
 		if nlayer == 2:
-		    W1 = tf.Variable(tf.random_normal([nhidden,ninput],0.,2.0/(nhidden+ninput)))
-		    W2 = tf.Variable(tf.random_normal([noutput,nhidden],0.,2./(nhidden+noutput)))
+		    W1 = tf.Variable(tf.random_uniform([nhidden,ninput],0.,2.0/(nhidden+ninput)))
+		    W2 = tf.Variable(tf.random_uniform([noutput,nhidden],0.,2./(nhidden+noutput)))
 #		    b_out = tf.Variable(tf.zeros([noutput, 1]))
 		    internal_rep = tf.matmul(W1,input_ph)
 		    pre_output = tf.matmul(W2,internal_rep)# + b_out
 		elif nlayer == 3:
-		    W1 = tf.Variable(tf.random_normal([nhidden,ninput],0.,2./(nhidden+ninput)))
-		    W2 = tf.Variable(tf.random_normal([nhidden,nhidden],0.,1./nhidden))
-		    W3 = tf.Variable(tf.random_normal([noutput,nhidden],0.,2./(nhidden+noutput)))
+		    W1 = tf.Variable(tf.random_uniform([nhidden,ninput],0.,2./(nhidden+ninput)))
+		    W2 = tf.Variable(tf.random_uniform([nhidden,nhidden],0.,1./nhidden))
+		    W3 = tf.Variable(tf.random_uniform([noutput,nhidden],0.,2./(nhidden+noutput)))
 #		    b_out = tf.Variable(tf.zeros([noutput, 1]))
 		    internal_rep = tf.matmul(W1,input_ph)
 		    pre_output = tf.matmul(W3,tf.matmul(W2,internal_rep))# + b_out
 		elif nlayer == 4:
-		    W1 = tf.Variable(tf.random_normal([nhidden,ninput],0.,2./(nhidden+ninput)))
-		    W2 = tf.Variable(tf.random_normal([nhidden,nhidden],0.,1./nhidden))
-		    W3 = tf.Variable(tf.random_normal([nhidden,nhidden],0.,1./nhidden))
-		    W4 = tf.Variable(tf.random_normal([noutput,nhidden],0.,2./(nhidden+noutput)))
+		    W1 = tf.Variable(tf.random_uniform([nhidden,ninput],0.,2./(nhidden+ninput)))
+		    W2 = tf.Variable(tf.random_uniform([nhidden,nhidden],0.,1./nhidden))
+		    W3 = tf.Variable(tf.random_uniform([nhidden,nhidden],0.,1./nhidden))
+		    W4 = tf.Variable(tf.random_uniform([noutput,nhidden],0.,2./(nhidden+noutput)))
 #		    b_out = tf.Variable(tf.zeros([noutput, 1]))
 		    internal_rep = tf.matmul(W1,input_ph)
 			
