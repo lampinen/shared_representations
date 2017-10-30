@@ -15,7 +15,7 @@ def IO_from_tree(tree, top=True):
     subtrees = [IO_from_tree(subtree, top=False) for subtree in tree]
     IO = block_diag(*subtrees)
     if not top: # add indicator to group these subtrees
-	IO = np.concatenate((np.ones((len(IO), 1)), IO), axis=1)
+	IO = np.concatenate((np.ones((len(IO), len(IO))), IO), axis=1)
     return IO 
 
 

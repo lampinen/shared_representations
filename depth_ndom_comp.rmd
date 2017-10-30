@@ -52,7 +52,7 @@ avg_d = d %>%
 ```{r}
 ggplot(data=avg_d, aes(x=epoch, y=scaled_MSE, color=num_domains)) +
   geom_line(size=1.25) +
-  geom_ribbon(aes(x=epoch, ymin=scaled_min_MSE, ymax=scaled_max_MSE, fill=num_domains), alpha=0.3) +
+#  geom_ribbon(aes(x=epoch, ymin=scaled_min_MSE, ymax=scaled_max_MSE, fill=num_domains), alpha=0.3) +
   facet_grid(network ~ num_layers, scales="free_x") +
   scale_color_brewer(palette="Set1", labels=c("Separate", "Together")) +
   theme_bw(base_size=15) +
@@ -65,3 +65,73 @@ ggsave("talks/lightning/figures/depth_ndom_comp.png", width=7, height=5)
 
 ```
 
+
+# Less simple
+
+```{r}
+num_runs = 10
+networks = c('nonlinear')
+ndomains_list = c(10, 2, 1)
+
+d = data.frame()
+for (network in networks) {
+  for (nlayer in c(3)) {
+    for (ndomains in ndomains_list) {
+      for (rseed in 0:(num_runs-1)) {
+        filename = sprintf("./results/less_simple_4/%s_nlayer_%i_ndomains_%i_rseed_%i_loss_track.csv",network,nlayer,ndomains,rseed)
+        this_d = read.csv(filename, header=T)
+        last_epoch = tail(this_d$epoch, 1)
+        if (last_epoch < 4995) {
+          final_MSE =  tail(this_d$MSE, 1)
+          omitted_d = data.frame(epoch=seq(last_epoch + 5, 4995, 5), MSE=rep(final_MSE, (4995-last_epoch)/5))
+          this_d = bind_rows(this_d, omitted_d)
+        }
+        this_d = this_d %>%
+          mutate(num_layers=nlayer,
+                 num_domains=ndomains,
+                 network=network,
+                 rseed=rseed)
+        d = bind_rows(d, this_d)
+      }
+    }
+  }
+}
+```
+
+```{r}
+d = d %>%
+  filter(epoch < 1000 | (num_layers == 3 & epoch < 5000)) %>%
+  mutate(num_domains = factor(num_domains))
+#         num_layers = factor(num_layers, labels=c("One hidden layer", "Two hidden layers")),
+#         network = factor(network, labels=c("Fully linear", "Final layer nonlinear")))
+```
+
+```{r}
+run_d = d %>%
+  group_by(num_layers, num_domains, network, rseed) %>%
+  summarize(keep=min(MSE) <= 0.001) 
+d = inner_join(d, run_d)
+```
+
+```{r}
+avg_d = d %>% 
+#  filter(keep) %>%
+  group_by(num_layers, num_domains, network, epoch) %>%
+  summarize(min_MSE=min(MSE), max_MSE=max(MSE), mean_MSE=mean(MSE)) %>%
+  ungroup() %>%
+  mutate(log_MSE=log(mean_MSE),
+         scaled_MSE=mean_MSE/as.numeric(levels(num_domains)[num_domains]),
+         scaled_min_MSE=min_MSE/as.numeric(levels(num_domains)[num_domains]),
+         scaled_max_MSE=max_MSE/as.numeric(levels(num_domains)[num_domains]),
+         log_scaled_MSE=log(scaled_MSE))
+```
+
+```{r}
+ggplot(data=avg_d, aes(x=epoch, y=scaled_MSE, color=num_domains)) +
+  geom_line(size=1.25) +
+  facet_grid(network ~ num_layers, scales="free_x") +
+#  geom_ribbon(aes(x=epoch, ymin=scaled_min_MSE, ymax=scaled_max_MSE, fill=num_domains), alpha=0.3) +
+  theme_bw(base_size=15) +
+  labs(color='num domains', x='Epoch (number of times through training dataset)', y='Error (per family)') +
+  theme(plot.background = element_blank(),panel.grid.major = element_blank(),panel.grid.minor = element_blank())
+```

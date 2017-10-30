@@ -8,7 +8,7 @@ init_eta = 0.01
 eta_decay = 1.0 #multiplicative per eta_decay_epoch epochs
 eta_decay_epoch = 10
 nepochs = 10000
-nruns = 5
+nruns = 100
 #nhidden = 6
 #rseed = 2  #reproducibility
 ###################################
@@ -38,11 +38,11 @@ print
 
 for network in ['nonlinear', 'linear']:
     for nlayer in [3,2]:
-	for ndomains in [1,2,3]:
+	for ndomains in [1,2]: #,3]:
 	    ninput = 2*ndomains
 	    noutput = 3*ndomains 
 	    nhidden = ninput
-	    for rseed in xrange(2, nruns):
+	    for rseed in xrange(0, nruns):
 		print "nlayer %i ndomains %i run %i" % (nlayer, ndomains, rseed)
 		filename_prefix = "results/depth_and_ndom_comp/%s_nlayer_%i_ndomains_%i_rseed_%i_" %(network,nlayer,ndomains,rseed)
 
