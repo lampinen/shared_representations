@@ -2,14 +2,15 @@ import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
 import os
+from scipy.linalg import block_diag
 from orthogonal_matrices import random_orthogonal
 
 ######Parameters###################
-init_eta = 0.01
+init_eta = 0.002
 eta_decay = 1.0 #multiplicative per eta_decay_epoch epochs
 eta_decay_epoch = 10
 nepochs = 10000
-nruns = 10
+nruns = 100
 num_inputs_per = 20
 num_outputs_per = 30
 rank = 3
@@ -79,12 +80,13 @@ for rseed in xrange(0, nruns):
                         else:
                             this_x_data_2, this_y_data_2 = this_x_data, this_y_data 
 
-                        x_data = np.concatenate([this_x_data, this_x_data_2], axis=-1)
-                        y_data = np.concatenate([this_y_data, this_y_data_2], axis=-1)
+                        
+                        x_data = block_diag(this_x_data, this_x_data_2)
+                        y_data = block_diag(this_y_data, this_y_data_2)
                     else:
                         x_data = this_x_data
                         y_data = this_y_data
-                    np.clip(y_data, 0, None, y_data) # make the task rectified linear
+                    y_data = np.clip(y_data, 0, None) + 0.1*np.clip(y_data, None, 0) # make the task leaky_relu-ed linear
 
                     input_ph = tf.placeholder(tf.float32, shape=[None, ninput])
                     target_ph = tf.placeholder(tf.float32, shape=[None, noutput])
@@ -112,7 +114,7 @@ for rseed in xrange(0, nruns):
                         print "Error, invalid number of layers given"
                         exit(1)
 
-                    output = tf.nn.relu(pre_output)
+                    output = tf.nn.leaky_relu(pre_output, alpha=0.1)
                     rep_mean_ph =  tf.placeholder(tf.float32, shape=[nhidden,1])
 
                     target_t = tf.transpose(target_ph)
@@ -133,8 +135,8 @@ for rseed in xrange(0, nruns):
                     sess.run(init)
 
                     def test_accuracy():
-                        MSE = sess.run(d1_loss,feed_dict={input_ph: x_data,target_ph: y_data})
-                        MSE /= len(x_data)
+                        MSE = sess.run(d1_loss,feed_dict={input_ph: x_data[:num_inputs_per, :],target_ph: y_data[num_inputs_per, :]})
+                        MSE /= num_inputs_per 
                         return MSE
 
                     def print_outputs():
@@ -190,10 +192,12 @@ for rseed in xrange(0, nruns):
                     loss_filename = filename_prefix + "loss_track.csv"
                     #if os.path.exists(filename):
                 #	os.remove(filename)
-                    save_activations(pre_output,filename_prefix+"initial_pre_outputs.csv")
-                    save_activations(internal_rep,filename_prefix+"initial_reps.csv")
+#                    save_activations(pre_output,filename_prefix+"initial_pre_outputs.csv")
+#                    save_activations(internal_rep,filename_prefix+"initial_reps.csv")
                     with open(loss_filename, 'w') as fout:
                         fout.write("epoch, MSE\n")
+                        curr_mse = test_accuracy()
+                        fout.write("%i, %f\n" %(0, curr_mse))
                         for epoch in xrange(nepochs):
                             if network == 'nonlinear':
                                 train_with_standard_loss()
@@ -203,9 +207,9 @@ for rseed in xrange(0, nruns):
                                 curr_mse = test_accuracy()
                                 print "epoch: %i, MSE: %f" %(epoch, curr_mse)	
                                 fout.write("%i, %f\n" %(epoch, curr_mse))
-                            if epoch % 100 == 0:
-                                save_activations(internal_rep,filename_prefix+"epoch_%i_internal_rep.csv" %epoch)
-                                save_activations(pre_output,filename_prefix+"epoch_%i_pre_outputs.csv" %epoch)
+#                            if epoch % 100 == 0:
+#                                save_activations(internal_rep,filename_prefix+"epoch_%i_internal_rep.csv" %epoch)
+#                                save_activations(pre_output,filename_prefix+"epoch_%i_pre_outputs.csv" %epoch)
                             
                             if epoch % eta_decay_epoch == 0:
                                 curr_eta *= eta_decay
@@ -213,6 +217,6 @@ for rseed in xrange(0, nruns):
 
                     print "Final MSE: %f" %(test_accuracy())
 
-                    print_preoutputs()
-                    save_activations(pre_output,filename_prefix+"final_pre_outputs.csv")
-                    save_activations(internal_rep,filename_prefix+"final_reps.csv")
+#                    print_preoutputs()
+#                    save_activations(pre_output,filename_prefix+"final_pre_outputs.csv")
+#                    save_activations(internal_rep,filename_prefix+"final_reps.csv")

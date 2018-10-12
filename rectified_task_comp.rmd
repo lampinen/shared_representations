@@ -1,0 +1,76 @@
+---
+title: "Task transfer comparison"
+author: "Andrew Lampinen"
+output: html_document
+---
+```{r}
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+```
+
+```{r}
+num_runs = 10
+networks = c('linear', 'nonlinear')
+nlayers = 2:3
+ndoms = 1:2
+
+d = data.frame()
+for (network in networks) {
+  for (nlayer in nlayers) {
+    for (ndomains in ndoms) {
+      if (ndomains > 1) {
+        possible_alignments = c("aligned", "random")
+      } else {
+        possible_alignments = c("NA")
+      }
+      for (alignment in possible_alignments) {
+        for (rseed in 0:(num_runs-1)) {
+          filename = sprintf("./results/task_comp/%s_nlayer_%i_ndomains_%i_aligned_%s_rseed_%i_loss_track.csv",network,nlayer,ndomains,alignment,rseed)
+          this_d = read.csv(filename, header=T)
+          this_d = this_d %>%
+            mutate(num_layers=nlayer,
+                   num_domains=ndomains,
+                   alignment = alignment,
+                   network=network,
+                   rseed=rseed)
+          d = bind_rows(d, this_d)
+        }
+      }
+    }
+  }
+}
+```
+
+```{r}
+d = d %>%
+  filter(epoch < 1000 | (num_layers == 3 & epoch < 2500)) %>%
+  mutate(num_domains = factor(num_domains),
+         alignment = factor(alignment, levels=c("aligned", "random", "NA"), labels=c("aligned", "random", "no aux.")),
+         num_layers = factor(num_layers, labels=c("One hidden layer", "Two hidden layers")),
+         network = factor(network, labels=c("Fully linear", "Final layer nonlinear")))
+```
+
+```{r}
+avg_d = d %>% 
+  group_by(num_layers, num_domains, network, alignment, epoch) %>%
+  summarize(min_MSE=min(MSE), max_MSE=max(MSE), mean_MSE=mean(MSE)) %>%
+  ungroup() %>%
+  mutate(log_MSE=log(mean_MSE), scaled_MSE=mean_MSE/as.numeric(num_domains), scaled_min_MSE=min_MSE/as.numeric(num_domains), scaled_max_MSE=max_MSE/as.numeric(num_domains))
+```
+
+```{r}
+ggplot(data=avg_d, aes(x=epoch, y=scaled_MSE, color=alignment)) +
+  geom_line(size=1.25) +
+#  geom_ribbon(aes(x=epoch, ymin=scaled_min_MSE, ymax=scaled_max_MSE, fill=num_domains), alpha=0.3) +
+  facet_grid(network ~ num_layers, scales="free_x") +
+  scale_color_brewer(palette="Set1") +
+  theme_bw(base_size=15) +
+  labs(color='Aux. Alignment', x='Epoch', y='Error (target domain)') +
+  theme(plot.background = element_blank(),panel.grid.major = element_blank(),panel.grid.minor = element_blank())
+```
+
+```{r}
+ggsave("result_plots/rectified_task_comp.png")
+```
+
