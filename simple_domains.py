@@ -135,7 +135,7 @@ for rseed in xrange(0, nruns):
                     sess.run(init)
 
                     def test_accuracy():
-                        MSE = sess.run(d1_loss,feed_dict={input_ph: x_data[:num_inputs_per, :],target_ph: y_data[num_inputs_per, :]})
+                        MSE = sess.run(d1_loss,feed_dict={input_ph: x_data[:num_inputs_per, :],target_ph: y_data[:num_inputs_per, :]})
                         MSE /= num_inputs_per 
                         return MSE
 
