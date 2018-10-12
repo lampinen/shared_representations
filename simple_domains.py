@@ -119,9 +119,9 @@ for rseed in xrange(0, nruns):
 
                     target_t = tf.transpose(target_ph)
                     loss = tf.reduce_sum(tf.square(output - target_t))# +0.05*(tf.nn.l2_loss(internal_rep))
-                    d1_loss = tf.reduce_sum(tf.square(output[:, :num_outputs_per] - target_t[:, :num_outputs_per]))
+                    d1_loss = tf.reduce_sum(tf.square(output[:num_outputs_per, :] - target_t[:num_outputs_per, :]))
                     linearized_loss = tf.reduce_sum(tf.square(pre_output - target_t))# +0.05*(tf.nn.l2_loss(internal_rep))
-                    d1_linearized_loss = tf.reduce_sum(tf.square(pre_output[:, :num_outputs_per] - target_t[:, :num_outputs_per]))
+                    d1_linearized_loss = tf.reduce_sum(tf.square(pre_output[:num_outputs_per, :] - target_t[:num_outputs_per, :]))
                     output_grad = tf.gradients(loss,[output])[0]
                     W1_grad = tf.gradients(loss,[W1])[0]
                     eta_ph = tf.placeholder(tf.float32)
@@ -135,7 +135,8 @@ for rseed in xrange(0, nruns):
                     sess.run(init)
 
                     def test_accuracy():
-                        MSE = sess.run(d1_loss,feed_dict={input_ph: x_data[:num_inputs_per, :],target_ph: y_data[:num_inputs_per, :]})
+                        MSE = sess.run(d1_linearized_loss if network == "linear" else d1_loss,
+                                       feed_dict={input_ph: x_data[:num_inputs_per, :],target_ph: y_data[:num_inputs_per, :]})
                         MSE /= num_inputs_per 
                         return MSE
 

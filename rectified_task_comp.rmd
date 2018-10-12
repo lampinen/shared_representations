@@ -10,7 +10,7 @@ library(ggplot2)
 ```
 
 ```{r}
-num_runs = 10
+num_runs = 1
 networks = c('linear', 'nonlinear')
 nlayers = 2:3
 ndoms = 1:2
@@ -44,7 +44,7 @@ for (network in networks) {
 
 ```{r}
 d = d %>%
-  filter(epoch < 1000 | (num_layers == 3 & epoch < 2500)) %>%
+  filter(epoch < 2000 | (num_layers == 3 & epoch < 10000)) %>%
   mutate(num_domains = factor(num_domains),
          alignment = factor(alignment, levels=c("aligned", "random", "NA"), labels=c("aligned", "random", "no aux.")),
          num_layers = factor(num_layers, labels=c("One hidden layer", "Two hidden layers")),
@@ -56,7 +56,7 @@ avg_d = d %>%
   group_by(num_layers, num_domains, network, alignment, epoch) %>%
   summarize(min_MSE=min(MSE), max_MSE=max(MSE), mean_MSE=mean(MSE)) %>%
   ungroup() %>%
-  mutate(log_MSE=log(mean_MSE), scaled_MSE=mean_MSE/as.numeric(num_domains), scaled_min_MSE=min_MSE/as.numeric(num_domains), scaled_max_MSE=max_MSE/as.numeric(num_domains))
+  mutate(log_MSE=log(mean_MSE), scaled_MSE=mean_MSE, scaled_min_MSE=min_MSE, scaled_max_MSE=max_MSE)
 ```
 
 ```{r}
