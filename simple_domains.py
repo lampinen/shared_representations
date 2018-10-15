@@ -13,6 +13,7 @@ nepochs = 10000
 nruns = 100
 num_inputs_per = 20
 num_outputs_per = 30
+num_hidden = 10
 rank = 3
 #nhidden = 6
 #rseed = 2  #reproducibility
@@ -65,7 +66,7 @@ for rseed in xrange(0, nruns):
             for ndomains in [1,2]: #,3]:
                 ninput = num_inputs_per*ndomains
                 noutput = num_outputs_per*ndomains 
-                nhidden = ninput
+                nhidden = num_hidden*ndomains
                 alignment_options = ["aligned", "random"] if ndomains >1  else ["NA"]
                 for alignment in alignment_options:
                     print "nlayer %i ndomains %i alignment %s run %i" % (nlayer, ndomains, alignment, rseed)
@@ -91,22 +92,22 @@ for rseed in xrange(0, nruns):
                     input_ph = tf.placeholder(tf.float32, shape=[None, ninput])
                     target_ph = tf.placeholder(tf.float32, shape=[None, noutput])
                     if nlayer == 2:
-                        W1 = tf.Variable(tf.random_uniform([nhidden,ninput],0.,2.0/(nhidden+ninput)))
-                        W2 = tf.Variable(tf.random_uniform([noutput,nhidden],0.,2./(nhidden+noutput)))
+                        W1 = tf.Variable(tf.random_uniform([nhidden,ninput],0.,2.0/(num_hidden+num_inputs_per)))
+                        W2 = tf.Variable(tf.random_uniform([noutput,nhidden],0.,2./(num_hidden+num_outputs_per)))
                         internal_rep = tf.matmul(W1,tf.transpose(input_ph))
                         pre_output = tf.matmul(W2,internal_rep)
                     elif nlayer == 3:
-                        W1 = tf.Variable(tf.random_uniform([nhidden,ninput],0.,2./(nhidden+ninput)))
-                        W2 = tf.Variable(tf.random_uniform([nhidden,nhidden],0.,1./nhidden))
-                        W3 = tf.Variable(tf.random_uniform([noutput,nhidden],0.,2./(nhidden+noutput)))
+                        W1 = tf.Variable(tf.random_uniform([nhidden,ninput],0.,2./(num_hidden+num_inputs_per)))
+                        W2 = tf.Variable(tf.random_uniform([nhidden,nhidden],0.,1./num_hidden))
+                        W3 = tf.Variable(tf.random_uniform([noutput,nhidden],0.,2./(num_hidden+num_outputs_per)))
                         internal_rep = tf.matmul(W1,tf.transpose(input_ph))
                             
                         pre_output = tf.matmul(W3,tf.matmul(W2,internal_rep))
                     elif nlayer == 4:
-                        W1 = tf.Variable(tf.random_uniform([nhidden,ninput],0.,2./(nhidden+ninput)))
-                        W2 = tf.Variable(tf.random_uniform([nhidden,nhidden],0.,1./nhidden))
-                        W3 = tf.Variable(tf.random_uniform([nhidden,nhidden],0.,1./nhidden))
-                        W4 = tf.Variable(tf.random_uniform([noutput,nhidden],0.,2./(nhidden+noutput)))
+                        W1 = tf.Variable(tf.random_uniform([nhidden,ninput],0.,2./(num_hidden+num_inputs_per)))
+                        W2 = tf.Variable(tf.random_uniform([nhidden,nhidden],0.,1./num_hidden))
+                        W3 = tf.Variable(tf.random_uniform([nhidden,nhidden],0.,1./num_hidden))
+                        W4 = tf.Variable(tf.random_uniform([noutput,nhidden],0.,2./(num_hidden+num_outputs_per)))
                         internal_rep = tf.matmul(W1,tf.transpose(input_ph))
                             
                         pre_output = tf.matmul(W4,tf.matmul(W3,tf.matmul(W2,internal_rep)))
