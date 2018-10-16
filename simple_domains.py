@@ -10,11 +10,11 @@ init_eta = 0.002
 eta_decay = 1.0 #multiplicative per eta_decay_epoch epochs
 eta_decay_epoch = 10
 nepochs = 10000
-nruns = 100
+nruns = 10
 num_inputs_per = 20
 num_outputs_per = 30
-num_hidden = 10
-rank = 3
+num_hidden = 2
+rank = 1
 #nhidden = 6
 #rseed = 2  #reproducibility
 ###################################
@@ -41,7 +41,7 @@ rank = 3
 #print
 #
 
-def SVD_dataset(num_examples, num_outputs, num_nonempty=4, singular_value_multiplier=1):
+def SVD_dataset(num_examples, num_outputs, num_nonempty=4, singular_value_multiplier=5):
     """Like the shared input modes dataset, but only one domain"""
     input_modes = random_orthogonal(num_examples)
     strengths = np.zeros(num_examples)
@@ -66,7 +66,7 @@ for rseed in xrange(0, nruns):
             for ndomains in [1,2]: #,3]:
                 ninput = num_inputs_per*ndomains
                 noutput = num_outputs_per*ndomains 
-                nhidden = num_hidden*ndomains
+                nhidden = num_hidden
                 alignment_options = ["aligned", "random"] if ndomains >1  else ["NA"]
                 for alignment in alignment_options:
                     print "nlayer %i ndomains %i alignment %s run %i" % (nlayer, ndomains, alignment, rseed)
@@ -87,7 +87,7 @@ for rseed in xrange(0, nruns):
                     else:
                         x_data = this_x_data
                         y_data = this_y_data
-                    y_data = np.clip(y_data, 0, None) + 0.1*np.clip(y_data, None, 0) # make the task leaky_relu-ed linear
+                    y_data = np.clip(y_data, 0, None)# + 0.1*np.clip(y_data, None, 0) # make the task leaky_relu-ed linear
 
                     input_ph = tf.placeholder(tf.float32, shape=[None, ninput])
                     target_ph = tf.placeholder(tf.float32, shape=[None, noutput])

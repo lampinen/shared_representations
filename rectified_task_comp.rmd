@@ -10,7 +10,7 @@ library(ggplot2)
 ```
 
 ```{r}
-num_runs = 1
+num_runs = 5
 networks = c('linear', 'nonlinear')
 nlayers = 2:3
 ndoms = 1:2
